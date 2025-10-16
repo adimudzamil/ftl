@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flight Time Calculator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f0f2f5;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        
+        .calculator {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            width: 100%;
+            max-width: 550px;
+        }
+        
+        h1 {
+            color: #1a3a8f;
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+        
+        .input-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+        
+        button {
+            background-color: #1a3a8f;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            width: 100%;
+            margin-top: 10px;
+        }
+        
+        button:hover {
+            background-color: #0a2463;
+        }
+        
+        .results {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            background-color: #f8f9fa;
+            display: none;
+        }
+        
+        .result-item {
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        
+        .ok {
+            background-color: #d4edda;
+            border-left: 4px solid #28a745;
+        }
+        
+        .warning {
+            background-color: #fff3cd;
+            border-left: 4px solid #ffc107;
+        }
+        
+        .danger {
+            background-color: #f8d7da;
+            border-left: 4px solid #dc3545;
+        }
+        
+        .time-display {
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin: 5px 0;
+        }
+        
+        .limits-info {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            background-color: #e9ecef;
+            font-size: 0.85rem;
+        }
+        
+        .limits-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        
+        .limits-table th, .limits-table td {
+            padding: 5px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .limits-table th {
+            background-color: #1a3a8f;
+            color: white;
+        }
+        
+        .night-periods {
+            margin-top: 10px;
+            font-size: 0.8rem;
+        }
+        
+        .night-period {
+            margin-bottom: 5px;
+            padding: 5px;
+            background-color: #f8f9fa;
+            border-radius: 3px;
+        }
+        
+        .gmt-info {
+            font-size: 0.8rem;
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        .input-description {
+            font-size: 0.75rem;
+            color: #666;
+            margin-top: 3px;
+            font-style: italic;
+            line-height: 1.3;
+        }
+        
+        .gmt-comparison {
+            margin-top: 10px;
+            padding: 8px;
+            background-color: #e9ecef;
+            border-radius: 5px;
+            font-size: 0.85rem;
+        }
+        
+        .non-acclimatized-info {
+            margin-top: 10px;
+            padding: 8px;
+            background-color: #fff3cd;
+            border-radius: 5px;
+            font-size: 0.85rem;
+            border-left: 3px solid #ffc107;
+        }
+        
+        .tables-container {
+            display: flex;
+            gap: 15px;
+            margin-top: 10px;
+        }
+        
+        .table-wrapper {
+            flex: 1;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        
+        .table-title {
+            background-color: #1a3a8f;
+            color: white;
+            padding: 8px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            text-align: center;
+        }
+        
+        .non-acclimatized-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .non-acclimatized-table th, .non-acclimatized-table td {
+            padding: 6px;
+            text-align: center;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .non-acclimatized-table th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+        }
+        
+        .table-section {
+            margin-top: 20px;
+        }
+        
+        .section-title {
+            color: #1a3a8f;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+            border-bottom: 2px solid #1a3a8f;
+            padding-bottom: 5px;
+        }
+        
+        .footnote {
+            text-align: center;
+            margin-top: 25px;
+            padding-top: 15px;
+            border-top: 1px solid #ddd;
+            color: #666;
+            font-size: 0.8rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator">
+        <h1>Flight Time Calculator</h1>
+        
+        <div class="input-group">
+            <label for="baseGMT">Base GMT</label>
+            <select id="baseGMT">
+                <option value="-12">GMT-12</option>
+                <option value="-11">GMT-11</option>
+                <option value="-10">GMT-10</option>
+                <option value="-9">GMT-9</option>
+                <option value="-8">GMT-8</option>
+                <option value="-7">GMT-7</option>
+                <option value="-6">GMT-6</option>
+                <option value="-5">GMT-5</option>
+                <option value="-4">GMT-4</option>
+                <option value="-3">GMT-3</option>
+                <option value="-2">GMT-2</option>
+                <option value="-1">GMT-1</option>
+                <option value="0">GMT+0</option>
+                <option value="1">GMT+1</option>
+                <option value="2">GMT+2</option>
+                <option value="3">GMT+3</option>
+                <option value="4">GMT+4</option>
+                <option value="5">GMT+5</option>
+                <option value="6">GMT+6</option>
+                <option value="7">GMT+7</option>
+                <option value="8" selected>GMT+8</option>
+                <option value="9">GMT+9</option>
+                <option value="10">GMT+10</option>
+                <option value="11">GMT+11</option>
+                <option value="12">GMT+12</option>
+            </select>
+            <div class="gmt-info">Select your home base timezone</div>
+        </div>
+        
+        <div class="input-group">
+            <label for="lastDepartureGMT">Last Departure Station GMT</label>
+            <select id="lastDepartureGMT">
+                <option value="-12">GMT-12</option>
+                <option value="-11">GMT-11</option>
+                <option value="-10">GMT-10</option>
+                <option value="-9">GMT-9</option>
+                <option value="-8">GMT-8</option>
+                <option value="-7">GMT-7</option>
+                <option value="-6">GMT-6</option>
+                <option value="-5">GMT-5</option>
+                <option value="-4">GMT-4</option>
+                <option value="-3">GMT-3</option>
+                <option value="-2">GMT-2</option>
+                <option value="-1">GMT-1</option>
+                <option value="0">GMT+0</option>
+                <option value="1">GMT+1</option>
+                <option value="2">GMT+2</option>
+                <option value="3">GMT+3</option>
+                <option value="4">GMT+4</option>
+                <option value="5">GMT+5</option>
+                <option value="6">GMT+6</option>
+                <option value="7">GMT+7</option>
+                <option value="8" selected>GMT+8</option>
+                <option value="9">GMT+9</option>
+                <option value="10">GMT+10</option>
+                <option value="11">GMT+11</option>
+                <option value="12">GMT+12</option>
+            </select>
+            <div class="gmt-info">Select last departure station timezone</div>
+        </div>
+        
+        <div class="input-group">
+            <label for="lastDutyEnd">Last Duty End Date and Time</label>
+            <input type="datetime-local" id="lastDutyEnd" required>
+            <div class="input-description">Check last duty end time in your roster (STA + 30 minutes) or (ATA + 30 minutes)</div>
+        </div>
+        
+        <div class="input-group">
+            <label for="dutyStart">Start Time</label>
+            <input type="datetime-local" id="dutyStart" required>
+            <div class="input-description">Reporting time at Base/ ex-Station.</div>
+        </div>
+        
+        <div class="input-group">
+            <label for="dutyEnd">End Time</label>
+            <input type="datetime-local" id="dutyEnd" required>
+            <div class="input-description">Final sector STA/ATA. FDP does not count +30 minutes post flight duty time. If last sector is PS(DHC/Paxiing) insert the previous sector STA/ATA.</div>
+        </div>
+        
+        <div class="input-group">
+            <label for="sectors">Number of Sectors</label>
+            <input type="number" id="sectors" min="1" max="4" value="1" required>
+        </div>
+        
+        <button id="calculateBtn">Calculate</button>
+        
+        <div class="results" id="results">
+            <div id="resultContent">
+                <!-- Results will appear here -->
+            </div>
+        </div>
+        
+        <div class="table-section">
+            <div class="section-title">Acclimatized Duty Limits</div>
+            <div class="limits-info">
+                <table class="limits-table">
+                    <thead>
+                        <tr>
+                            <th>Start Time</th>
+                            <th>Sectors</th>
+                            <th>Duty Limit</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>0600-0759</td><td>1</td><td>14:00</td></tr>
+                        <tr><td>0600-0759</td><td>2</td><td>13:15</td></tr>
+                        <tr><td>0600-0759</td><td>3</td><td>12:30</td></tr>
+                        <tr><td>0600-0759</td><td>4</td><td>11:45</td></tr>
+                        <tr><td>0800-1259</td><td>1</td><td>15:00</td></tr>
+                        <tr><td>0800-1259</td><td>2</td><td>14:15</td></tr>
+                        <tr><td>0800-1259</td><td>3</td><td>13:30</td></tr>
+                        <tr><td>0800-1259</td><td>4</td><td>12:45</td></tr>
+                        <tr><td>1300-1759</td><td>1</td><td>14:00</td></tr>
+                        <tr><td>1300-1759</td><td>2</td><td>13:15</td></tr>
+                        <tr><td>1300-1759</td><td>3</td><td>12:30</td></tr>
+                        <tr><td>1300-1759</td><td>4</td><td>11:45</td></tr>
+                        <tr><td>1800-2159</td><td>1</td><td>13:00</td></tr>
+                        <tr><td>1800-2159</td><td>2</td><td>12:15</td></tr>
+                        <tr><td>1800-2159</td><td>3</td><td>11:30</td></tr>
+                        <tr><td>1800-2159</td><td>4</td><td>10:45</td></tr>
+                        <tr><td>2200-0559</td><td>1</td><td>12:00</td></tr>
+                        <tr><td>2200-0559</td><td>2</td><td>11:15</td></tr>
+                        <tr><td>2200-0559</td><td>3</td><td>10:30</td></tr>
+                        <tr><td>2200-0559</td><td>4</td><td>10:00</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div class="table-section">
+            <div class="section-title">Non-Acclimatized Duty Limits</div>
+            <div class="limits-info">
+                <div class="tables-container">
+                    <div class="table-wrapper">
+                        <div class="table-title">Rest Period ≤18h OR ≥30h</div>
+                        <table class="non-acclimatized-table">
+                            <thead>
+                                <tr>
+                                    <th>Sectors</th>
+                                    <th>Duty Limit</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>1</td><td>14:00</td></tr>
+                                <tr><td>2</td><td>13:15</td></tr>
+                                <tr><td>3</td><td>12:30</td></tr>
+                                <tr><td>4</td><td>11:45</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="table-wrapper">
+                        <div class="table-title">Rest Period 18:01h to 29:59h</div>
+                        <table class="non-acclimatized-table">
+                            <thead>
+                                <tr>
+                                    <th>Sectors</th>
+                                    <th>Duty Limit</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>1</td><td>12:30</td></tr>
+                                <tr><td>2</td><td>12:00</td></tr>
+                                <tr><td>3</td><td>11:30</td></tr>
+                                <tr><td>4</td><td>10:45</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footnote">
+            by 2100551 16/10/25
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('calculateBtn').addEventListener('click', function() {
+            calculate();
+        });
+        
+        function calculate() {
+            // Get input values
+            const baseGMT = parseInt(document.getElementById('baseGMT').value);
+            const lastDepartureGMT = parseInt(document.getElementById('lastDepartureGMT').value);
+            const lastDutyEnd = new Date(document.getElementById('lastDutyEnd').value);
+            const dutyStart = new Date(document.getElementById('dutyStart').value);
+            const dutyEnd = new Date(document.getElementById('dutyEnd').value);
+            const sectors = parseInt(document.getElementById('sectors').value);
+            
+            // Calculate duty period in milliseconds
+            const dutyMs = dutyEnd - dutyStart;
+            
+            // Convert to hours and minutes
+            const dutyHours = Math.floor(dutyMs / (1000 * 60 * 60));
+            const dutyMinutes = Math.floor((dutyMs % (1000 * 60 * 60)) / (1000 * 60));
+            
+            // Format as HH:MM
+            const dutyTimeFormatted = `${dutyHours}h ${dutyMinutes}m`;
+            
+            // Calculate acclimatization
+            const acclimatization = checkAcclimatization(lastDutyEnd, dutyStart, baseGMT, lastDepartureGMT);
+            
+            // Determine limits based on start time, sectors, and acclimatization status
+            let dutyLimitHours, dutyLimitMinutes;
+            
+            if (acclimatization.isAcclimatized) {
+                // Use normal acclimatized limits
+                const startHour = dutyStart.getHours();
+                const startMinutes = dutyStart.getMinutes();
+                const startTimeInMinutes = startHour * 60 + startMinutes;
+                
+                // Set duty limits based on all conditions
+                dutyLimitHours = 14; // Default fallback
+                dutyLimitMinutes = 0;
+                
+                // 0600-0759
+                if (startTimeInMinutes >= 6*60 && startTimeInMinutes < 8*60) {
+                    if (sectors === 1) { dutyLimitHours = 14; dutyLimitMinutes = 0; }
+                    else if (sectors === 2) { dutyLimitHours = 13; dutyLimitMinutes = 15; }
+                    else if (sectors === 3) { dutyLimitHours = 12; dutyLimitMinutes = 30; }
+                    else if (sectors === 4) { dutyLimitHours = 11; dutyLimitMinutes = 45; }
+                }
+                // 0800-1259
+                else if (startTimeInMinutes >= 8*60 && startTimeInMinutes < 13*60) {
+                    if (sectors === 1) { dutyLimitHours = 15; dutyLimitMinutes = 0; }
+                    else if (sectors === 2) { dutyLimitHours = 14; dutyLimitMinutes = 15; }
+                    else if (sectors === 3) { dutyLimitHours = 13; dutyLimitMinutes = 30; }
+                    else if (sectors === 4) { dutyLimitHours = 12; dutyLimitMinutes = 45; }
+                }
+                // 1300-1759
+                else if (startTimeInMinutes >= 13*60 && startTimeInMinutes < 18*60) {
+                    if (sectors === 1) { dutyLimitHours = 14; dutyLimitMinutes = 0; }
+                    else if (sectors === 2) { dutyLimitHours = 13; dutyLimitMinutes = 15; }
+                    else if (sectors === 3) { dutyLimitHours = 12; dutyLimitMinutes = 30; }
+                    else if (sectors === 4) { dutyLimitHours = 11; dutyLimitMinutes = 45; }
+                }
+                // 1800-2159
+                else if (startTimeInMinutes >= 18*60 && startTimeInMinutes < 22*60) {
+                    if (sectors === 1) { dutyLimitHours = 13; dutyLimitMinutes = 0; }
+                    else if (sectors === 2) { dutyLimitHours = 12; dutyLimitMinutes = 15; }
+                    else if (sectors === 3) { dutyLimitHours = 11; dutyLimitMinutes = 30; }
+                    else if (sectors === 4) { dutyLimitHours = 10; dutyLimitMinutes = 45; }
+                }
+                // 2200-0559 (crosses midnight)
+                else if (startTimeInMinutes >= 22*60 || startTimeInMinutes < 6*60) {
+                    if (sectors === 1) { dutyLimitHours = 12; dutyLimitMinutes = 0; }
+                    else if (sectors === 2) { dutyLimitHours = 11; dutyLimitMinutes = 15; }
+                    else if (sectors === 3) { dutyLimitHours = 10; dutyLimitMinutes = 30; }
+                    else if (sectors === 4) { dutyLimitHours = 10; dutyLimitMinutes = 0; }
+                }
+            } else {
+                // Use non-acclimatized limits based on rest period
+                const restHours = acclimatization.restHours;
+                
+                if (restHours <= 18 || restHours >= 30) {
+                    // Table 1: Rest period ≤18 hours OR ≥30 hours
+                    if (sectors === 1) { dutyLimitHours = 14; dutyLimitMinutes = 0; }
+                    else if (sectors === 2) { dutyLimitHours = 13; dutyLimitMinutes = 15; }
+                    else if (sectors === 3) { dutyLimitHours = 12; dutyLimitMinutes = 30; }
+                    else if (sectors === 4) { dutyLimitHours = 11; dutyLimitMinutes = 45; }
+                } else {
+                    // Table 2: Rest period between 18:01 and 29:59 hours
+                    if (sectors === 1) { dutyLimitHours = 12; dutyLimitMinutes = 30; }
+                    else if (sectors === 2) { dutyLimitHours = 12; dutyLimitMinutes = 0; }
+                    else if (sectors === 3) { dutyLimitHours = 11; dutyLimitMinutes = 30; }
+                    else if (sectors === 4) { dutyLimitHours = 10; dutyLimitMinutes = 45; }
+                }
+            }
+            
+            // Format duty limit for display
+            let dutyLimitFormatted = `${dutyLimitHours}h`;
+            if (dutyLimitMinutes > 0) {
+                dutyLimitFormatted += ` ${dutyLimitMinutes}m`;
+            }
+            
+            // Set sector limits
+            const sectorLimit = 4;
+            
+            // Check compliance
+            const dutyDecimal = dutyMs / (1000 * 60 * 60); // For comparison with limits
+            const dutyLimitDecimal = dutyLimitHours + (dutyLimitMinutes / 60);
+            const dutyStatus = dutyDecimal <= dutyLimitDecimal ? 'ok' : 'danger';
+            const sectorStatus = sectors <= sectorLimit ? 'ok' : 'danger';
+            
+            // Create result messages
+            let resultHTML = '';
+            
+            // Acclimatization result
+            resultHTML += `<div class="result-item ${acclimatization.status}">`;
+            resultHTML += `<strong>Acclimatization:</strong> ${acclimatization.message}<br>`;
+            resultHTML += `<strong>Rest Period:</strong> ${acclimatization.restPeriod}<br>`;
+            resultHTML += `<strong>Night Periods with 8+ hours rest:</strong> ${acclimatization.validNightPeriods} of 2 required`;
+            
+            // Show timezone info if applicable
+            if (acclimatization.timezoneExemption) {
+                resultHTML += `<div class="gmt-comparison">`;
+                resultHTML += `<strong>Timezone Exemption:</strong> Last departure station GMT${lastDepartureGMT >= 0 ? '+' : ''}${lastDepartureGMT} is within ±2 hours of Base GMT${baseGMT >= 0 ? '+' : ''}${baseGMT}`;
+                resultHTML += `</div>`;
+            }
+            
+            // Show non-acclimatized info if applicable
+            if (!acclimatization.isAcclimatized) {
+                resultHTML += `<div class="non-acclimatized-info">`;
+                resultHTML += `<strong>Non-Acclimatized Limits Applied:</strong> `;
+                if (acclimatization.restHours <= 18 || acclimatization.restHours >= 30) {
+                    resultHTML += `Rest period (${acclimatization.restPeriod}) is ≤18h OR ≥30h`;
+                } else {
+                    resultHTML += `Rest period (${acclimatization.restPeriod}) is between 18:01h and 29:59h`;
+                }
+                resultHTML += `</div>`;
+            }
+            
+            // Show night period details
+            if (acclimatization.nightPeriods.length > 0) {
+                resultHTML += `<div class="night-periods">`;
+                acclimatization.nightPeriods.forEach((period, index) => {
+                    const status = period.restHours >= 8 ? '✓' : '✗';
+                    resultHTML += `<div class="night-period">${status} Night ${index+1}: ${period.date} (${period.restHours.toFixed(1)}h rest)</div>`;
+                });
+                resultHTML += `</div>`;
+            }
+            
+            resultHTML += `</div>`;
+            
+            // Duty period result
+            resultHTML += `<div class="result-item ${dutyStatus}">`;
+            resultHTML += `<strong>Duty Period:</strong>`;
+            resultHTML += `<div class="time-display">${dutyTimeFormatted}</div>`;
+            resultHTML += `<strong>Limit:</strong> ${dutyLimitFormatted}<br>`;
+            resultHTML += dutyStatus === 'ok' ? 
+                '✓ Within limit' : 
+                '✗ Exceeds limit!';
+            resultHTML += `</div>`;
+            
+            // Sectors result
+            resultHTML += `<div class="result-item ${sectorStatus}">`;
+            resultHTML += `<strong>Sectors:</strong> ${sectors}<br>`;
+            resultHTML += `<strong>Limit:</strong> ${sectorLimit}<br>`;
+            resultHTML += sectorStatus === 'ok' ? 
+                '✓ Within limit' : 
+                '✗ Exceeds limit!';
+            resultHTML += `</div>`;
+            
+            // Display results
+            document.getElementById('resultContent').innerHTML = resultHTML;
+            document.getElementById('results').style.display = 'block';
+        }
+        
+        function checkAcclimatization(lastDutyEnd, dutyStart, baseGMT, lastDepartureGMT) {
+            // Calculate total rest period in hours
+            const restMs = dutyStart - lastDutyEnd;
+            const restHours = restMs / (1000 * 60 * 60);
+            
+            // Format rest period for display
+            const restHoursFormatted = Math.floor(restHours);
+            const restMinutesFormatted = Math.floor((restHours % 1) * 60);
+            const restPeriod = `${restHoursFormatted}h ${restMinutesFormatted}m`;
+            
+            // Check if last departure station GMT is within ±2 hours of base GMT
+            const timezoneDifference = Math.abs(lastDepartureGMT - baseGMT);
+            const timezoneExemption = timezoneDifference <= 2;
+            
+            // Count night periods (2200 to 0800) with at least 8 hours of rest
+            let validNightPeriods = 0;
+            let nightPeriods = [];
+            
+            // Start from the day of last duty end
+            let currentDate = new Date(lastDutyEnd);
+            currentDate.setHours(0, 0, 0, 0);
+            
+            // Check up to 5 days to cover all possible night periods
+            for (let i = 0; i < 5; i++) {
+                const nightStart = new Date(currentDate);
+                nightStart.setHours(22, 0, 0, 0);
+                
+                const nightEnd = new Date(currentDate);
+                nightEnd.setDate(nightEnd.getDate() + 1);
+                nightEnd.setHours(8, 0, 0, 0);
+                
+                // If the night period is completely outside the rest period, skip
+                if (nightEnd <= lastDutyEnd || nightStart >= dutyStart) {
+                    currentDate.setDate(currentDate.getDate() + 1);
+                    continue;
+                }
+                
+                // Calculate overlap between rest period and night period
+                const overlapStart = new Date(Math.max(lastDutyEnd.getTime(), nightStart.getTime()));
+                const overlapEnd = new Date(Math.min(dutyStart.getTime(), nightEnd.getTime()));
+                
+                const overlapHours = (overlapEnd - overlapStart) / (1000 * 60 * 60);
+                
+                // Only count if there's a positive overlap
+                if (overlapHours > 0) {
+                    const isValid = overlapHours >= 8;
+                    if (isValid) validNightPeriods++;
+                    
+                    nightPeriods.push({
+                        date: nightStart.toLocaleDateString(),
+                        restHours: overlapHours,
+                        isValid: isValid
+                    });
+                }
+                
+                currentDate.setDate(currentDate.getDate() + 1);
+            }
+            
+            // Determine acclimatization status
+            let status = 'danger';
+            let message = 'Not Acclimatized';
+            let isAcclimatized = false;
+            
+            // Check if timezone exemption applies
+            if (timezoneExemption) {
+                status = 'ok';
+                message = 'Acclimatized (Timezone Exemption)';
+                isAcclimatized = true;
+            }
+            // Otherwise apply normal rules
+            else if (validNightPeriods >= 2 && restHours >= 34) {
+                status = 'ok';
+                message = 'Acclimatized';
+                isAcclimatized = true;
+            } else if (validNightPeriods >= 2 && restHours < 34) {
+                status = 'warning';
+                message = 'Night periods OK but rest < 34h';
+            } else if (validNightPeriods < 2 && restHours >= 34) {
+                status = 'warning';
+                message = 'Rest period OK but insufficient night periods';
+            }
+            
+            return {
+                status: status,
+                message: message,
+                restPeriod: restPeriod,
+                restHours: restHours,
+                validNightPeriods: validNightPeriods,
+                nightPeriods: nightPeriods,
+                timezoneExemption: timezoneExemption,
+                isAcclimatized: isAcclimatized
+            };
+        }
+        
+        // Set default date/time values
+        window.onload = function() {
+            const now = new Date();
+            
+            // Format for datetime-local input
+            const formatDateTime = (date) => {
+                return date.toISOString().slice(0, 16);
+            };
+            
+            // Set all datetime inputs to current device date and time
+            document.getElementById('lastDutyEnd').value = formatDateTime(now);
+            document.getElementById('dutyStart').value = formatDateTime(now);
+            document.getElementById('dutyEnd').value = formatDateTime(now);
+            
+            // Set GMT defaults to +8
+            document.getElementById('baseGMT').value = "8";
+            document.getElementById('lastDepartureGMT').value = "8";
+        };
+    </script>
+</body>
+</html>
