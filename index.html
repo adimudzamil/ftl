@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Flight Time Calculator</title>
+    <title>Malaysia Airlines FTL Calculator</title>
     <style>
         * {
             margin: 0;
@@ -27,14 +27,24 @@
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
             padding: 30px;
             width: 100%;
-            max-width: 550px;
+            max-width: 600px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
         }
         
         h1 {
             color: #1a3a8f;
-            text-align: center;
-            margin-bottom: 20px;
-            font-size: 1.5rem;
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+        }
+        
+        .reference-note {
+            color: #666;
+            font-size: 0.85rem;
+            font-style: italic;
         }
         
         .input-group {
@@ -175,44 +185,6 @@
             border-left: 3px solid #ffc107;
         }
         
-        .tables-container {
-            display: flex;
-            gap: 15px;
-            margin-top: 10px;
-        }
-        
-        .table-wrapper {
-            flex: 1;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            overflow: hidden;
-        }
-        
-        .table-title {
-            background-color: #1a3a8f;
-            color: white;
-            padding: 8px;
-            font-size: 0.9rem;
-            font-weight: bold;
-            text-align: center;
-        }
-        
-        .non-acclimatized-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        
-        .non-acclimatized-table th, .non-acclimatized-table td {
-            padding: 6px;
-            text-align: center;
-            border-bottom: 1px solid #ddd;
-        }
-        
-        .non-acclimatized-table th {
-            background-color: #f8f9fa;
-            font-weight: 600;
-        }
-        
         .table-section {
             margin-top: 20px;
         }
@@ -233,40 +205,142 @@
             color: #666;
             font-size: 0.8rem;
         }
+        
+        .crew-results {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .crew-result {
+            flex: 1;
+            padding: 10px;
+            border-radius: 5px;
+            background-color: #f8f9fa;
+        }
+        
+        .crew-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #1a3a8f;
+        }
+        
+        .special-condition {
+            font-size: 0.8rem;
+            margin-top: 5px;
+            color: #666;
+            font-style: italic;
+        }
     </style>
 </head>
 <body>
     <div class="calculator">
-        <h1>Flight Time Calculator</h1>
+        <div class="header">
+            <h1>Malaysia Airlines FTL Calculator</h1>
+            <div class="reference-note">Based on OM-A issue 10 revision 1 Ch7.5.8, dated 20/06/25.</div>
+        </div>
         
         <div class="input-group">
             <label for="baseGMT">Base GMT</label>
             <select id="baseGMT">
-                <option value="-12">GMT-12</option>
-                <option value="-11">GMT-11</option>
-                <option value="-10">GMT-10</option>
-                <option value="-9">GMT-9</option>
-                <option value="-8">GMT-8</option>
-                <option value="-7">GMT-7</option>
-                <option value="-6">GMT-6</option>
-                <option value="-5">GMT-5</option>
-                <option value="-4">GMT-4</option>
-                <option value="-3">GMT-3</option>
-                <option value="-2">GMT-2</option>
-                <option value="-1">GMT-1</option>
-                <option value="0">GMT+0</option>
-                <option value="1">GMT+1</option>
-                <option value="2">GMT+2</option>
-                <option value="3">GMT+3</option>
-                <option value="4">GMT+4</option>
-                <option value="5">GMT+5</option>
-                <option value="6">GMT+6</option>
-                <option value="7">GMT+7</option>
-                <option value="8" selected>GMT+8</option>
-                <option value="9">GMT+9</option>
-                <option value="10">GMT+10</option>
-                <option value="11">GMT+11</option>
-                <option value="12">GMT+12</option>
+                <!-- GMT options with quarter-hour increments -->
+                <option value="-12">GMT-12:00</option>
+                <option value="-11.75">GMT-11:45</option>
+                <option value="-11.5">GMT-11:30</option>
+                <option value="-11.25">GMT-11:15</option>
+                <option value="-11">GMT-11:00</option>
+                <option value="-10.75">GMT-10:45</option>
+                <option value="-10.5">GMT-10:30</option>
+                <option value="-10.25">GMT-10:15</option>
+                <option value="-10">GMT-10:00</option>
+                <option value="-9.75">GMT-09:45</option>
+                <option value="-9.5">GMT-09:30</option>
+                <option value="-9.25">GMT-09:15</option>
+                <option value="-9">GMT-09:00</option>
+                <option value="-8.75">GMT-08:45</option>
+                <option value="-8.5">GMT-08:30</option>
+                <option value="-8.25">GMT-08:15</option>
+                <option value="-8">GMT-08:00</option>
+                <option value="-7.75">GMT-07:45</option>
+                <option value="-7.5">GMT-07:30</option>
+                <option value="-7.25">GMT-07:15</option>
+                <option value="-7">GMT-07:00</option>
+                <option value="-6.75">GMT-06:45</option>
+                <option value="-6.5">GMT-06:30</option>
+                <option value="-6.25">GMT-06:15</option>
+                <option value="-6">GMT-06:00</option>
+                <option value="-5.75">GMT-05:45</option>
+                <option value="-5.5">GMT-05:30</option>
+                <option value="-5.25">GMT-05:15</option>
+                <option value="-5">GMT-05:00</option>
+                <option value="-4.75">GMT-04:45</option>
+                <option value="-4.5">GMT-04:30</option>
+                <option value="-4.25">GMT-04:15</option>
+                <option value="-4">GMT-04:00</option>
+                <option value="-3.75">GMT-03:45</option>
+                <option value="-3.5">GMT-03:30</option>
+                <option value="-3.25">GMT-03:15</option>
+                <option value="-3">GMT-03:00</option>
+                <option value="-2.75">GMT-02:45</option>
+                <option value="-2.5">GMT-02:30</option>
+                <option value="-2.25">GMT-02:15</option>
+                <option value="-2">GMT-02:00</option>
+                <option value="-1.75">GMT-01:45</option>
+                <option value="-1.5">GMT-01:30</option>
+                <option value="-1.25">GMT-01:15</option>
+                <option value="-1">GMT-01:00</option>
+                <option value="-0.75">GMT-00:45</option>
+                <option value="-0.5">GMT-00:30</option>
+                <option value="-0.25">GMT-00:15</option>
+                <option value="0">GMT+00:00</option>
+                <option value="0.25">GMT+00:15</option>
+                <option value="0.5">GMT+00:30</option>
+                <option value="0.75">GMT+00:45</option>
+                <option value="1">GMT+01:00</option>
+                <option value="1.25">GMT+01:15</option>
+                <option value="1.5">GMT+01:30</option>
+                <option value="1.75">GMT+01:45</option>
+                <option value="2">GMT+02:00</option>
+                <option value="2.25">GMT+02:15</option>
+                <option value="2.5">GMT+02:30</option>
+                <option value="2.75">GMT+02:45</option>
+                <option value="3">GMT+03:00</option>
+                <option value="3.25">GMT+03:15</option>
+                <option value="3.5">GMT+03:30</option>
+                <option value="3.75">GMT+03:45</option>
+                <option value="4">GMT+04:00</option>
+                <option value="4.25">GMT+04:15</option>
+                <option value="4.5">GMT+04:30</option>
+                <option value="4.75">GMT+04:45</option>
+                <option value="5">GMT+05:00</option>
+                <option value="5.25">GMT+05:15</option>
+                <option value="5.5">GMT+05:30</option>
+                <option value="5.75">GMT+05:45</option>
+                <option value="6">GMT+06:00</option>
+                <option value="6.25">GMT+06:15</option>
+                <option value="6.5">GMT+06:30</option>
+                <option value="6.75">GMT+06:45</option>
+                <option value="7">GMT+07:00</option>
+                <option value="7.25">GMT+07:15</option>
+                <option value="7.5">GMT+07:30</option>
+                <option value="7.75">GMT+07:45</option>
+                <option value="8" selected>GMT+08:00</option>
+                <option value="8.25">GMT+08:15</option>
+                <option value="8.5">GMT+08:30</option>
+                <option value="8.75">GMT+08:45</option>
+                <option value="9">GMT+09:00</option>
+                <option value="9.25">GMT+09:15</option>
+                <option value="9.5">GMT+09:30</option>
+                <option value="9.75">GMT+09:45</option>
+                <option value="10">GMT+10:00</option>
+                <option value="10.25">GMT+10:15</option>
+                <option value="10.5">GMT+10:30</option>
+                <option value="10.75">GMT+10:45</option>
+                <option value="11">GMT+11:00</option>
+                <option value="11.25">GMT+11:15</option>
+                <option value="11.5">GMT+11:30</option>
+                <option value="11.75">GMT+11:45</option>
+                <option value="12">GMT+12:00</option>
             </select>
             <div class="gmt-info">Select your home base timezone</div>
         </div>
@@ -274,31 +348,104 @@
         <div class="input-group">
             <label for="lastDepartureGMT">Last Departure Station GMT</label>
             <select id="lastDepartureGMT">
-                <option value="-12">GMT-12</option>
-                <option value="-11">GMT-11</option>
-                <option value="-10">GMT-10</option>
-                <option value="-9">GMT-9</option>
-                <option value="-8">GMT-8</option>
-                <option value="-7">GMT-7</option>
-                <option value="-6">GMT-6</option>
-                <option value="-5">GMT-5</option>
-                <option value="-4">GMT-4</option>
-                <option value="-3">GMT-3</option>
-                <option value="-2">GMT-2</option>
-                <option value="-1">GMT-1</option>
-                <option value="0">GMT+0</option>
-                <option value="1">GMT+1</option>
-                <option value="2">GMT+2</option>
-                <option value="3">GMT+3</option>
-                <option value="4">GMT+4</option>
-                <option value="5">GMT+5</option>
-                <option value="6">GMT+6</option>
-                <option value="7">GMT+7</option>
-                <option value="8" selected>GMT+8</option>
-                <option value="9">GMT+9</option>
-                <option value="10">GMT+10</option>
-                <option value="11">GMT+11</option>
-                <option value="12">GMT+12</option>
+                <!-- Same GMT options as above -->
+                <option value="-12">GMT-12:00</option>
+                <option value="-11.75">GMT-11:45</option>
+                <option value="-11.5">GMT-11:30</option>
+                <option value="-11.25">GMT-11:15</option>
+                <option value="-11">GMT-11:00</option>
+                <option value="-10.75">GMT-10:45</option>
+                <option value="-10.5">GMT-10:30</option>
+                <option value="-10.25">GMT-10:15</option>
+                <option value="-10">GMT-10:00</option>
+                <option value="-9.75">GMT-09:45</option>
+                <option value="-9.5">GMT-09:30</option>
+                <option value="-9.25">GMT-09:15</option>
+                <option value="-9">GMT-09:00</option>
+                <option value="-8.75">GMT-08:45</option>
+                <option value="-8.5">GMT-08:30</option>
+                <option value="-8.25">GMT-08:15</option>
+                <option value="-8">GMT-08:00</option>
+                <option value="-7.75">GMT-07:45</option>
+                <option value="-7.5">GMT-07:30</option>
+                <option value="-7.25">GMT-07:15</option>
+                <option value="-7">GMT-07:00</option>
+                <option value="-6.75">GMT-06:45</option>
+                <option value="-6.5">GMT-06:30</option>
+                <option value="-6.25">GMT-06:15</option>
+                <option value="-6">GMT-06:00</option>
+                <option value="-5.75">GMT-05:45</option>
+                <option value="-5.5">GMT-05:30</option>
+                <option value="-5.25">GMT-05:15</option>
+                <option value="-5">GMT-05:00</option>
+                <option value="-4.75">GMT-04:45</option>
+                <option value="-4.5">GMT-04:30</option>
+                <option value="-4.25">GMT-04:15</option>
+                <option value="-4">GMT-04:00</option>
+                <option value="-3.75">GMT-03:45</option>
+                <option value="-3.5">GMT-03:30</option>
+                <option value="-3.25">GMT-03:15</option>
+                <option value="-3">GMT-03:00</option>
+                <option value="-2.75">GMT-02:45</option>
+                <option value="-2.5">GMT-02:30</option>
+                <option value="-2.25">GMT-02:15</option>
+                <option value="-2">GMT-02:00</option>
+                <option value="-1.75">GMT-01:45</option>
+                <option value="-1.5">GMT-01:30</option>
+                <option value="-1.25">GMT-01:15</option>
+                <option value="-1">GMT-01:00</option>
+                <option value="-0.75">GMT-00:45</option>
+                <option value="-0.5">GMT-00:30</option>
+                <option value="-0.25">GMT-00:15</option>
+                <option value="0">GMT+00:00</option>
+                <option value="0.25">GMT+00:15</option>
+                <option value="0.5">GMT+00:30</option>
+                <option value="0.75">GMT+00:45</option>
+                <option value="1">GMT+01:00</option>
+                <option value="1.25">GMT+01:15</option>
+                <option value="1.5">GMT+01:30</option>
+                <option value="1.75">GMT+01:45</option>
+                <option value="2">GMT+02:00</option>
+                <option value="2.25">GMT+02:15</option>
+                <option value="2.5">GMT+02:30</option>
+                <option value="2.75">GMT+02:45</option>
+                <option value="3">GMT+03:00</option>
+                <option value="3.25">GMT+03:15</option>
+                <option value="3.5">GMT+03:30</option>
+                <option value="3.75">GMT+03:45</option>
+                <option value="4">GMT+04:00</option>
+                <option value="4.25">GMT+04:15</option>
+                <option value="4.5">GMT+04:30</option>
+                <option value="4.75">GMT+04:45</option>
+                <option value="5">GMT+05:00</option>
+                <option value="5.25">GMT+05:15</option>
+                <option value="5.5">GMT+05:30</option>
+                <option value="5.75">GMT+05:45</option>
+                <option value="6">GMT+06:00</option>
+                <option value="6.25">GMT+06:15</option>
+                <option value="6.5">GMT+06:30</option>
+                <option value="6.75">GMT+06:45</option>
+                <option value="7">GMT+07:00</option>
+                <option value="7.25">GMT+07:15</option>
+                <option value="7.5">GMT+07:30</option>
+                <option value="7.75">GMT+07:45</option>
+                <option value="8" selected>GMT+08:00</option>
+                <option value="8.25">GMT+08:15</option>
+                <option value="8.5">GMT+08:30</option>
+                <option value="8.75">GMT+08:45</option>
+                <option value="9">GMT+09:00</option>
+                <option value="9.25">GMT+09:15</option>
+                <option value="9.5">GMT+09:30</option>
+                <option value="9.75">GMT+09:45</option>
+                <option value="10">GMT+10:00</option>
+                <option value="10.25">GMT+10:15</option>
+                <option value="10.5">GMT+10:30</option>
+                <option value="10.75">GMT+10:45</option>
+                <option value="11">GMT+11:00</option>
+                <option value="11.25">GMT+11:15</option>
+                <option value="11.5">GMT+11:30</option>
+                <option value="11.75">GMT+11:45</option>
+                <option value="12">GMT+12:00</option>
             </select>
             <div class="gmt-info">Select last departure station timezone</div>
         </div>
@@ -342,30 +489,31 @@
                         <tr>
                             <th>Start Time</th>
                             <th>Sectors</th>
-                            <th>Duty Limit</th>
+                            <th>Cabin Crew Limit</th>
+                            <th>Tech Crew Limit</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr><td>0600-0759</td><td>1</td><td>14:00</td></tr>
-                        <tr><td>0600-0759</td><td>2</td><td>13:15</td></tr>
-                        <tr><td>0600-0759</td><td>3</td><td>12:30</td></tr>
-                        <tr><td>0600-0759</td><td>4</td><td>11:45</td></tr>
-                        <tr><td>0800-1259</td><td>1</td><td>15:00</td></tr>
-                        <tr><td>0800-1259</td><td>2</td><td>14:15</td></tr>
-                        <tr><td>0800-1259</td><td>3</td><td>13:30</td></tr>
-                        <tr><td>0800-1259</td><td>4</td><td>12:45</td></tr>
-                        <tr><td>1300-1759</td><td>1</td><td>14:00</td></tr>
-                        <tr><td>1300-1759</td><td>2</td><td>13:15</td></tr>
-                        <tr><td>1300-1759</td><td>3</td><td>12:30</td></tr>
-                        <tr><td>1300-1759</td><td>4</td><td>11:45</td></tr>
-                        <tr><td>1800-2159</td><td>1</td><td>13:00</td></tr>
-                        <tr><td>1800-2159</td><td>2</td><td>12:15</td></tr>
-                        <tr><td>1800-2159</td><td>3</td><td>11:30</td></tr>
-                        <tr><td>1800-2159</td><td>4</td><td>10:45</td></tr>
-                        <tr><td>2200-0559</td><td>1</td><td>12:00</td></tr>
-                        <tr><td>2200-0559</td><td>2</td><td>11:15</td></tr>
-                        <tr><td>2200-0559</td><td>3</td><td>10:30</td></tr>
-                        <tr><td>2200-0559</td><td>4</td><td>10:00</td></tr>
+                        <tr><td>0600-0759</td><td>1</td><td>14:00</td><td>13:00</td></tr>
+                        <tr><td>0600-0759</td><td>2</td><td>13:15</td><td>12:15</td></tr>
+                        <tr><td>0600-0759</td><td>3</td><td>12:30</td><td>11:30</td></tr>
+                        <tr><td>0600-0759</td><td>4</td><td>11:45</td><td>10:45</td></tr>
+                        <tr><td>0800-1259</td><td>1</td><td>15:00</td><td>14:00</td></tr>
+                        <tr><td>0800-1259</td><td>2</td><td>14:15</td><td>13:15</td></tr>
+                        <tr><td>0800-1259</td><td>3</td><td>13:30</td><td>12:30</td></tr>
+                        <tr><td>0800-1259</td><td>4</td><td>12:45</td><td>11:45</td></tr>
+                        <tr><td>1300-1759</td><td>1</td><td>14:00</td><td>13:00</td></tr>
+                        <tr><td>1300-1759</td><td>2</td><td>13:15</td><td>12:15</td></tr>
+                        <tr><td>1300-1759</td><td>3</td><td>12:30</td><td>11:30</td></tr>
+                        <tr><td>1300-1759</td><td>4</td><td>11:45</td><td>10:45</td></tr>
+                        <tr><td>1800-2159</td><td>1</td><td>13:00</td><td>12:00</td></tr>
+                        <tr><td>1800-2159</td><td>2</td><td>12:15</td><td>11:15</td></tr>
+                        <tr><td>1800-2159</td><td>3</td><td>11:30</td><td>10:30</td></tr>
+                        <tr><td>1800-2159</td><td>4</td><td>10:45</td><td>09:45</td></tr>
+                        <tr><td>2200-0559</td><td>1</td><td>12:00</td><td>11:00</td></tr>
+                        <tr><td>2200-0559</td><td>2</td><td>11:15</td><td>10:15</td></tr>
+                        <tr><td>2200-0559</td><td>3</td><td>10:30</td><td>09:30</td></tr>
+                        <tr><td>2200-0559</td><td>4</td><td>10:00</td><td>09:00</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -374,43 +522,26 @@
         <div class="table-section">
             <div class="section-title">Non-Acclimatized Duty Limits</div>
             <div class="limits-info">
-                <div class="tables-container">
-                    <div class="table-wrapper">
-                        <div class="table-title">Rest Period ≤18h OR ≥30h</div>
-                        <table class="non-acclimatized-table">
-                            <thead>
-                                <tr>
-                                    <th>Sectors</th>
-                                    <th>Duty Limit</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr><td>1</td><td>14:00</td></tr>
-                                <tr><td>2</td><td>13:15</td></tr>
-                                <tr><td>3</td><td>12:30</td></tr>
-                                <tr><td>4</td><td>11:45</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    
-                    <div class="table-wrapper">
-                        <div class="table-title">Rest Period 18:01h to 29:59h</div>
-                        <table class="non-acclimatized-table">
-                            <thead>
-                                <tr>
-                                    <th>Sectors</th>
-                                    <th>Duty Limit</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr><td>1</td><td>12:30</td></tr>
-                                <tr><td>2</td><td>12:00</td></tr>
-                                <tr><td>3</td><td>11:30</td></tr>
-                                <tr><td>4</td><td>10:45</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+                <table class="limits-table">
+                    <thead>
+                        <tr>
+                            <th>Rest Period</th>
+                            <th>Sectors</th>
+                            <th>Cabin Crew Limit</th>
+                            <th>Tech Crew Limit</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td rowspan="4">≤18h OR ≥30h</td><td>1</td><td>14:00</td><td>13:00</td></tr>
+                        <tr><td>2</td><td>13:15</td><td>12:15</td></tr>
+                        <tr><td>3</td><td>12:30</td><td>11:30</td></tr>
+                        <tr><td>4</td><td>11:45</td><td>10:45</td></tr>
+                        <tr><td rowspan="4">18:01h to 29:59h</td><td>1</td><td>12:30</td><td>11:30</td></tr>
+                        <tr><td>2</td><td>12:00</td><td>11:00</td></tr>
+                        <tr><td>3</td><td>11:30</td><td>10:30</td></tr>
+                        <tr><td>4</td><td>10:45</td><td>09:45</td></tr>
+                    </tbody>
+                </table>
             </div>
         </div>
         
@@ -426,8 +557,8 @@
         
         function calculate() {
             // Get input values
-            const baseGMT = parseInt(document.getElementById('baseGMT').value);
-            const lastDepartureGMT = parseInt(document.getElementById('lastDepartureGMT').value);
+            const baseGMT = parseFloat(document.getElementById('baseGMT').value);
+            const lastDepartureGMT = parseFloat(document.getElementById('lastDepartureGMT').value);
             const lastDutyEnd = new Date(document.getElementById('lastDutyEnd').value);
             const dutyStart = new Date(document.getElementById('dutyStart').value);
             const dutyEnd = new Date(document.getElementById('dutyEnd').value);
@@ -447,7 +578,7 @@
             const acclimatization = checkAcclimatization(lastDutyEnd, dutyStart, baseGMT, lastDepartureGMT);
             
             // Determine limits based on start time, sectors, and acclimatization status
-            let dutyLimitHours, dutyLimitMinutes;
+            let cabinDutyLimitHours, cabinDutyLimitMinutes;
             
             if (acclimatization.isAcclimatized) {
                 // Use normal acclimatized limits
@@ -456,43 +587,43 @@
                 const startTimeInMinutes = startHour * 60 + startMinutes;
                 
                 // Set duty limits based on all conditions
-                dutyLimitHours = 14; // Default fallback
-                dutyLimitMinutes = 0;
+                cabinDutyLimitHours = 14; // Default fallback
+                cabinDutyLimitMinutes = 0;
                 
                 // 0600-0759
                 if (startTimeInMinutes >= 6*60 && startTimeInMinutes < 8*60) {
-                    if (sectors === 1) { dutyLimitHours = 14; dutyLimitMinutes = 0; }
-                    else if (sectors === 2) { dutyLimitHours = 13; dutyLimitMinutes = 15; }
-                    else if (sectors === 3) { dutyLimitHours = 12; dutyLimitMinutes = 30; }
-                    else if (sectors === 4) { dutyLimitHours = 11; dutyLimitMinutes = 45; }
+                    if (sectors === 1) { cabinDutyLimitHours = 14; cabinDutyLimitMinutes = 0; }
+                    else if (sectors === 2) { cabinDutyLimitHours = 13; cabinDutyLimitMinutes = 15; }
+                    else if (sectors === 3) { cabinDutyLimitHours = 12; cabinDutyLimitMinutes = 30; }
+                    else if (sectors === 4) { cabinDutyLimitHours = 11; cabinDutyLimitMinutes = 45; }
                 }
                 // 0800-1259
                 else if (startTimeInMinutes >= 8*60 && startTimeInMinutes < 13*60) {
-                    if (sectors === 1) { dutyLimitHours = 15; dutyLimitMinutes = 0; }
-                    else if (sectors === 2) { dutyLimitHours = 14; dutyLimitMinutes = 15; }
-                    else if (sectors === 3) { dutyLimitHours = 13; dutyLimitMinutes = 30; }
-                    else if (sectors === 4) { dutyLimitHours = 12; dutyLimitMinutes = 45; }
+                    if (sectors === 1) { cabinDutyLimitHours = 15; cabinDutyLimitMinutes = 0; }
+                    else if (sectors === 2) { cabinDutyLimitHours = 14; cabinDutyLimitMinutes = 15; }
+                    else if (sectors === 3) { cabinDutyLimitHours = 13; cabinDutyLimitMinutes = 30; }
+                    else if (sectors === 4) { cabinDutyLimitHours = 12; cabinDutyLimitMinutes = 45; }
                 }
                 // 1300-1759
                 else if (startTimeInMinutes >= 13*60 && startTimeInMinutes < 18*60) {
-                    if (sectors === 1) { dutyLimitHours = 14; dutyLimitMinutes = 0; }
-                    else if (sectors === 2) { dutyLimitHours = 13; dutyLimitMinutes = 15; }
-                    else if (sectors === 3) { dutyLimitHours = 12; dutyLimitMinutes = 30; }
-                    else if (sectors === 4) { dutyLimitHours = 11; dutyLimitMinutes = 45; }
+                    if (sectors === 1) { cabinDutyLimitHours = 14; cabinDutyLimitMinutes = 0; }
+                    else if (sectors === 2) { cabinDutyLimitHours = 13; cabinDutyLimitMinutes = 15; }
+                    else if (sectors === 3) { cabinDutyLimitHours = 12; cabinDutyLimitMinutes = 30; }
+                    else if (sectors === 4) { cabinDutyLimitHours = 11; cabinDutyLimitMinutes = 45; }
                 }
                 // 1800-2159
                 else if (startTimeInMinutes >= 18*60 && startTimeInMinutes < 22*60) {
-                    if (sectors === 1) { dutyLimitHours = 13; dutyLimitMinutes = 0; }
-                    else if (sectors === 2) { dutyLimitHours = 12; dutyLimitMinutes = 15; }
-                    else if (sectors === 3) { dutyLimitHours = 11; dutyLimitMinutes = 30; }
-                    else if (sectors === 4) { dutyLimitHours = 10; dutyLimitMinutes = 45; }
+                    if (sectors === 1) { cabinDutyLimitHours = 13; cabinDutyLimitMinutes = 0; }
+                    else if (sectors === 2) { cabinDutyLimitHours = 12; cabinDutyLimitMinutes = 15; }
+                    else if (sectors === 3) { cabinDutyLimitHours = 11; cabinDutyLimitMinutes = 30; }
+                    else if (sectors === 4) { cabinDutyLimitHours = 10; cabinDutyLimitMinutes = 45; }
                 }
                 // 2200-0559 (crosses midnight)
                 else if (startTimeInMinutes >= 22*60 || startTimeInMinutes < 6*60) {
-                    if (sectors === 1) { dutyLimitHours = 12; dutyLimitMinutes = 0; }
-                    else if (sectors === 2) { dutyLimitHours = 11; dutyLimitMinutes = 15; }
-                    else if (sectors === 3) { dutyLimitHours = 10; dutyLimitMinutes = 30; }
-                    else if (sectors === 4) { dutyLimitHours = 10; dutyLimitMinutes = 0; }
+                    if (sectors === 1) { cabinDutyLimitHours = 12; cabinDutyLimitMinutes = 0; }
+                    else if (sectors === 2) { cabinDutyLimitHours = 11; cabinDutyLimitMinutes = 15; }
+                    else if (sectors === 3) { cabinDutyLimitHours = 10; cabinDutyLimitMinutes = 30; }
+                    else if (sectors === 4) { cabinDutyLimitHours = 10; cabinDutyLimitMinutes = 0; }
                 }
             } else {
                 // Use non-acclimatized limits based on rest period
@@ -500,32 +631,143 @@
                 
                 if (restHours <= 18 || restHours >= 30) {
                     // Table 1: Rest period ≤18 hours OR ≥30 hours
-                    if (sectors === 1) { dutyLimitHours = 14; dutyLimitMinutes = 0; }
-                    else if (sectors === 2) { dutyLimitHours = 13; dutyLimitMinutes = 15; }
-                    else if (sectors === 3) { dutyLimitHours = 12; dutyLimitMinutes = 30; }
-                    else if (sectors === 4) { dutyLimitHours = 11; dutyLimitMinutes = 45; }
+                    if (sectors === 1) { cabinDutyLimitHours = 14; cabinDutyLimitMinutes = 0; }
+                    else if (sectors === 2) { cabinDutyLimitHours = 13; cabinDutyLimitMinutes = 15; }
+                    else if (sectors === 3) { cabinDutyLimitHours = 12; cabinDutyLimitMinutes = 30; }
+                    else if (sectors === 4) { cabinDutyLimitHours = 11; cabinDutyLimitMinutes = 45; }
                 } else {
                     // Table 2: Rest period between 18:01 and 29:59 hours
-                    if (sectors === 1) { dutyLimitHours = 12; dutyLimitMinutes = 30; }
-                    else if (sectors === 2) { dutyLimitHours = 12; dutyLimitMinutes = 0; }
-                    else if (sectors === 3) { dutyLimitHours = 11; dutyLimitMinutes = 30; }
-                    else if (sectors === 4) { dutyLimitHours = 10; dutyLimitMinutes = 45; }
+                    if (sectors === 1) { cabinDutyLimitHours = 12; cabinDutyLimitMinutes = 30; }
+                    else if (sectors === 2) { cabinDutyLimitHours = 12; cabinDutyLimitMinutes = 0; }
+                    else if (sectors === 3) { cabinDutyLimitHours = 11; cabinDutyLimitMinutes = 30; }
+                    else if (sectors === 4) { cabinDutyLimitHours = 10; cabinDutyLimitMinutes = 45; }
                 }
             }
             
-            // Format duty limit for display
-            let dutyLimitFormatted = `${dutyLimitHours}h`;
-            if (dutyLimitMinutes > 0) {
-                dutyLimitFormatted += ` ${dutyLimitMinutes}m`;
+            // Calculate tech crew limits
+            let techDutyLimitHours, techDutyLimitMinutes;
+            let specialCondition = "";
+            
+            // Calculate duty period in decimal hours for tech crew conditions
+            const dutyDecimal = dutyMs / (1000 * 60 * 60);
+            
+            // For sectors 2,3,4, use the standard rule (1 hour less than cabin crew)
+            if (sectors > 1) {
+                techDutyLimitHours = cabinDutyLimitHours - 1;
+                techDutyLimitMinutes = cabinDutyLimitMinutes;
+                
+                // Handle cases where subtracting 1 hour affects the minutes
+                if (techDutyLimitHours < 0) {
+                    techDutyLimitHours = 0;
+                }
+            } 
+            // For sector 1, apply special tech crew conditions
+            else {
+                const startHour = dutyStart.getHours();
+                const startMinutes = dutyStart.getMinutes();
+                const startTimeInMinutes = startHour * 60 + startMinutes;
+                
+                if (acclimatization.isAcclimatized) {
+                    // Determine start time block
+                    let timeBlock;
+                    if (startTimeInMinutes >= 6*60 && startTimeInMinutes < 8*60) timeBlock = '0600-0759';
+                    else if (startTimeInMinutes >= 8*60 && startTimeInMinutes < 13*60) timeBlock = '0800-1259';
+                    else if (startTimeInMinutes >= 13*60 && startTimeInMinutes < 18*60) timeBlock = '1300-1759';
+                    else if (startTimeInMinutes >= 18*60 && startTimeInMinutes < 22*60) timeBlock = '1800-2159';
+                    else timeBlock = '2200-0559';
+                    
+                    if (dutyDecimal >= 7 && dutyDecimal < 9) {
+                        // 7h to 8h59m
+                        specialCondition = "Duty period 7h-8h59m, Sector 1";
+                        switch(timeBlock) {
+                            case '0600-0759': techDutyLimitHours = 12; techDutyLimitMinutes = 15; break;
+                            case '0800-1259': techDutyLimitHours = 13; techDutyLimitMinutes = 15; break;
+                            case '1300-1759': techDutyLimitHours = 12; techDutyLimitMinutes = 15; break;
+                            case '1800-2159': techDutyLimitHours = 11; techDutyLimitMinutes = 15; break;
+                            case '2200-0559': techDutyLimitHours = 10; techDutyLimitMinutes = 15; break;
+                        }
+                    } else if (dutyDecimal >= 9 && dutyDecimal < 11) {
+                        // 9h to 10h59m
+                        specialCondition = "Duty period 9h-10h59m, Sector 1";
+                        switch(timeBlock) {
+                            case '0600-0759': techDutyLimitHours = 11; techDutyLimitMinutes = 30; break;
+                            case '0800-1259': techDutyLimitHours = 12; techDutyLimitMinutes = 30; break;
+                            case '1300-1759': techDutyLimitHours = 11; techDutyLimitMinutes = 30; break;
+                            case '1800-2159': techDutyLimitHours = 10; techDutyLimitMinutes = 30; break;
+                            case '2200-0559': techDutyLimitHours = 9; techDutyLimitMinutes = 30; break;
+                        }
+                    } else if (dutyDecimal >= 11) {
+                        // 11h and above
+                        specialCondition = "Duty period 11h+, Sector 1";
+                        switch(timeBlock) {
+                            case '0600-0759': techDutyLimitHours = 10; techDutyLimitMinutes = 45; break;
+                            case '0800-1259': techDutyLimitHours = 11; techDutyLimitMinutes = 45; break;
+                            case '1300-1759': techDutyLimitHours = 10; techDutyLimitMinutes = 45; break;
+                            case '1800-2159': techDutyLimitHours = 9; techDutyLimitMinutes = 45; break;
+                            case '2200-0559': techDutyLimitHours = 9; techDutyLimitMinutes = 0; break;
+                        }
+                    } else {
+                        // Default for duty periods less than 7 hours
+                        techDutyLimitHours = cabinDutyLimitHours - 1;
+                        techDutyLimitMinutes = cabinDutyLimitMinutes;
+                    }
+                } else {
+                    // Non-acclimatized tech crew, sector 1
+                    const restHours = acclimatization.restHours;
+                    
+                    if (dutyDecimal >= 7 && dutyDecimal < 9) {
+                        // 7h to 8h59m
+                        specialCondition = "Duty period 7h-8h59m, Sector 1";
+                        if (restHours <= 18 || restHours >= 30) {
+                            techDutyLimitHours = 11; techDutyLimitMinutes = 45;
+                        } else {
+                            techDutyLimitHours = 10; techDutyLimitMinutes = 45;
+                        }
+                    } else if (dutyDecimal >= 9 && dutyDecimal < 11) {
+                        // 9h to 10h59m
+                        specialCondition = "Duty period 9h-10h59m, Sector 1";
+                        if (restHours <= 18 || restHours >= 30) {
+                            techDutyLimitHours = 11; techDutyLimitMinutes = 45;
+                        } else {
+                            techDutyLimitHours = 10; techDutyLimitMinutes = 45;
+                        }
+                    } else if (dutyDecimal >= 11) {
+                        // 11h and above
+                        specialCondition = "Duty period 11h+, Sector 1";
+                        techDutyLimitHours = null; // N/A
+                        techDutyLimitMinutes = null;
+                    } else {
+                        // Default for duty periods less than 7 hours
+                        techDutyLimitHours = cabinDutyLimitHours - 1;
+                        techDutyLimitMinutes = cabinDutyLimitMinutes;
+                    }
+                }
+            }
+            
+            // Format duty limits for display
+            let cabinDutyLimitFormatted = `${cabinDutyLimitHours}h`;
+            if (cabinDutyLimitMinutes > 0) {
+                cabinDutyLimitFormatted += ` ${cabinDutyLimitMinutes}m`;
+            }
+            
+            let techDutyLimitFormatted = "N/A";
+            if (techDutyLimitHours !== null) {
+                techDutyLimitFormatted = `${techDutyLimitHours}h`;
+                if (techDutyLimitMinutes > 0) {
+                    techDutyLimitFormatted += ` ${techDutyLimitMinutes}m`;
+                }
             }
             
             // Set sector limits
             const sectorLimit = 4;
             
-            // Check compliance
-            const dutyDecimal = dutyMs / (1000 * 60 * 60); // For comparison with limits
-            const dutyLimitDecimal = dutyLimitHours + (dutyLimitMinutes / 60);
-            const dutyStatus = dutyDecimal <= dutyLimitDecimal ? 'ok' : 'danger';
+            // Check compliance for both crew types
+            const cabinDutyLimitDecimal = cabinDutyLimitHours + (cabinDutyLimitMinutes / 60);
+            const techDutyLimitDecimal = techDutyLimitHours !== null ? 
+                techDutyLimitHours + (techDutyLimitMinutes / 60) : null;
+            
+            const cabinDutyStatus = dutyDecimal <= cabinDutyLimitDecimal ? 'ok' : 'danger';
+            const techDutyStatus = techDutyLimitDecimal !== null && dutyDecimal <= techDutyLimitDecimal ? 'ok' : 'danger';
             const sectorStatus = sectors <= sectorLimit ? 'ok' : 'danger';
             
             // Create result messages
@@ -568,14 +810,38 @@
             
             resultHTML += `</div>`;
             
-            // Duty period result
-            resultHTML += `<div class="result-item ${dutyStatus}">`;
+            // Duty period result - now with both cabin and tech crew
+            resultHTML += `<div class="result-item">`;
             resultHTML += `<strong>Duty Period:</strong>`;
             resultHTML += `<div class="time-display">${dutyTimeFormatted}</div>`;
-            resultHTML += `<strong>Limit:</strong> ${dutyLimitFormatted}<br>`;
-            resultHTML += dutyStatus === 'ok' ? 
+            resultHTML += `<div class="crew-results">`;
+            
+            // Cabin crew result
+            resultHTML += `<div class="crew-result ${cabinDutyStatus}">`;
+            resultHTML += `<div class="crew-title">Cabin Crew</div>`;
+            resultHTML += `<strong>Limit:</strong> ${cabinDutyLimitFormatted}<br>`;
+            resultHTML += cabinDutyStatus === 'ok' ? 
                 '✓ Within limit' : 
                 '✗ Exceeds limit!';
+            resultHTML += `</div>`;
+            
+            // Tech crew result
+            resultHTML += `<div class="crew-result ${techDutyStatus}">`;
+            resultHTML += `<div class="crew-title">Tech Crew</div>`;
+            resultHTML += `<strong>Limit:</strong> ${techDutyLimitFormatted}<br>`;
+            if (specialCondition) {
+                resultHTML += `<div class="special-condition">${specialCondition}</div>`;
+            }
+            if (techDutyLimitFormatted === "N/A") {
+                resultHTML += 'N/A - Not applicable';
+            } else {
+                resultHTML += techDutyStatus === 'ok' ? 
+                    '✓ Within limit' : 
+                    '✗ Exceeds limit!';
+            }
+            resultHTML += `</div>`;
+            
+            resultHTML += `</div>`;
             resultHTML += `</div>`;
             
             // Sectors result
