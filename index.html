@@ -254,7 +254,7 @@
         </div>
         
         <div class="input-group">
-            <label for="baseGMT">Base GMT</label>
+            <label for="baseGMT">Current GMT</label>
             <select id="baseGMT">
                 <!-- GMT options with quarter-hour increments -->
                 <option value="-12">GMT-12:00</option>
@@ -355,7 +355,7 @@
                 <option value="11.75">GMT+11:45</option>
                 <option value="12">GMT+12:00</option>
             </select>
-            <div class="gmt-info">Select your home base timezone</div>
+            <div class="gmt-info">Select your current GMT, the place where you are departing from today.</div>
         </div>
         
         <div class="input-group">
@@ -465,7 +465,113 @@
         
         <div class="input-group">
             <label for="lastDutyEnd">Last Duty End Date and Time</label>
-            <input type="datetime-local" id="lastDutyEnd" required>
+            <div class="time-gmt-container">
+                <div class="time-input">
+                    <input type="datetime-local" id="lastDutyEnd" required>
+                </div>
+                <div class="gmt-input">
+                    <select id="lastDutyEndGMT">
+                        <!-- Same GMT options as above -->
+                        <option value="-12">GMT-12:00</option>
+                        <option value="-11.75">GMT-11:45</option>
+                        <option value="-11.5">GMT-11:30</option>
+                        <option value="-11.25">GMT-11:15</option>
+                        <option value="-11">GMT-11:00</option>
+                        <option value="-10.75">GMT-10:45</option>
+                        <option value="-10.5">GMT-10:30</option>
+                        <option value="-10.25">GMT-10:15</option>
+                        <option value="-10">GMT-10:00</option>
+                        <option value="-9.75">GMT-09:45</option>
+                        <option value="-9.5">GMT-09:30</option>
+                        <option value="-9.25">GMT-09:15</option>
+                        <option value="-9">GMT-09:00</option>
+                        <option value="-8.75">GMT-08:45</option>
+                        <option value="-8.5">GMT-08:30</option>
+                        <option value="-8.25">GMT-08:15</option>
+                        <option value="-8">GMT-08:00</option>
+                        <option value="-7.75">GMT-07:45</option>
+                        <option value="-7.5">GMT-07:30</option>
+                        <option value="-7.25">GMT-07:15</option>
+                        <option value="-7">GMT-07:00</option>
+                        <option value="-6.75">GMT-06:45</option>
+                        <option value="-6.5">GMT-06:30</option>
+                        <option value="-6.25">GMT-06:15</option>
+                        <option value="-6">GMT-06:00</option>
+                        <option value="-5.75">GMT-05:45</option>
+                        <option value="-5.5">GMT-05:30</option>
+                        <option value="-5.25">GMT-05:15</option>
+                        <option value="-5">GMT-05:00</option>
+                        <option value="-4.75">GMT-04:45</option>
+                        <option value="-4.5">GMT-04:30</option>
+                        <option value="-4.25">GMT-04:15</option>
+                        <option value="-4">GMT-04:00</option>
+                        <option value="-3.75">GMT-03:45</option>
+                        <option value="-3.5">GMT-03:30</option>
+                        <option value="-3.25">GMT-03:15</option>
+                        <option value="-3">GMT-03:00</option>
+                        <option value="-2.75">GMT-02:45</option>
+                        <option value="-2.5">GMT-02:30</option>
+                        <option value="-2.25">GMT-02:15</option>
+                        <option value="-2">GMT-02:00</option>
+                        <option value="-1.75">GMT-01:45</option>
+                        <option value="-1.5">GMT-01:30</option>
+                        <option value="-1.25">GMT-01:15</option>
+                        <option value="-1">GMT-01:00</option>
+                        <option value="-0.75">GMT-00:45</option>
+                        <option value="-0.5">GMT-00:30</option>
+                        <option value="-0.25">GMT-00:15</option>
+                        <option value="0">GMT+00:00</option>
+                        <option value="0.25">GMT+00:15</option>
+                        <option value="0.5">GMT+00:30</option>
+                        <option value="0.75">GMT+00:45</option>
+                        <option value="1">GMT+01:00</option>
+                        <option value="1.25">GMT+01:15</option>
+                        <option value="1.5">GMT+01:30</option>
+                        <option value="1.75">GMT+01:45</option>
+                        <option value="2">GMT+02:00</option>
+                        <option value="2.25">GMT+02:15</option>
+                        <option value="2.5">GMT+02:30</option>
+                        <option value="2.75">GMT+02:45</option>
+                        <option value="3">GMT+03:00</option>
+                        <option value="3.25">GMT+03:15</option>
+                        <option value="3.5">GMT+03:30</option>
+                        <option value="3.75">GMT+03:45</option>
+                        <option value="4">GMT+04:00</option>
+                        <option value="4.25">GMT+04:15</option>
+                        <option value="4.5">GMT+04:30</option>
+                        <option value="4.75">GMT+04:45</option>
+                        <option value="5">GMT+05:00</option>
+                        <option value="5.25">GMT+05:15</option>
+                        <option value="5.5">GMT+05:30</option>
+                        <option value="5.75">GMT+05:45</option>
+                        <option value="6">GMT+06:00</option>
+                        <option value="6.25">GMT+06:15</option>
+                        <option value="6.5">GMT+06:30</option>
+                        <option value="6.75">GMT+06:45</option>
+                        <option value="7">GMT+07:00</option>
+                        <option value="7.25">GMT+07:15</option>
+                        <option value="7.5">GMT+07:30</option>
+                        <option value="7.75">GMT+07:45</option>
+                        <option value="8" selected>GMT+08:00</option>
+                        <option value="8.25">GMT+08:15</option>
+                        <option value="8.5">GMT+08:30</option>
+                        <option value="8.75">GMT+08:45</option>
+                        <option value="9">GMT+09:00</option>
+                        <option value="9.25">GMT+09:15</option>
+                        <option value="9.5">GMT+09:30</option>
+                        <option value="9.75">GMT+09:45</option>
+                        <option value="10">GMT+10:00</option>
+                        <option value="10.25">GMT+10:15</option>
+                        <option value="10.5">GMT+10:30</option>
+                        <option value="10.75">GMT+10:45</option>
+                        <option value="11">GMT+11:00</option>
+                        <option value="11.25">GMT+11:15</option>
+                        <option value="11.5">GMT+11:30</option>
+                        <option value="11.75">GMT+11:45</option>
+                        <option value="12">GMT+12:00</option>
+                    </select>
+                </div>
+            </div>
             <div class="input-description">Check last duty end time in your roster (STA + 30 minutes) or (ATA + 30 minutes)</div>
         </div>
         
@@ -786,6 +892,7 @@
             const lastDepartureGMT = parseFloat(document.getElementById('lastDepartureGMT').value);
             const startGMT = parseFloat(document.getElementById('startGMT').value);
             const endGMT = parseFloat(document.getElementById('endGMT').value);
+            const lastDutyEndGMT = parseFloat(document.getElementById('lastDutyEndGMT').value);
             const lastDutyEnd = new Date(document.getElementById('lastDutyEnd').value);
             const dutyStart = new Date(document.getElementById('dutyStart').value);
             const dutyEnd = new Date(document.getElementById('dutyEnd').value);
@@ -802,7 +909,7 @@
             const dutyTimeFormatted = `${dutyHours}h ${dutyMinutes}m`;
             
             // Calculate acclimatization
-            const acclimatization = checkAcclimatization(lastDutyEnd, dutyStart, baseGMT, lastDepartureGMT, startGMT);
+            const acclimatization = checkAcclimatization(lastDutyEnd, dutyStart, baseGMT, lastDepartureGMT, startGMT, lastDutyEndGMT);
             
             // Determine limits based on start time, sectors, and acclimatization status
             let cabinDutyLimitHours, cabinDutyLimitMinutes;
@@ -1009,7 +1116,7 @@
             // Show timezone info if applicable
             if (acclimatization.timezoneExemption) {
                 resultHTML += `<div class="gmt-comparison">`;
-                resultHTML += `<strong>Timezone Exemption:</strong> Last departure station GMT${lastDepartureGMT >= 0 ? '+' : ''}${lastDepartureGMT} is within ±2 hours of Base GMT${baseGMT >= 0 ? '+' : ''}${baseGMT}`;
+                resultHTML += `<strong>Timezone Exemption:</strong> Last departure station GMT${lastDepartureGMT >= 0 ? '+' : ''}${lastDepartureGMT} is within ±2 hours of Current GMT${baseGMT >= 0 ? '+' : ''}${baseGMT}`;
                 resultHTML += `</div>`;
             }
             
@@ -1094,9 +1201,9 @@
             return endUTC - startUTC;
         }
         
-        function checkAcclimatization(lastDutyEnd, dutyStart, baseGMT, lastDepartureGMT, startGMT) {
+        function checkAcclimatization(lastDutyEnd, dutyStart, baseGMT, lastDepartureGMT, startGMT, lastDutyEndGMT) {
             // Calculate total rest period in hours (adjusting for timezone)
-            const lastDutyEndUTC = new Date(lastDutyEnd.getTime() + (lastDepartureGMT * 60 * 60 * 1000));
+            const lastDutyEndUTC = new Date(lastDutyEnd.getTime() + (lastDutyEndGMT * 60 * 60 * 1000));
             const dutyStartUTC = new Date(dutyStart.getTime() + (startGMT * 60 * 60 * 1000));
             const restMs = dutyStartUTC - lastDutyEndUTC;
             const restHours = restMs / (1000 * 60 * 60);
@@ -1106,7 +1213,7 @@
             const restMinutesFormatted = Math.floor((restHours % 1) * 60);
             const restPeriod = `${restHoursFormatted}h ${restMinutesFormatted}m`;
             
-            // Check if last departure station GMT is within ±2 hours of base GMT
+            // Check if last departure station GMT is within ±2 hours of current GMT
             const timezoneDifference = Math.abs(lastDepartureGMT - baseGMT);
             const timezoneExemption = timezoneDifference <= 2;
             
@@ -1207,6 +1314,7 @@
             // Set GMT defaults to +8
             document.getElementById('baseGMT').value = "8";
             document.getElementById('lastDepartureGMT').value = "8";
+            document.getElementById('lastDutyEndGMT').value = "8";
             document.getElementById('startGMT').value = "8";
             document.getElementById('endGMT').value = "8";
         };
