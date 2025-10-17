@@ -65,6 +65,19 @@
             font-size: 1rem;
         }
         
+        .time-gmt-container {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .time-input {
+            flex: 2;
+        }
+        
+        .gmt-input {
+            flex: 1;
+        }
+        
         button {
             background-color: #1a3a8f;
             color: white;
@@ -458,13 +471,225 @@
         
         <div class="input-group">
             <label for="dutyStart">Start Time</label>
-            <input type="datetime-local" id="dutyStart" required>
+            <div class="time-gmt-container">
+                <div class="time-input">
+                    <input type="datetime-local" id="dutyStart" required>
+                </div>
+                <div class="gmt-input">
+                    <select id="startGMT">
+                        <!-- Same GMT options as above -->
+                        <option value="-12">GMT-12:00</option>
+                        <option value="-11.75">GMT-11:45</option>
+                        <option value="-11.5">GMT-11:30</option>
+                        <option value="-11.25">GMT-11:15</option>
+                        <option value="-11">GMT-11:00</option>
+                        <option value="-10.75">GMT-10:45</option>
+                        <option value="-10.5">GMT-10:30</option>
+                        <option value="-10.25">GMT-10:15</option>
+                        <option value="-10">GMT-10:00</option>
+                        <option value="-9.75">GMT-09:45</option>
+                        <option value="-9.5">GMT-09:30</option>
+                        <option value="-9.25">GMT-09:15</option>
+                        <option value="-9">GMT-09:00</option>
+                        <option value="-8.75">GMT-08:45</option>
+                        <option value="-8.5">GMT-08:30</option>
+                        <option value="-8.25">GMT-08:15</option>
+                        <option value="-8">GMT-08:00</option>
+                        <option value="-7.75">GMT-07:45</option>
+                        <option value="-7.5">GMT-07:30</option>
+                        <option value="-7.25">GMT-07:15</option>
+                        <option value="-7">GMT-07:00</option>
+                        <option value="-6.75">GMT-06:45</option>
+                        <option value="-6.5">GMT-06:30</option>
+                        <option value="-6.25">GMT-06:15</option>
+                        <option value="-6">GMT-06:00</option>
+                        <option value="-5.75">GMT-05:45</option>
+                        <option value="-5.5">GMT-05:30</option>
+                        <option value="-5.25">GMT-05:15</option>
+                        <option value="-5">GMT-05:00</option>
+                        <option value="-4.75">GMT-04:45</option>
+                        <option value="-4.5">GMT-04:30</option>
+                        <option value="-4.25">GMT-04:15</option>
+                        <option value="-4">GMT-04:00</option>
+                        <option value="-3.75">GMT-03:45</option>
+                        <option value="-3.5">GMT-03:30</option>
+                        <option value="-3.25">GMT-03:15</option>
+                        <option value="-3">GMT-03:00</option>
+                        <option value="-2.75">GMT-02:45</option>
+                        <option value="-2.5">GMT-02:30</option>
+                        <option value="-2.25">GMT-02:15</option>
+                        <option value="-2">GMT-02:00</option>
+                        <option value="-1.75">GMT-01:45</option>
+                        <option value="-1.5">GMT-01:30</option>
+                        <option value="-1.25">GMT-01:15</option>
+                        <option value="-1">GMT-01:00</option>
+                        <option value="-0.75">GMT-00:45</option>
+                        <option value="-0.5">GMT-00:30</option>
+                        <option value="-0.25">GMT-00:15</option>
+                        <option value="0">GMT+00:00</option>
+                        <option value="0.25">GMT+00:15</option>
+                        <option value="0.5">GMT+00:30</option>
+                        <option value="0.75">GMT+00:45</option>
+                        <option value="1">GMT+01:00</option>
+                        <option value="1.25">GMT+01:15</option>
+                        <option value="1.5">GMT+01:30</option>
+                        <option value="1.75">GMT+01:45</option>
+                        <option value="2">GMT+02:00</option>
+                        <option value="2.25">GMT+02:15</option>
+                        <option value="2.5">GMT+02:30</option>
+                        <option value="2.75">GMT+02:45</option>
+                        <option value="3">GMT+03:00</option>
+                        <option value="3.25">GMT+03:15</option>
+                        <option value="3.5">GMT+03:30</option>
+                        <option value="3.75">GMT+03:45</option>
+                        <option value="4">GMT+04:00</option>
+                        <option value="4.25">GMT+04:15</option>
+                        <option value="4.5">GMT+04:30</option>
+                        <option value="4.75">GMT+04:45</option>
+                        <option value="5">GMT+05:00</option>
+                        <option value="5.25">GMT+05:15</option>
+                        <option value="5.5">GMT+05:30</option>
+                        <option value="5.75">GMT+05:45</option>
+                        <option value="6">GMT+06:00</option>
+                        <option value="6.25">GMT+06:15</option>
+                        <option value="6.5">GMT+06:30</option>
+                        <option value="6.75">GMT+06:45</option>
+                        <option value="7">GMT+07:00</option>
+                        <option value="7.25">GMT+07:15</option>
+                        <option value="7.5">GMT+07:30</option>
+                        <option value="7.75">GMT+07:45</option>
+                        <option value="8" selected>GMT+08:00</option>
+                        <option value="8.25">GMT+08:15</option>
+                        <option value="8.5">GMT+08:30</option>
+                        <option value="8.75">GMT+08:45</option>
+                        <option value="9">GMT+09:00</option>
+                        <option value="9.25">GMT+09:15</option>
+                        <option value="9.5">GMT+09:30</option>
+                        <option value="9.75">GMT+09:45</option>
+                        <option value="10">GMT+10:00</option>
+                        <option value="10.25">GMT+10:15</option>
+                        <option value="10.5">GMT+10:30</option>
+                        <option value="10.75">GMT+10:45</option>
+                        <option value="11">GMT+11:00</option>
+                        <option value="11.25">GMT+11:15</option>
+                        <option value="11.5">GMT+11:30</option>
+                        <option value="11.75">GMT+11:45</option>
+                        <option value="12">GMT+12:00</option>
+                    </select>
+                </div>
+            </div>
             <div class="input-description">Reporting time at Base/ ex-Station.</div>
         </div>
         
         <div class="input-group">
             <label for="dutyEnd">End Time</label>
-            <input type="datetime-local" id="dutyEnd" required>
+            <div class="time-gmt-container">
+                <div class="time-input">
+                    <input type="datetime-local" id="dutyEnd" required>
+                </div>
+                <div class="gmt-input">
+                    <select id="endGMT">
+                        <!-- Same GMT options as above -->
+                        <option value="-12">GMT-12:00</option>
+                        <option value="-11.75">GMT-11:45</option>
+                        <option value="-11.5">GMT-11:30</option>
+                        <option value="-11.25">GMT-11:15</option>
+                        <option value="-11">GMT-11:00</option>
+                        <option value="-10.75">GMT-10:45</option>
+                        <option value="-10.5">GMT-10:30</option>
+                        <option value="-10.25">GMT-10:15</option>
+                        <option value="-10">GMT-10:00</option>
+                        <option value="-9.75">GMT-09:45</option>
+                        <option value="-9.5">GMT-09:30</option>
+                        <option value="-9.25">GMT-09:15</option>
+                        <option value="-9">GMT-09:00</option>
+                        <option value="-8.75">GMT-08:45</option>
+                        <option value="-8.5">GMT-08:30</option>
+                        <option value="-8.25">GMT-08:15</option>
+                        <option value="-8">GMT-08:00</option>
+                        <option value="-7.75">GMT-07:45</option>
+                        <option value="-7.5">GMT-07:30</option>
+                        <option value="-7.25">GMT-07:15</option>
+                        <option value="-7">GMT-07:00</option>
+                        <option value="-6.75">GMT-06:45</option>
+                        <option value="-6.5">GMT-06:30</option>
+                        <option value="-6.25">GMT-06:15</option>
+                        <option value="-6">GMT-06:00</option>
+                        <option value="-5.75">GMT-05:45</option>
+                        <option value="-5.5">GMT-05:30</option>
+                        <option value="-5.25">GMT-05:15</option>
+                        <option value="-5">GMT-05:00</option>
+                        <option value="-4.75">GMT-04:45</option>
+                        <option value="-4.5">GMT-04:30</option>
+                        <option value="-4.25">GMT-04:15</option>
+                        <option value="-4">GMT-04:00</option>
+                        <option value="-3.75">GMT-03:45</option>
+                        <option value="-3.5">GMT-03:30</option>
+                        <option value="-3.25">GMT-03:15</option>
+                        <option value="-3">GMT-03:00</option>
+                        <option value="-2.75">GMT-02:45</option>
+                        <option value="-2.5">GMT-02:30</option>
+                        <option value="-2.25">GMT-02:15</option>
+                        <option value="-2">GMT-02:00</option>
+                        <option value="-1.75">GMT-01:45</option>
+                        <option value="-1.5">GMT-01:30</option>
+                        <option value="-1.25">GMT-01:15</option>
+                        <option value="-1">GMT-01:00</option>
+                        <option value="-0.75">GMT-00:45</option>
+                        <option value="-0.5">GMT-00:30</option>
+                        <option value="-0.25">GMT-00:15</option>
+                        <option value="0">GMT+00:00</option>
+                        <option value="0.25">GMT+00:15</option>
+                        <option value="0.5">GMT+00:30</option>
+                        <option value="0.75">GMT+00:45</option>
+                        <option value="1">GMT+01:00</option>
+                        <option value="1.25">GMT+01:15</option>
+                        <option value="1.5">GMT+01:30</option>
+                        <option value="1.75">GMT+01:45</option>
+                        <option value="2">GMT+02:00</option>
+                        <option value="2.25">GMT+02:15</option>
+                        <option value="2.5">GMT+02:30</option>
+                        <option value="2.75">GMT+02:45</option>
+                        <option value="3">GMT+03:00</option>
+                        <option value="3.25">GMT+03:15</option>
+                        <option value="3.5">GMT+03:30</option>
+                        <option value="3.75">GMT+03:45</option>
+                        <option value="4">GMT+04:00</option>
+                        <option value="4.25">GMT+04:15</option>
+                        <option value="4.5">GMT+04:30</option>
+                        <option value="4.75">GMT+04:45</option>
+                        <option value="5">GMT+05:00</option>
+                        <option value="5.25">GMT+05:15</option>
+                        <option value="5.5">GMT+05:30</option>
+                        <option value="5.75">GMT+05:45</option>
+                        <option value="6">GMT+06:00</option>
+                        <option value="6.25">GMT+06:15</option>
+                        <option value="6.5">GMT+06:30</option>
+                        <option value="6.75">GMT+06:45</option>
+                        <option value="7">GMT+07:00</option>
+                        <option value="7.25">GMT+07:15</option>
+                        <option value="7.5">GMT+07:30</option>
+                        <option value="7.75">GMT+07:45</option>
+                        <option value="8" selected>GMT+08:00</option>
+                        <option value="8.25">GMT+08:15</option>
+                        <option value="8.5">GMT+08:30</option>
+                        <option value="8.75">GMT+08:45</option>
+                        <option value="9">GMT+09:00</option>
+                        <option value="9.25">GMT+09:15</option>
+                        <option value="9.5">GMT+09:30</option>
+                        <option value="9.75">GMT+09:45</option>
+                        <option value="10">GMT+10:00</option>
+                        <option value="10.25">GMT+10:15</option>
+                        <option value="10.5">GMT+10:30</option>
+                        <option value="10.75">GMT+10:45</option>
+                        <option value="11">GMT+11:00</option>
+                        <option value="11.25">GMT+11:15</option>
+                        <option value="11.5">GMT+11:30</option>
+                        <option value="11.75">GMT+11:45</option>
+                        <option value="12">GMT+12:00</option>
+                    </select>
+                </div>
+            </div>
             <div class="input-description">Final sector STA/ATA. FDP does not count +30 minutes post flight duty time. If last sector is PS(DHC/Paxiing) insert the previous sector STA/ATA.</div>
         </div>
         
@@ -559,13 +784,15 @@
             // Get input values
             const baseGMT = parseFloat(document.getElementById('baseGMT').value);
             const lastDepartureGMT = parseFloat(document.getElementById('lastDepartureGMT').value);
+            const startGMT = parseFloat(document.getElementById('startGMT').value);
+            const endGMT = parseFloat(document.getElementById('endGMT').value);
             const lastDutyEnd = new Date(document.getElementById('lastDutyEnd').value);
             const dutyStart = new Date(document.getElementById('dutyStart').value);
             const dutyEnd = new Date(document.getElementById('dutyEnd').value);
             const sectors = parseInt(document.getElementById('sectors').value);
             
-            // Calculate duty period in milliseconds
-            const dutyMs = dutyEnd - dutyStart;
+            // Calculate duty period in milliseconds (adjusting for timezone differences)
+            const dutyMs = calculateDutyPeriodWithTimezone(dutyStart, dutyEnd, startGMT, endGMT);
             
             // Convert to hours and minutes
             const dutyHours = Math.floor(dutyMs / (1000 * 60 * 60));
@@ -575,7 +802,7 @@
             const dutyTimeFormatted = `${dutyHours}h ${dutyMinutes}m`;
             
             // Calculate acclimatization
-            const acclimatization = checkAcclimatization(lastDutyEnd, dutyStart, baseGMT, lastDepartureGMT);
+            const acclimatization = checkAcclimatization(lastDutyEnd, dutyStart, baseGMT, lastDepartureGMT, startGMT);
             
             // Determine limits based on start time, sectors, and acclimatization status
             let cabinDutyLimitHours, cabinDutyLimitMinutes;
@@ -858,9 +1085,20 @@
             document.getElementById('results').style.display = 'block';
         }
         
-        function checkAcclimatization(lastDutyEnd, dutyStart, baseGMT, lastDepartureGMT) {
-            // Calculate total rest period in hours
-            const restMs = dutyStart - lastDutyEnd;
+        function calculateDutyPeriodWithTimezone(startTime, endTime, startGMT, endGMT) {
+            // Convert both times to UTC for accurate calculation
+            const startUTC = new Date(startTime.getTime() + (startGMT * 60 * 60 * 1000));
+            const endUTC = new Date(endTime.getTime() + (endGMT * 60 * 60 * 1000));
+            
+            // Calculate the difference
+            return endUTC - startUTC;
+        }
+        
+        function checkAcclimatization(lastDutyEnd, dutyStart, baseGMT, lastDepartureGMT, startGMT) {
+            // Calculate total rest period in hours (adjusting for timezone)
+            const lastDutyEndUTC = new Date(lastDutyEnd.getTime() + (lastDepartureGMT * 60 * 60 * 1000));
+            const dutyStartUTC = new Date(dutyStart.getTime() + (startGMT * 60 * 60 * 1000));
+            const restMs = dutyStartUTC - lastDutyEndUTC;
             const restHours = restMs / (1000 * 60 * 60);
             
             // Format rest period for display
@@ -877,7 +1115,7 @@
             let nightPeriods = [];
             
             // Start from the day of last duty end
-            let currentDate = new Date(lastDutyEnd);
+            let currentDate = new Date(lastDutyEndUTC);
             currentDate.setHours(0, 0, 0, 0);
             
             // Check up to 5 days to cover all possible night periods
@@ -890,14 +1128,14 @@
                 nightEnd.setHours(8, 0, 0, 0);
                 
                 // If the night period is completely outside the rest period, skip
-                if (nightEnd <= lastDutyEnd || nightStart >= dutyStart) {
+                if (nightEnd <= lastDutyEndUTC || nightStart >= dutyStartUTC) {
                     currentDate.setDate(currentDate.getDate() + 1);
                     continue;
                 }
                 
                 // Calculate overlap between rest period and night period
-                const overlapStart = new Date(Math.max(lastDutyEnd.getTime(), nightStart.getTime()));
-                const overlapEnd = new Date(Math.min(dutyStart.getTime(), nightEnd.getTime()));
+                const overlapStart = new Date(Math.max(lastDutyEndUTC.getTime(), nightStart.getTime()));
+                const overlapEnd = new Date(Math.min(dutyStartUTC.getTime(), nightEnd.getTime()));
                 
                 const overlapHours = (overlapEnd - overlapStart) / (1000 * 60 * 60);
                 
@@ -969,6 +1207,8 @@
             // Set GMT defaults to +8
             document.getElementById('baseGMT').value = "8";
             document.getElementById('lastDepartureGMT').value = "8";
+            document.getElementById('startGMT').value = "8";
+            document.getElementById('endGMT').value = "8";
         };
     </script>
 </body>
