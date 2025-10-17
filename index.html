@@ -1057,17 +1057,17 @@
                         // 7h to 8h59m
                         specialCondition = "Duty period 7h-8h59m, Sector 1";
                         if (restHours <= 18 || restHours >= 30) {
-                            techDutyLimitHours = 11; techDutyLimitMinutes = 45;
-                        } else {
                             techDutyLimitHours = 10; techDutyLimitMinutes = 45;
+                        } else {
+                            techDutyLimitHours = 09; techDutyLimitMinutes = 45;
                         }
                     } else if (dutyDecimal >= 9 && dutyDecimal < 11) {
                         // 9h to 10h59m
                         specialCondition = "Duty period 9h-10h59m, Sector 1";
                         if (restHours <= 18 || restHours >= 30) {
-                            techDutyLimitHours = 11; techDutyLimitMinutes = 45;
-                        } else {
                             techDutyLimitHours = 10; techDutyLimitMinutes = 45;
+                        } else {
+                            techDutyLimitHours = 09; techDutyLimitMinutes = 45;
                         }
                     } else if (dutyDecimal >= 11) {
                         // 11h and above
