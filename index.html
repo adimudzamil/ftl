@@ -893,12 +893,12 @@
             const startGMT = parseFloat(document.getElementById('startGMT').value);
             const endGMT = parseFloat(document.getElementById('endGMT').value);
             const lastDutyEndGMT = parseFloat(document.getElementById('lastDutyEndGMT').value);
-            const lastDutyEnd = new Date(document.getElementById('lastDutyEnd').value);
-            const dutyStart = new Date(document.getElementById('dutyStart').value);
-            const dutyEnd = new Date(document.getElementById('dutyEnd').value);
+            const lastDutyEnd = document.getElementById('lastDutyEnd').value;
+            const dutyStart = document.getElementById('dutyStart').value;
+            const dutyEnd = document.getElementById('dutyEnd').value;
             const sectors = parseInt(document.getElementById('sectors').value);
             
-            // Calculate duty period in milliseconds (adjusting for timezone differences)
+            // Calculate duty period in milliseconds (CORRECTED - proper timezone conversion)
             const dutyMs = calculateDutyPeriodWithTimezone(dutyStart, dutyEnd, startGMT, endGMT);
             
             // Convert to hours and minutes
@@ -916,8 +916,10 @@
             
             if (acclimatization.isAcclimatized) {
                 // Use normal acclimatized limits
-                const startHour = dutyStart.getHours();
-                const startMinutes = dutyStart.getMinutes();
+                // Get the start time in the local timezone for determining the time block
+                const startTimeInLocal = convertToLocalTime(dutyStart, startGMT);
+                const startHour = startTimeInLocal.getHours();
+                const startMinutes = startTimeInLocal.getMinutes();
                 const startTimeInMinutes = startHour * 60 + startMinutes;
                 
                 // Set duty limits based on all conditions
@@ -997,8 +999,10 @@
             } 
             // For sector 1, apply special tech crew conditions
             else {
-                const startHour = dutyStart.getHours();
-                const startMinutes = dutyStart.getMinutes();
+                // Get the start time in the local timezone for determining the time block
+                const startTimeInLocal = convertToLocalTime(dutyStart, startGMT);
+                const startHour = startTimeInLocal.getHours();
+                const startMinutes = startTimeInLocal.getMinutes();
                 const startTimeInMinutes = startHour * 60 + startMinutes;
                 
                 if (acclimatization.isAcclimatized) {
@@ -1192,19 +1196,37 @@
             document.getElementById('results').style.display = 'block';
         }
         
-        function calculateDutyPeriodWithTimezone(startTime, endTime, startGMT, endGMT) {
+        function calculateDutyPeriodWithTimezone(startTimeStr, endTimeStr, startGMT, endGMT) {
             // Convert both times to UTC for accurate calculation
-            const startUTC = new Date(startTime.getTime() + (startGMT * 60 * 60 * 1000));
-            const endUTC = new Date(endTime.getTime() + (endGMT * 60 * 60 * 1000));
+            const startUTC = convertToUTC(startTimeStr, startGMT);
+            const endUTC = convertToUTC(endTimeStr, endGMT);
             
             // Calculate the difference
             return endUTC - startUTC;
         }
         
-        function checkAcclimatization(lastDutyEnd, dutyStart, baseGMT, lastDepartureGMT, startGMT, lastDutyEndGMT) {
-            // Calculate total rest period in hours (adjusting for timezone)
-            const lastDutyEndUTC = new Date(lastDutyEnd.getTime() + (lastDutyEndGMT * 60 * 60 * 1000));
-            const dutyStartUTC = new Date(dutyStart.getTime() + (startGMT * 60 * 60 * 1000));
+        function convertToUTC(dateTimeStr, gmtOffset) {
+            // Parse the datetime string
+            const date = new Date(dateTimeStr);
+            
+            // Convert to UTC by subtracting the GMT offset (in milliseconds)
+            // GMT+8 means 8 hours ahead of UTC, so we subtract 8 hours to get UTC
+            return date.getTime() - (gmtOffset * 60 * 60 * 1000);
+        }
+        
+        function convertToLocalTime(dateTimeStr, gmtOffset) {
+            // Parse the datetime string and convert to local time
+            const date = new Date(dateTimeStr);
+            
+            // Adjust for the GMT offset to get the actual local time
+            // GMT+8 means 8 hours ahead of UTC, so we add 8 hours to get local time
+            return new Date(date.getTime() + (gmtOffset * 60 * 60 * 1000));
+        }
+        
+        function checkAcclimatization(lastDutyEndStr, dutyStartStr, baseGMT, lastDepartureGMT, startGMT, lastDutyEndGMT) {
+            // Calculate total rest period in hours (using proper timezone conversion)
+            const lastDutyEndUTC = convertToUTC(lastDutyEndStr, lastDutyEndGMT);
+            const dutyStartUTC = convertToUTC(dutyStartStr, startGMT);
             const restMs = dutyStartUTC - lastDutyEndUTC;
             const restHours = restMs / (1000 * 60 * 60);
             
@@ -1221,8 +1243,12 @@
             let validNightPeriods = 0;
             let nightPeriods = [];
             
+            // Convert to local times for night period calculation
+            const lastDutyEndLocal = convertToLocalTime(lastDutyEndStr, lastDutyEndGMT);
+            const dutyStartLocal = convertToLocalTime(dutyStartStr, startGMT);
+            
             // Start from the day of last duty end
-            let currentDate = new Date(lastDutyEndUTC);
+            let currentDate = new Date(lastDutyEndLocal);
             currentDate.setHours(0, 0, 0, 0);
             
             // Check up to 5 days to cover all possible night periods
@@ -1235,14 +1261,14 @@
                 nightEnd.setHours(8, 0, 0, 0);
                 
                 // If the night period is completely outside the rest period, skip
-                if (nightEnd <= lastDutyEndUTC || nightStart >= dutyStartUTC) {
+                if (nightEnd <= lastDutyEndLocal || nightStart >= dutyStartLocal) {
                     currentDate.setDate(currentDate.getDate() + 1);
                     continue;
                 }
                 
                 // Calculate overlap between rest period and night period
-                const overlapStart = new Date(Math.max(lastDutyEndUTC.getTime(), nightStart.getTime()));
-                const overlapEnd = new Date(Math.min(dutyStartUTC.getTime(), nightEnd.getTime()));
+                const overlapStart = new Date(Math.max(lastDutyEndLocal.getTime(), nightStart.getTime()));
+                const overlapEnd = new Date(Math.min(dutyStartLocal.getTime(), nightEnd.getTime()));
                 
                 const overlapHours = (overlapEnd - overlapStart) / (1000 * 60 * 60);
                 
