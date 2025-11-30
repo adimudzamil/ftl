@@ -1,0 +1,1893 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FTL Calculator by *2100551*</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⏳</text></svg>">
+<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⏳/text></svg>">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f0f2f5;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        
+        .calculator {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            width: 100%;
+            max-width: 800px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        h1 {
+            color: #1a3a8f;
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+        }
+        
+        .reference-note {
+            color: #666;
+            font-size: 0.85rem;
+            font-style: italic;
+        }
+        
+        .calculator-selector {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .calc-btn {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #1a3a8f;
+            background-color: white;
+            color: #1a3a8f;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .calc-btn.active {
+            background-color: #1a3a8f;
+            color: white;
+        }
+        
+        .calc-btn:hover {
+            background-color: #0a2463;
+            color: white;
+        }
+        
+        .calculator-form {
+            display: none;
+        }
+        
+        .calculator-form.active {
+            display: block;
+        }
+        
+        .input-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+        
+        .time-gmt-container {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .time-input {
+            flex: 2;
+        }
+        
+        .gmt-input {
+            flex: 1;
+        }
+        
+        .gmt-select {
+            font-size: 0.85rem;
+        }
+        
+        button {
+            background-color: #1a3a8f;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            width: 100%;
+            margin-top: 10px;
+        }
+        
+        button:hover {
+            background-color: #0a2463;
+        }
+        
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        
+        .results {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            background-color: #f8f9fa;
+            display: none;
+        }
+        
+        .result-item {
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        
+        .ok {
+            background-color: #d4edda;
+            border-left: 4px solid #28a745;
+        }
+        
+        .warning {
+            background-color: #fff3cd;
+            border-left: 4px solid #ffc107;
+        }
+        
+        .danger {
+            background-color: #f8d7da;
+            border-left: 4px solid #dc3545;
+        }
+        
+        .time-display {
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin: 5px 0;
+        }
+        
+        .limits-info {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            background-color: #e9ecef;
+            font-size: 0.85rem;
+        }
+        
+        .limits-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        
+        .limits-table th, .limits-table td {
+            padding: 5px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .limits-table th {
+            background-color: #1a3a8f;
+            color: white;
+        }
+        
+        .night-periods {
+            margin-top: 10px;
+            font-size: 0.8rem;
+        }
+        
+        .night-period {
+            margin-bottom: 5px;
+            padding: 5px;
+            background-color: #f8f9fa;
+            border-radius: 3px;
+        }
+        
+        .gmt-info {
+            font-size: 0.8rem;
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        .input-description {
+            font-size: 0.75rem;
+            color: #666;
+            margin-top: 3px;
+            font-style: italic;
+            line-height: 1.3;
+        }
+        
+        .gmt-comparison {
+            margin-top: 10px;
+            padding: 8px;
+            background-color: #e9ecef;
+            border-radius: 5px;
+            font-size: 0.85rem;
+        }
+        
+        .non-acclimatized-info {
+            margin-top: 10px;
+            padding: 8px;
+            background-color: #fff3cd;
+            border-radius: 5px;
+            font-size: 0.85rem;
+            border-left: 3px solid #ffc107;
+        }
+        
+        .table-section {
+            margin-top: 20px;
+        }
+        
+        .section-title {
+            color: #1a3a8f;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+            border-bottom: 2px solid #1a3a8f;
+            padding-bottom: 5px;
+        }
+        
+        .footnote {
+            text-align: center;
+            margin-top: 25px;
+            padding-top: 15px;
+            border-top: 1px solid #ddd;
+            color: #666;
+            font-size: 0.8rem;
+        }
+        
+        .crew-results {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .crew-result {
+            flex: 1;
+            padding: 10px;
+            border-radius: 5px;
+            background-color: #f8f9fa;
+        }
+        
+        .crew-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #1a3a8f;
+        }
+        
+        .special-condition {
+            font-size: 0.8rem;
+            margin-top: 5px;
+            color: #666;
+            font-style: italic;
+        }
+        
+        .table-reference {
+            margin-top: 5px;
+            font-size: 0.8rem;
+            color: #666;
+            font-style: italic;
+        }
+        
+        .error-message {
+            color: #dc3545;
+            font-size: 0.8rem;
+            margin-top: 5px;
+            display: none;
+        }
+        
+        .input-error {
+            border-color: #dc3545;
+            background-color: #f8d7da;
+        }
+        
+        .save-status {
+            text-align: center;
+            font-size: 0.8rem;
+            margin-top: 10px;
+            color: #28a745;
+            display: none;
+        }
+        
+        .loading {
+            opacity: 0.7;
+            pointer-events: none;
+        }
+        
+        .auto-save-toggle {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+        }
+        
+        .auto-save-toggle input {
+            width: auto;
+            margin-right: 8px;
+        }
+
+        /* Standby Calculator Styles */
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .checkbox-group input {
+            width: auto;
+            margin-right: 8px;
+        }
+        
+        .eta-display {
+            font-size: 1.2em;
+            font-weight: bold;
+            padding: 10px;
+            border-radius: 4px;
+            text-align: center;
+            margin: 10px 0;
+        }
+        
+        .eta-within-limit {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+            border: 1px solid #4caf50;
+        }
+        
+        .eta-exceeded {
+            background-color: #ffebee;
+            color: #c62828;
+            border: 1px solid #f44336;
+        }
+        
+        .success {
+            background-color: #e8f5e9;
+            border-left-color: #4caf50;
+        }
+        
+        .form-row {
+            display: flex;
+            flex-wrap: wrap;
+            margin: 0 -10px;
+        }
+        
+        .form-col {
+            flex: 1;
+            padding: 0 10px;
+            min-width: 200px;
+        }
+        
+        @media (max-width: 768px) {
+            .form-col {
+                flex: 100%;
+                margin-bottom: 15px;
+            }
+            .calculator-selector {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator">
+        <div class="header">
+            <h1>FTL Calculator by *2100551*</h1>
+            <div class="reference-note">Based on OM-A issue 10 revision 1 Ch7.5.8, dated 20/06/25.</div>
+        </div>
+        
+        <!-- Auto-save toggle -->
+        <div class="auto-save-toggle">
+            <input type="checkbox" id="autoSaveToggle" checked>
+            <label for="autoSaveToggle">Auto-save form data</label>
+        </div>
+        <div class="save-status" id="saveStatus">Form data saved</div>
+        
+        <!-- Calculator Selector -->
+        <div class="calculator-selector">
+            <button class="calc-btn active" data-calc="cabin">Cabin Crew Calculator</button>
+            <button class="calc-btn" data-calc="tech">Tech Crew Calculator</button>
+            <button class="calc-btn" data-calc="standby">Standby Calculator</button>
+        </div>
+        
+        <!-- Cabin Crew Calculator -->
+        <div id="cabin-calculator" class="calculator-form active">
+            <!-- Existing cabin crew calculator form -->
+            <div class="input-group">
+                <label for="cabinAircraftType">Aircraft Type</label>
+                <select id="cabinAircraftType">
+                    <option value="737">737</option>
+                    <option value="widebody">332/333/339/350</option>
+                </select>
+                <div class="input-description">Select your aircraft type</div>
+            </div>
+            
+            <div class="input-group">
+                <label for="cabinBaseGMT">Current GMT</label>
+                <select id="cabinBaseGMT" class="gmt-select">
+                    <!-- GMT options would be populated by JavaScript -->
+                </select>
+                <div class="gmt-info">Select your current GMT, the place where you are departing from today.</div>
+                <div class="error-message" id="cabinBaseGMTError"></div>
+            </div>
+            
+            <div class="input-group">
+                <label for="cabinLastDepartureGMT">Last Departure Station GMT</label>
+                <select id="cabinLastDepartureGMT" class="gmt-select">
+                    <!-- GMT options would be populated by JavaScript -->
+                </select>
+                <div class="gmt-info">Select last departure station timezone</div>
+                <div class="error-message" id="cabinLastDepartureGMTError"></div>
+            </div>
+            
+            <div class="input-group">
+                <label for="cabinLastDutyEnd">Last Duty End Date and Time</label>
+                <div class="time-gmt-container">
+                    <div class="time-input">
+                        <input type="datetime-local" id="cabinLastDutyEnd" required>
+                    </div>
+                    <div class="gmt-input">
+                        <select id="cabinLastDutyEndGMT" class="gmt-select">
+                            <!-- GMT options would be populated by JavaScript -->
+                        </select>
+                    </div>
+                </div>
+                <div class="input-description">Check last duty end time in your roster (STA + 30 minutes) or (ATA + 30 minutes)</div>
+                <div class="error-message" id="cabinLastDutyEndError"></div>
+            </div>
+            
+            <div class="input-group">
+                <label for="cabinDutyStart">Start Time</label>
+                <div class="time-gmt-container">
+                    <div class="time-input">
+                        <input type="datetime-local" id="cabinDutyStart" required>
+                    </div>
+                    <div class="gmt-input">
+                        <select id="cabinStartGMT" class="gmt-select">
+                            <!-- GMT options would be populated by JavaScript -->
+                        </select>
+                    </div>
+                </div>
+                <div class="input-description">Reporting time at Base/ ex-Station.</div>
+                <div class="error-message" id="cabinDutyStartError"></div>
+            </div>
+            
+            <div class="input-group">
+                <label for="cabinDutyEnd">End Time</label>
+                <div class="time-gmt-container">
+                    <div class="time-input">
+                        <input type="datetime-local" id="cabinDutyEnd" required>
+                    </div>
+                    <div class="gmt-input">
+                        <select id="cabinEndGMT" class="gmt-select">
+                            <!-- GMT options would be populated by JavaScript -->
+                        </select>
+                    </div>
+                </div>
+                <div class="input-description">Final sector STA/ATA. FDP does not count +30 minutes post flight duty time.</div>
+                <div class="error-message" id="cabinDutyEndError"></div>
+            </div>
+            
+            <div class="input-group">
+                <label for="cabinSectors">Number of Sectors</label>
+                <input type="number" id="cabinSectors" min="1" max="4" value="1" required>
+                <div class="error-message" id="cabinSectorsError"></div>
+            </div>
+            
+            <button id="calculateCabinBtn">Calculate Cabin Crew Limits</button>
+            
+            <div class="results" id="cabinResults">
+                <div id="cabinResultContent">
+                    <!-- Results will appear here -->
+                </div>
+            </div>
+        </div>
+        
+        <!-- Tech Crew Calculator -->
+        <div id="tech-calculator" class="calculator-form">
+            <!-- Existing tech crew calculator form -->
+            <div class="input-group">
+                <label for="techAircraftType">Aircraft Type</label>
+                <select id="techAircraftType">
+                    <option value="737">737</option>
+                    <option value="widebody">332/333/339/350</option>
+                </select>
+                <div class="input-description">Select your aircraft type</div>
+            </div>
+            
+            <div class="input-group">
+                <label for="techBaseGMT">Current GMT</label>
+                <select id="techBaseGMT" class="gmt-select">
+                    <!-- GMT options would be populated by JavaScript -->
+                </select>
+                <div class="gmt-info">Select your current GMT, the place where you are departing from today.</div>
+                <div class="error-message" id="techBaseGMTError"></div>
+            </div>
+            
+            <div class="input-group">
+                <label for="techLastDepartureGMT">Last Departure Station GMT</label>
+                <select id="techLastDepartureGMT" class="gmt-select">
+                    <!-- GMT options would be populated by JavaScript -->
+                </select>
+                <div class="gmt-info">Select last departure station timezone</div>
+                <div class="error-message" id="techLastDepartureGMTError"></div>
+            </div>
+            
+            <div class="input-group">
+                <label for="techLastDutyEnd">Last Duty End Date and Time</label>
+                <div class="time-gmt-container">
+                    <div class="time-input">
+                        <input type="datetime-local" id="techLastDutyEnd" required>
+                    </div>
+                    <div class="gmt-input">
+                        <select id="techLastDutyEndGMT" class="gmt-select">
+                            <!-- GMT options would be populated by JavaScript -->
+                        </select>
+                    </div>
+                </div>
+                <div class="input-description">Check last duty end time in your roster (STA + 30 minutes) or (ATA + 30 minutes)</div>
+                <div class="error-message" id="techLastDutyEndError"></div>
+            </div>
+            
+            <div class="input-group">
+                <label for="techDutyStart">Start Time</label>
+                <div class="time-gmt-container">
+                    <div class="time-input">
+                        <input type="datetime-local" id="techDutyStart" required>
+                    </div>
+                    <div class="gmt-input">
+                        <select id="techStartGMT" class="gmt-select">
+                            <!-- GMT options would be populated by JavaScript -->
+                        </select>
+                    </div>
+                </div>
+                <div class="input-description">Reporting time at Base/ ex-Station.</div>
+                <div class="error-message" id="techDutyStartError"></div>
+            </div>
+            
+            <div class="input-group">
+                <label for="techDutyEnd">End Time</label>
+                <div class="time-gmt-container">
+                    <div class="time-input">
+                        <input type="datetime-local" id="techDutyEnd" required>
+                    </div>
+                    <div class="gmt-input">
+                        <select id="techEndGMT" class="gmt-select">
+                            <!-- GMT options would be populated by JavaScript -->
+                        </select>
+                    </div>
+                </div>
+                <div class="input-description">Final sector STA/ATA. FDP does not count +30 minutes post flight duty time.</div>
+                <div class="error-message" id="techDutyEndError"></div>
+            </div>
+            
+            <div class="input-group">
+                <label for="techSectors">Number of Sectors</label>
+                <input type="number" id="techSectors" min="1" max="4" value="1" required>
+                <div class="error-message" id="techSectorsError"></div>
+            </div>
+            
+            <button id="calculateTechBtn">Calculate Tech Crew Limits</button>
+            
+            <div class="results" id="techResults">
+                <div id="techResultContent">
+                    <!-- Results will appear here -->
+                </div>
+            </div>
+        </div>
+        
+        <!-- NEW Standby Calculator -->
+        <div id="standby-calculator" class="calculator-form">
+            <div class="input-group">
+                <label for="standbyCrewType">Crew Type</label>
+                <select id="standbyCrewType">
+                    <option value="cabin">Cabin Crew</option>
+                    <option value="tech">Tech Crew</option>
+                </select>
+                <div class="input-description">Select crew type for standby calculation</div>
+            </div>
+            
+            <div class="input-group">
+                <label for="standbyType">Standby Type</label>
+                <select id="standbyType">
+                    <option value="airport">Airport Standby (Immediate Readiness)</option>
+                    <option value="home">Home/Suitable Accommodation</option>
+                </select>
+                <div class="input-description">Select the type of standby duty</div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-col">
+                    <div class="input-group">
+                        <label for="standbyStart">Standby Start Time</label>
+                        <input type="time" id="standbyStart" value="17:15">
+                    </div>
+                </div>
+                <div class="form-col">
+                    <div class="input-group">
+                        <label for="reporting">Reporting Time</label>
+                        <input type="time" id="reporting" value="23:15">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-col">
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="shortNotice">
+                        <label for="shortNotice">≤2 hours notice of report time (Home standby 2200-0800 only)</label>
+                    </div>
+                </div>
+                <div class="form-col">
+                    <div class="input-group">
+                        <label for="standbySectors">Number of Sectors</label>
+                        <select id="standbySectors">
+                            <option value="1">1</option>
+                            <option value="2" selected>2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                            <option value="6">6</option>
+                            <option value="7">7</option>
+                            <option value="8">8+</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="input-group">
+                <label for="arrival">Actual Arrival Time</label>
+                <input type="time" id="arrival" value="07:30">
+                <div class="input-description">Enter the actual or planned arrival time</div>
+            </div>
+            
+            <button id="calculateStandbyBtn">Calculate Standby Duty</button>
+            
+            <div class="results" id="standbyResults">
+                <div id="standbyResultContent">
+                    <!-- Results will appear here -->
+                </div>
+            </div>
+        </div>
+        
+        <!-- Reference Tables -->
+        <div class="table-section">
+            <div class="section-title">Acclimatized Duty Limits</div>
+            <div class="limits-info">
+                <table class="limits-table">
+                    <thead>
+                        <tr>
+                            <th>Start Time</th>
+                            <th>Sectors</th>
+                            <th>Cabin Crew Limit</th>
+                            <th>Tech Crew Limit</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>0600-0759</td><td>1</td><td>14:00</td><td>13:00</td></tr>
+                        <tr><td>0600-0759</td><td>2</td><td>13:15</td><td>12:15</td></tr>
+                        <tr><td>0600-0759</td><td>3</td><td>12:30</td><td>11:30</td></tr>
+                        <tr><td>0600-0759</td><td>4</td><td>11:45</td><td>10:45</td></tr>
+                        <tr><td>0800-1259</td><td>1</td><td>15:00</td><td>14:00</td></tr>
+                        <tr><td>0800-1259</td><td>2</td><td>14:15</td><td>13:15</td></tr>
+                        <tr><td>0800-1259</td><td>3</td><td>13:30</td><td>12:30</td></tr>
+                        <tr><td>0800-1259</td><td>4</td><td>12:45</td><td>11:45</td></tr>
+                        <tr><td>1300-1759</td><td>1</td><td>14:00</td><td>13:00</td></tr>
+                        <tr><td>1300-1759</td><td>2</td><td>13:15</td><td>12:15</td></tr>
+                        <tr><td>1300-1759</td><td>3</td><td>12:30</td><td>11:30</td></tr>
+                        <tr><td>1300-1759</td><td>4</td><td>11:45</td><td>10:45</td></tr>
+                        <tr><td>1800-2159</td><td>1</td><td>13:00</td><td>12:00</td></tr>
+                        <tr><td>1800-2159</td><td>2</td><td>12:15</td><td>11:15</td></tr>
+                        <tr><td>1800-2159</td><td>3</td><td>11:30</td><td>10:30</td></tr>
+                        <tr><td>1800-2159</td><td>4</td><td>10:45</td><td>09:45</td></tr>
+                        <tr><td>2200-0559</td><td>1</td><td>12:00</td><td>11:00</td></tr>
+                        <tr><td>2200-0559</td><td>2</td><td>11:15</td><td>10:15</td></tr>
+                        <tr><td>2200-0559</td><td>3</td><td>10:30</td><td>09:30</td></tr>
+                        <tr><td>2200-0559</td><td>4</td><td>10:00</td><td>09:00</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div class="table-section">
+            <div class="section-title">Non-Acclimatized Duty Limits</div>
+            <div class="limits-info">
+                <table class="limits-table">
+                    <thead>
+                        <tr>
+                            <th>Rest Period</th>
+                            <th>Sectors</th>
+                            <th>Cabin Crew Limit</th>
+                            <th>Tech Crew Limit</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td rowspan="4">≤18h OR ≥30h</td><td>1</td><td>14:00</td><td>13:00</td></tr>
+                        <tr><td>2</td><td>13:15</td><td>12:15</td></tr>
+                        <tr><td>3</td><td>12:30</td><td>11:30</td></tr>
+                        <tr><td>4</td><td>11:45</td><td>10:45</td></tr>
+                        <tr><td rowspan="4">18:01h to 29:59h</td><td>1</td><td>12:30</td><td>11:30</td></tr>
+                        <tr><td>2</td><td>12:00</td><td>11:00</td></tr>
+                        <tr><td>3</td><td>11:30</td><td>10:30</td></tr>
+                        <tr><td>4</td><td>10:45</td><td>09:45</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div class="footnote">
+            by 2100551 16/10/25
+        </div>
+    </div>
+
+    <script>
+        // Configuration and Constants
+        const CONFIG = {
+            MAX_SECTORS: 4,
+            TIMEZONE_EXEMPTION_THRESHOLD: 2,
+            REQUIRED_NIGHT_PERIODS: 2,
+            MIN_REST_FOR_ACCLIMATIZATION: 34,
+            NIGHT_PERIOD: { start: 22, end: 8 },
+            DEFAULT_GMT: 8,
+            AUTO_SAVE_DELAY: 1000,
+            CALCULATION_DEBOUNCE: 300,
+            MAX_STANDBY_HOURS: 12
+        };
+
+        // FDP Table data for standby calculator
+        const FDP_TABLE = {
+            "06:00-07:59": [14.0, 13.25, 12.5, 11.75, 11.0, 10.5, 10.0, 10.0],
+            "08:00-12:59": [15.0, 14.25, 13.5, 12.75, 12.0, 11.5, 11.0, 10.5],
+            "13:00-17:59": [14.0, 13.25, 12.5, 11.75, 11.0, 10.5, 10.0, 10.0],
+            "18:00-21:59": [13.0, 12.25, 11.5, 10.75, 10.0, 10.0, 10.0, 10.0],
+            "22:00-05:59": [12.0, 11.25, 10.5, 10.0, 10.0, 10.0, 10.0, 11.0]
+        };
+
+        // Centralized Limit Tables
+        const LIMIT_TABLES = {
+            acclimatized: {
+                '0600-0759': {
+                    cabin: [{ hours: 14, minutes: 0 }, { hours: 13, minutes: 15 }, { hours: 12, minutes: 30 }, { hours: 11, minutes: 45 }],
+                    tech: [{ hours: 13, minutes: 0 }, { hours: 12, minutes: 15 }, { hours: 11, minutes: 30 }, { hours: 10, minutes: 45 }]
+                },
+                '0800-1259': {
+                    cabin: [{ hours: 15, minutes: 0 }, { hours: 14, minutes: 15 }, { hours: 13, minutes: 30 }, { hours: 12, minutes: 45 }],
+                    tech: [{ hours: 14, minutes: 0 }, { hours: 13, minutes: 15 }, { hours: 12, minutes: 30 }, { hours: 11, minutes: 45 }]
+                },
+                '1300-1759': {
+                    cabin: [{ hours: 14, minutes: 0 }, { hours: 13, minutes: 15 }, { hours: 12, minutes: 30 }, { hours: 11, minutes: 45 }],
+                    tech: [{ hours: 13, minutes: 0 }, { hours: 12, minutes: 15 }, { hours: 11, minutes: 30 }, { hours: 10, minutes: 45 }]
+                },
+                '1800-2159': {
+                    cabin: [{ hours: 13, minutes: 0 }, { hours: 12, minutes: 15 }, { hours: 11, minutes: 30 }, { hours: 10, minutes: 45 }],
+                    tech: [{ hours: 12, minutes: 0 }, { hours: 11, minutes: 15 }, { hours: 10, minutes: 30 }, { hours: 9, minutes: 45 }]
+                },
+                '2200-0559': {
+                    cabin: [{ hours: 12, minutes: 0 }, { hours: 11, minutes: 15 }, { hours: 10, minutes: 30 }, { hours: 10, minutes: 0 }],
+                    tech: [{ hours: 11, minutes: 0 }, { hours: 10, minutes: 15 }, { hours: 9, minutes: 30 }, { hours: 9, minutes: 0 }]
+                }
+            },
+            nonAcclimatized: {
+                'shortOrLongRest': {
+                    cabin: [{ hours: 14, minutes: 0 }, { hours: 13, minutes: 15 }, { hours: 12, minutes: 30 }, { hours: 11, minutes: 45 }],
+                    tech: [{ hours: 13, minutes: 0 }, { hours: 12, minutes: 15 }, { hours: 11, minutes: 30 }, { hours: 10, minutes: 45 }]
+                },
+                'mediumRest': {
+                    cabin: [{ hours: 12, minutes: 30 }, { hours: 12, minutes: 0 }, { hours: 11, minutes: 30 }, { hours: 10, minutes: 45 }],
+                    tech: [{ hours: 11, minutes: 30 }, { hours: 11, minutes: 0 }, { hours: 10, minutes: 30 }, { hours: 9, minutes: 45 }]
+                }
+            }
+        };
+
+        // GMT Options Data
+        const GMT_OPTIONS = [
+            { value: -12, label: 'GMT-12:00' }, { value: -11.75, label: 'GMT-11:45' }, { value: -11, label: 'GMT-11:00' },
+            { value: -10, label: 'GMT-10:00' }, { value: -9.5, label: 'GMT-09:30' }, { value: -9, label: 'GMT-09:00' },
+            { value: -8, label: 'GMT-08:00' }, { value: -7, label: 'GMT-07:00' }, { value: -6, label: 'GMT-06:00' },
+            { value: -5, label: 'GMT-05:00' }, { value: -4, label: 'GMT-04:00' }, { value: -3.5, label: 'GMT-03:30' },
+            { value: -3, label: 'GMT-03:00' }, { value: -2, label: 'GMT-02:00' }, { value: -1, label: 'GMT-01:00' },
+            { value: 0, label: 'GMT+00:00' }, { value: 1, label: 'GMT+01:00' }, { value: 2, label: 'GMT+02:00' },
+            { value: 3, label: 'GMT+03:00' }, { value: 3.5, label: 'GMT+03:30' }, { value: 4, label: 'GMT+04:00' },
+            { value: 4.5, label: 'GMT+04:30' }, { value: 5, label: 'GMT+05:00' }, { value: 5.5, label: 'GMT+05:30' },
+            { value: 5.75, label: 'GMT+05:45' }, { value: 6, label: 'GMT+06:00' }, { value: 6.5, label: 'GMT+06:30' },
+            { value: 7, label: 'GMT+07:00' }, { value: 8, label: 'GMT+08:00' }, { value: 9, label: 'GMT+09:00' },
+            { value: 9.5, label: 'GMT+09:30' }, { value: 10, label: 'GMT+10:00' }, { value: 10.5, label: 'GMT+10:30' },
+            { value: 11, label: 'GMT+11:00' }, { value: 12, label: 'GMT+12:00' }
+        ];
+
+        // Utility Functions
+        const Utils = {
+            debounce(func, wait) {
+                let timeout;
+                return function executedFunction(...args) {
+                    const later = () => {
+                        clearTimeout(timeout);
+                        func(...args);
+                    };
+                    clearTimeout(timeout);
+                    timeout = setTimeout(later, wait);
+                };
+            },
+
+            formatTimeDisplay(hours, minutes) {
+                return `${hours}h ${minutes > 0 ? `${minutes}m` : ''}`.trim();
+            },
+
+            showError(elementId, message) {
+                const errorElement = document.getElementById(elementId);
+                if (errorElement) {
+                    errorElement.textContent = message;
+                    errorElement.style.display = 'block';
+                    document.querySelector(`#${elementId.replace('Error', '')}`).classList.add('input-error');
+                }
+            },
+
+            clearError(elementId) {
+                const errorElement = document.getElementById(elementId);
+                if (errorElement) {
+                    errorElement.textContent = '';
+                    errorElement.style.display = 'none';
+                    document.querySelector(`#${elementId.replace('Error', '')}`).classList.remove('input-error');
+                }
+            },
+
+            showSaveStatus() {
+                const saveStatus = document.getElementById('saveStatus');
+                saveStatus.style.display = 'block';
+                setTimeout(() => {
+                    saveStatus.style.display = 'none';
+                }, 2000);
+            },
+
+            // Standby calculator utility functions
+            timeToDecimal(timeStr) {
+                const [hours, minutes] = timeStr.split(':').map(Number);
+                return hours + minutes / 60;
+            },
+
+            decimalToTime(decimal) {
+                const hours = Math.floor(decimal);
+                const minutes = Math.round((decimal - hours) * 60);
+                return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+            },
+
+            getTimeRange(timeStr) {
+                const time = this.timeToDecimal(timeStr);
+                
+                if (time >= 6 && time < 8) return "06:00-07:59";
+                if (time >= 8 && time < 13) return "08:00-12:59";
+                if (time >= 13 && time < 18) return "13:00-17:59";
+                if (time >= 18 && time < 22) return "18:00-21:59";
+                return "22:00-05:59"; // Covers overnight
+            },
+
+            getFDP(timeStr, sectors, crewType) {
+                const timeRange = this.getTimeRange(timeStr);
+                const sectorIndex = Math.min(sectors - 1, 7); // Cap at 8+ sectors
+                
+                // Get the appropriate limit based on crew type
+                let limitHours;
+                if (crewType === 'cabin') {
+                    limitHours = FDP_TABLE[timeRange][sectorIndex];
+                } else {
+                    // For tech crew, we need to adjust based on the cabin limits
+                    // This is a simplified approach - you may need to adjust based on actual tech crew limits
+                    const cabinLimit = FDP_TABLE[timeRange][sectorIndex];
+                    limitHours = Math.max(cabinLimit - 1, 9); // Tech crew typically has 1 hour less
+                }
+                
+                const hours = Math.floor(limitHours);
+                const minutes = Math.round((limitHours - hours) * 60);
+                return { hours, minutes, decimal: limitHours };
+            }
+        };
+
+        // FTL Calculator Class
+        class FTLCalculator {
+            constructor(type) {
+                this.type = type;
+                this.elements = {};
+                this.initializeElements();
+                this.bindEvents();
+                this.loadSavedData();
+            }
+
+            initializeElements() {
+                // Cache DOM elements
+                this.elements = {
+                    form: document.getElementById(`${this.type}-calculator`),
+                    calculateBtn: document.getElementById(`calculate${this.type.charAt(0).toUpperCase() + this.type.slice(1)}Btn`),
+                    results: document.getElementById(`${this.type}Results`),
+                    resultContent: document.getElementById(`${this.type}ResultContent`)
+                };
+
+                // Form fields
+                const fields = ['AircraftType', 'BaseGMT', 'LastDepartureGMT', 'LastDutyEnd', 'LastDutyEndGMT', 
+                               'DutyStart', 'StartGMT', 'DutyEnd', 'EndGMT', 'Sectors'];
+                
+                fields.forEach(field => {
+                    this.elements[field] = document.getElementById(`${this.type}${field}`);
+                });
+            }
+
+            bindEvents() {
+                // Calculate button with debouncing
+                this.elements.calculateBtn.addEventListener('click', 
+                    Utils.debounce(() => this.calculate(), CONFIG.CALCULATION_DEBOUNCE));
+
+                // Auto-save on input changes
+                Object.values(this.elements).forEach(element => {
+                    if (element && element.tagName !== 'BUTTON' && element.id !== 'saveStatus') {
+                        element.addEventListener('input', () => {
+                            if (document.getElementById('autoSaveToggle').checked) {
+                                Utils.debounce(() => this.saveData(), CONFIG.AUTO_SAVE_DELAY)();
+                            }
+                        });
+                    }
+                });
+            }
+
+            validateInputs() {
+                let isValid = true;
+                const errors = [];
+
+                // Required field validation
+                if (!this.elements.LastDutyEnd.value) {
+                    Utils.showError(`${this.type}LastDutyEndError`, 'Last duty end time is required');
+                    isValid = false;
+                } else {
+                    Utils.clearError(`${this.type}LastDutyEndError`);
+                }
+
+                if (!this.elements.DutyStart.value) {
+                    Utils.showError(`${this.type}DutyStartError`, 'Duty start time is required');
+                    isValid = false;
+                } else {
+                    Utils.clearError(`${this.type}DutyStartError`);
+                }
+
+                if (!this.elements.DutyEnd.value) {
+                    Utils.showError(`${this.type}DutyEndError`, 'Duty end time is required');
+                    isValid = false;
+                } else {
+                    Utils.clearError(`${this.type}DutyEndError`);
+                }
+
+                // Date validation
+                if (this.elements.DutyStart.value && this.elements.DutyEnd.value) {
+                    const start = new Date(this.elements.DutyStart.value);
+                    const end = new Date(this.elements.DutyEnd.value);
+                    
+                    if (start >= end) {
+                        Utils.showError(`${this.type}DutyEndError`, 'Duty end must be after duty start');
+                        isValid = false;
+                    }
+                }
+
+                // Sector validation
+                const sectors = parseInt(this.elements.Sectors.value);
+                if (isNaN(sectors) || sectors < 1 || sectors > CONFIG.MAX_SECTORS) {
+                    Utils.showError(`${this.type}SectorsError`, `Sectors must be between 1 and ${CONFIG.MAX_SECTORS}`);
+                    isValid = false;
+                } else {
+                    Utils.clearError(`${this.type}SectorsError`);
+                }
+
+                return isValid;
+            }
+
+            calculate() {
+                if (!this.validateInputs()) {
+                    return;
+                }
+
+                try {
+                    // Show loading state
+                    this.elements.calculateBtn.disabled = true;
+                    this.elements.form.classList.add('loading');
+
+                    const dutyMs = this.calculateDutyPeriodWithTimezone(
+                        this.elements.DutyStart.value, 
+                        this.elements.DutyEnd.value, 
+                        parseFloat(this.elements.StartGMT.value), 
+                        parseFloat(this.elements.EndGMT.value)
+                    );
+                    
+                    const dutyHours = Math.floor(dutyMs / (1000 * 60 * 60));
+                    const dutyMinutes = Math.floor((dutyMs % (1000 * 60 * 60)) / (1000 * 60));
+                    const dutyTimeFormatted = Utils.formatTimeDisplay(dutyHours, dutyMinutes);
+                    
+                    const acclimatization = this.checkAcclimatization();
+                    const startTimeLocal = this.getLocalTimeFromInput(this.elements.DutyStart.value, parseFloat(this.elements.StartGMT.value));
+                    
+                    // Get crew limits
+                    const { limit, tableReference } = this.getDutyLimitsFromTable(
+                        startTimeLocal, 
+                        parseInt(this.elements.Sectors.value), 
+                        acclimatization.isAcclimatized,
+                        acclimatization.restHours
+                    );
+                    
+                    const limitDecimal = limit.hours + (limit.minutes / 60);
+                    const dutyDecimal = dutyHours + (dutyMinutes / 60);
+                    const status = dutyDecimal <= limitDecimal ? 'ok' : 'danger';
+                    
+                    const dutyLimitFormatted = Utils.formatTimeDisplay(limit.hours, limit.minutes);
+                    
+                    const sectorLimit = CONFIG.MAX_SECTORS;
+                    const sectors = parseInt(this.elements.Sectors.value);
+                    const sectorStatus = sectors <= sectorLimit ? 'ok' : 'danger';
+                    
+                    this.displayResults({
+                        dutyTimeFormatted,
+                        acclimatization,
+                        startTimeLocal,
+                        dutyLimitFormatted,
+                        status,
+                        sectors,
+                        sectorStatus,
+                        sectorLimit,
+                        tableReference,
+                        dutyDecimal,
+                        limitDecimal
+                    });
+
+                    // Save calculation
+                    this.saveData();
+
+                } catch (error) {
+                    console.error('Calculation error:', error);
+                    this.elements.resultContent.innerHTML = `<div class="result-item danger">Error in calculation: ${error.message}</div>`;
+                    this.elements.results.style.display = 'block';
+                } finally {
+                    // Remove loading state
+                    this.elements.calculateBtn.disabled = false;
+                    this.elements.form.classList.remove('loading');
+                }
+            }
+
+            displayResults(data) {
+                const aircraftTypeDisplay = this.elements.AircraftType.value === '737' ? '737' : '332/333/339/350';
+                
+                let resultHTML = '';
+                
+                // Aircraft info
+                resultHTML += `<div class="result-item ok">`;
+                resultHTML += `<strong>Crew Type:</strong> ${this.type === 'cabin' ? 'Cabin Crew' : 'Tech Crew'}<br>`;
+                resultHTML += `<strong>Aircraft Type:</strong> ${aircraftTypeDisplay}`;
+                resultHTML += `</div>`;
+                
+                // Acclimatization result
+                resultHTML += `<div class="result-item ${data.acclimatization.status}">`;
+                resultHTML += `<strong>Acclimatization:</strong> ${data.acclimatization.message}<br>`;
+                resultHTML += `<strong>Rest Period:</strong> ${data.acclimatization.restPeriod}<br>`;
+                resultHTML += `<strong>Night Periods with 8+ hours rest:</strong> ${data.acclimatization.validNightPeriods} of ${CONFIG.REQUIRED_NIGHT_PERIODS} required`;
+                
+                if (data.acclimatization.timezoneExemption) {
+                    const lastDepartureGMT = parseFloat(this.elements.LastDepartureGMT.value);
+                    const baseGMT = parseFloat(this.elements.BaseGMT.value);
+                    resultHTML += `<div class="gmt-comparison">`;
+                    resultHTML += `<strong>Timezone Exemption:</strong> Last departure station GMT${lastDepartureGMT >= 0 ? '+' : ''}${lastDepartureGMT} is within ±${CONFIG.TIMEZONE_EXEMPTION_THRESHOLD} hours of Current GMT${baseGMT >= 0 ? '+' : ''}${baseGMT}`;
+                    resultHTML += `</div>`;
+                }
+                
+                if (!data.acclimatization.isAcclimatized) {
+                    resultHTML += `<div class="non-acclimatized-info">`;
+                    resultHTML += `<strong>Non-Acclimatized Limits Applied:</strong> `;
+                    if (data.acclimatization.restHours <= 18 || data.acclimatization.restHours >= 30) {
+                        resultHTML += `Rest period (${data.acclimatization.restPeriod}) is ≤18h OR ≥30h`;
+                    } else {
+                        resultHTML += `Rest period (${data.acclimatization.restPeriod}) is between 18:01h and 29:59h`;
+                    }
+                    resultHTML += `</div>`;
+                }
+                
+                if (data.acclimatization.nightPeriods.length > 0) {
+                    resultHTML += `<div class="night-periods">`;
+                    data.acclimatization.nightPeriods.forEach((period, index) => {
+                        const status = period.restHours >= 8 ? '✓' : '✗';
+                        resultHTML += `<div class="night-period">${status} Night ${index+1}: ${period.date} (${period.restHours.toFixed(1)}h rest)</div>`;
+                    });
+                    resultHTML += `</div>`;
+                }
+                
+                resultHTML += `</div>`;
+                
+                // Duty period result
+                resultHTML += `<div class="result-item">`;
+                resultHTML += `<strong>Duty Period:</strong>`;
+                resultHTML += `<div class="time-display">${data.dutyTimeFormatted}</div>`;
+                
+                const startTimeFormatted = data.startTimeLocal.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                resultHTML += `<div class="table-reference">Start Time: ${startTimeFormatted} (Local) - Reference: ${data.tableReference}, ${data.sectors} sector(s)</div>`;
+                
+                resultHTML += `<div class="crew-results">`;
+                resultHTML += `<div class="crew-result ${data.status}">`;
+                resultHTML += `<div class="crew-title">${this.type === 'cabin' ? 'Cabin Crew' : 'Tech Crew'}</div>`;
+                resultHTML += `<strong>Limit:</strong> ${data.dutyLimitFormatted}<br>`;
+                resultHTML += data.status === 'ok' ? 
+                    '✓ Within limit' : 
+                    '✗ Exceeds limit!';
+                resultHTML += `</div>`;
+                resultHTML += `</div>`;
+                resultHTML += `</div>`;
+                
+                // Sectors result
+                resultHTML += `<div class="result-item ${data.sectorStatus}">`;
+                resultHTML += `<strong>Sectors:</strong> ${data.sectors}<br>`;
+                resultHTML += `<strong>Limit:</strong> ${data.sectorLimit}<br>`;
+                resultHTML += data.sectorStatus === 'ok' ? 
+                    '✓ Within limit' : 
+                    '✗ Exceeds limit!';
+                resultHTML += `</div>`;
+                
+                this.elements.resultContent.innerHTML = resultHTML;
+                this.elements.results.style.display = 'block';
+            }
+
+            // Common calculation methods
+            getLocalTimeFromInput(dateTimeStr, gmtOffset) {
+                const date = new Date(dateTimeStr);
+                const utcTime = date.getTime() + (date.getTimezoneOffset() * 60000);
+                const localTime = new Date(utcTime + (gmtOffset * 3600000));
+                return localTime;
+            }
+
+            calculateDutyPeriodWithTimezone(startTimeStr, endTimeStr, startGMT, endGMT) {
+                const startUTC = this.convertToUTC(startTimeStr, startGMT);
+                const endUTC = this.convertToUTC(endTimeStr, endGMT);
+                return endUTC - startUTC;
+            }
+
+            convertToUTC(dateTimeStr, gmtOffset) {
+                const date = new Date(dateTimeStr);
+                return date.getTime() - (gmtOffset * 60 * 60 * 1000);
+            }
+
+            checkAcclimatization() {
+                const lastDutyEndUTC = this.convertToUTC(this.elements.LastDutyEnd.value, parseFloat(this.elements.LastDutyEndGMT.value));
+                const dutyStartUTC = this.convertToUTC(this.elements.DutyStart.value, parseFloat(this.elements.StartGMT.value));
+                const restMs = dutyStartUTC - lastDutyEndUTC;
+                const restHours = restMs / (1000 * 60 * 60);
+                
+                const restHoursFormatted = Math.floor(restHours);
+                const restMinutesFormatted = Math.floor((restHours % 1) * 60);
+                const restPeriod = `${restHoursFormatted}h ${restMinutesFormatted}m`;
+                
+                const timezoneDifference = Math.abs(
+                    parseFloat(this.elements.LastDepartureGMT.value) - parseFloat(this.elements.BaseGMT.value)
+                );
+                const timezoneExemption = timezoneDifference <= CONFIG.TIMEZONE_EXEMPTION_THRESHOLD;
+                
+                let validNightPeriods = 0;
+                let nightPeriods = [];
+                
+                const lastDutyEndLocal = this.getLocalTimeFromInput(this.elements.LastDutyEnd.value, parseFloat(this.elements.LastDutyEndGMT.value));
+                const dutyStartLocal = this.getLocalTimeFromInput(this.elements.DutyStart.value, parseFloat(this.elements.StartGMT.value));
+                
+                let currentDate = new Date(lastDutyEndLocal);
+                currentDate.setHours(0, 0, 0, 0);
+                
+                for (let i = 0; i < 5; i++) {
+                    const nightStart = new Date(currentDate);
+                    nightStart.setHours(CONFIG.NIGHT_PERIOD.start, 0, 0, 0);
+                    
+                    const nightEnd = new Date(currentDate);
+                    nightEnd.setDate(nightEnd.getDate() + 1);
+                    nightEnd.setHours(CONFIG.NIGHT_PERIOD.end, 0, 0, 0);
+                    
+                    if (nightEnd <= lastDutyEndLocal || nightStart >= dutyStartLocal) {
+                        currentDate.setDate(currentDate.getDate() + 1);
+                        continue;
+                    }
+                    
+                    const overlapStart = new Date(Math.max(lastDutyEndLocal.getTime(), nightStart.getTime()));
+                    const overlapEnd = new Date(Math.min(dutyStartLocal.getTime(), nightEnd.getTime()));
+                    
+                    const overlapHours = (overlapEnd - overlapStart) / (1000 * 60 * 60);
+                    
+                    if (overlapHours > 0) {
+                        const isValid = overlapHours >= 8;
+                        if (isValid) validNightPeriods++;
+                        
+                        nightPeriods.push({
+                            date: nightStart.toLocaleDateString(),
+                            restHours: overlapHours,
+                            isValid: isValid
+                        });
+                    }
+                    
+                    currentDate.setDate(currentDate.getDate() + 1);
+                }
+                
+                let status = 'danger';
+                let message = 'Not Acclimatized';
+                let isAcclimatized = false;
+                
+                if (timezoneExemption) {
+                    status = 'ok';
+                    message = 'Acclimatized (Timezone Exemption)';
+                    isAcclimatized = true;
+                } else if (validNightPeriods >= CONFIG.REQUIRED_NIGHT_PERIODS && restHours >= CONFIG.MIN_REST_FOR_ACCLIMATIZATION) {
+                    status = 'ok';
+                    message = 'Acclimatized';
+                    isAcclimatized = true;
+                } else if (validNightPeriods >= CONFIG.REQUIRED_NIGHT_PERIODS && restHours < CONFIG.MIN_REST_FOR_ACCLIMATIZATION) {
+                    status = 'warning';
+                    message = 'Night periods OK but rest < 34h';
+                } else if (validNightPeriods < CONFIG.REQUIRED_NIGHT_PERIODS && restHours >= CONFIG.MIN_REST_FOR_ACCLIMATIZATION) {
+                    status = 'warning';
+                    message = 'Rest period OK but insufficient night periods';
+                }
+                
+                return {
+                    status: status,
+                    message: message,
+                    restPeriod: restPeriod,
+                    restHours: restHours,
+                    validNightPeriods: validNightPeriods,
+                    nightPeriods: nightPeriods,
+                    timezoneExemption: timezoneExemption,
+                    isAcclimatized: isAcclimatized
+                };
+            }
+
+            getDutyLimitsFromTable(startTimeLocal, sectors, isAcclimatized, restHours = null) {
+                const startHour = startTimeLocal.getHours();
+                const startMinutes = startTimeLocal.getMinutes();
+                const startTimeInMinutes = startHour * 60 + startMinutes;
+                
+                let limit = { hours: 0, minutes: 0 };
+                let tableReference = "";
+                const crewType = this.type;
+                
+                if (isAcclimatized) {
+                    // Use acclimatized table based on start time
+                    if (startTimeInMinutes >= 6*60 && startTimeInMinutes < 8*60) {
+                        tableReference = "0600-0759";
+                        limit = LIMIT_TABLES.acclimatized['0600-0759'][crewType][sectors - 1];
+                    } else if (startTimeInMinutes >= 8*60 && startTimeInMinutes < 13*60) {
+                        tableReference = "0800-1259";
+                        limit = LIMIT_TABLES.acclimatized['0800-1259'][crewType][sectors - 1];
+                    } else if (startTimeInMinutes >= 13*60 && startTimeInMinutes < 18*60) {
+                        tableReference = "1300-1759";
+                        limit = LIMIT_TABLES.acclimatized['1300-1759'][crewType][sectors - 1];
+                    } else if (startTimeInMinutes >= 18*60 && startTimeInMinutes < 22*60) {
+                        tableReference = "1800-2159";
+                        limit = LIMIT_TABLES.acclimatized['1800-2159'][crewType][sectors - 1];
+                    } else {
+                        tableReference = "2200-0559";
+                        limit = LIMIT_TABLES.acclimatized['2200-0559'][crewType][sectors - 1];
+                    }
+                } else {
+                    // Use non-acclimatized table based on rest period
+                    if (restHours <= 18 || restHours >= 30) {
+                        tableReference = "Rest ≤18h OR ≥30h";
+                        limit = LIMIT_TABLES.nonAcclimatized['shortOrLongRest'][crewType][sectors - 1];
+                    } else {
+                        tableReference = "Rest 18:01h-29:59h";
+                        limit = LIMIT_TABLES.nonAcclimatized['mediumRest'][crewType][sectors - 1];
+                    }
+                }
+                
+                return { limit, tableReference };
+            }
+
+            saveData() {
+                const formData = {};
+                Object.keys(this.elements).forEach(key => {
+                    if (this.elements[key] && this.elements[key].value !== undefined) {
+                        formData[key] = this.elements[key].value;
+                    }
+                });
+                
+                localStorage.setItem(`ftlCalculator_${this.type}`, JSON.stringify(formData));
+                Utils.showSaveStatus();
+            }
+
+            loadSavedData() {
+                const saved = localStorage.getItem(`ftlCalculator_${this.type}`);
+                if (saved) {
+                    const formData = JSON.parse(saved);
+                    Object.keys(formData).forEach(key => {
+                        if (this.elements[key] && formData[key] !== undefined) {
+                            this.elements[key].value = formData[key];
+                        }
+                    });
+                }
+            }
+        }
+
+        // Tech Crew Calculator with special conditions
+        class TechFTLCalculator extends FTLCalculator {
+            calculate() {
+                if (!this.validateInputs()) {
+                    return;
+                }
+
+                try {
+                    // Show loading state
+                    this.elements.calculateBtn.disabled = true;
+                    this.elements.form.classList.add('loading');
+
+                    const dutyMs = this.calculateDutyPeriodWithTimezone(
+                        this.elements.DutyStart.value, 
+                        this.elements.DutyEnd.value, 
+                        parseFloat(this.elements.StartGMT.value), 
+                        parseFloat(this.elements.EndGMT.value)
+                    );
+                    
+                    const dutyHours = Math.floor(dutyMs / (1000 * 60 * 60));
+                    const dutyMinutes = Math.floor((dutyMs % (1000 * 60 * 60)) / (1000 * 60));
+                    const dutyTimeFormatted = Utils.formatTimeDisplay(dutyHours, dutyMinutes);
+                    
+                    const acclimatization = this.checkAcclimatization();
+                    const startTimeLocal = this.getLocalTimeFromInput(this.elements.DutyStart.value, parseFloat(this.elements.StartGMT.value));
+                    
+                    // Get base tech crew limits
+                    const { limit: techLimit, tableReference } = this.getDutyLimitsFromTable(
+                        startTimeLocal, 
+                        parseInt(this.elements.Sectors.value), 
+                        acclimatization.isAcclimatized,
+                        acclimatization.restHours
+                    );
+                    
+                    // Apply special conditions for tech crew
+                    const { finalTechLimit, specialCondition, tableRef } = this.applySpecialConditions(
+                        techLimit, tableReference, parseInt(this.elements.Sectors.value), 
+                        dutyHours, dutyMinutes, acclimatization, startTimeLocal
+                    );
+                    
+                    const techLimitDecimal = finalTechLimit ? finalTechLimit.hours + (finalTechLimit.minutes / 60) : null;
+                    const dutyDecimal = dutyHours + (dutyMinutes / 60);
+                    const techStatus = techLimitDecimal !== null && dutyDecimal <= techLimitDecimal ? 'ok' : 'danger';
+                    
+                    const techDutyLimitFormatted = finalTechLimit ? 
+                        Utils.formatTimeDisplay(finalTechLimit.hours, finalTechLimit.minutes) : "N/A";
+                    
+                    const sectorLimit = CONFIG.MAX_SECTORS;
+                    const sectors = parseInt(this.elements.Sectors.value);
+                    const sectorStatus = sectors <= sectorLimit ? 'ok' : 'danger';
+                    
+                    this.displayTechResults({
+                        dutyTimeFormatted,
+                        acclimatization,
+                        startTimeLocal,
+                        techDutyLimitFormatted,
+                        techStatus,
+                        sectors,
+                        sectorStatus,
+                        sectorLimit,
+                        tableRef,
+                        specialCondition,
+                        dutyDecimal,
+                        techLimitDecimal
+                    });
+
+                    // Save calculation
+                    this.saveData();
+
+                } catch (error) {
+                    console.error('Calculation error:', error);
+                    this.elements.resultContent.innerHTML = `<div class="result-item danger">Error in calculation: ${error.message}</div>`;
+                    this.elements.results.style.display = 'block';
+                } finally {
+                    // Remove loading state
+                    this.elements.calculateBtn.disabled = false;
+                    this.elements.form.classList.remove('loading');
+                }
+            }
+
+            applySpecialConditions(techLimit, tableReference, sectors, dutyHours, dutyMinutes, acclimatization, startTimeLocal) {
+                let finalTechLimit = { ...techLimit };
+                let specialCondition = "";
+                let tableRef = tableReference;
+                
+                if (sectors === 1) {
+                    const dutyDecimal = dutyHours + (dutyMinutes / 60);
+                    
+                    if (acclimatization.isAcclimatized) {
+                        const startHour = startTimeLocal.getHours();
+                        const startMinutes = startTimeLocal.getMinutes();
+                        const startTimeInMinutes = startHour * 60 + startMinutes;
+                        
+                        let timeBlock;
+                        if (startTimeInMinutes >= 6*60 && startTimeInMinutes < 8*60) timeBlock = '0600-0759';
+                        else if (startTimeInMinutes >= 8*60 && startTimeInMinutes < 13*60) timeBlock = '0800-1259';
+                        else if (startTimeInMinutes >= 13*60 && startTimeInMinutes < 18*60) timeBlock = '1300-1759';
+                        else if (startTimeInMinutes >= 18*60 && startTimeInMinutes < 22*60) timeBlock = '1800-2159';
+                        else timeBlock = '2200-0559';
+                        
+                        if (dutyDecimal >= 7 && dutyDecimal < 9) {
+                            specialCondition = "Duty period 7h-8h59m, Sector 1";
+                            tableRef += " (Special Condition)";
+                            switch(timeBlock) {
+                                case '0600-0759': finalTechLimit = { hours: 12, minutes: 15 }; break;
+                                case '0800-1259': finalTechLimit = { hours: 13, minutes: 15 }; break;
+                                case '1300-1759': finalTechLimit = { hours: 12, minutes: 15 }; break;
+                                case '1800-2159': finalTechLimit = { hours: 11, minutes: 15 }; break;
+                                case '2200-0559': finalTechLimit = { hours: 10, minutes: 15 }; break;
+                            }
+                        } else if (dutyDecimal >= 9 && dutyDecimal < 11) {
+                            specialCondition = "Duty period 9h-10h59m, Sector 1";
+                            tableRef += " (Special Condition)";
+                            switch(timeBlock) {
+                                case '0600-0759': finalTechLimit = { hours: 11, minutes: 30 }; break;
+                                case '0800-1259': finalTechLimit = { hours: 12, minutes: 30 }; break;
+                                case '1300-1759': finalTechLimit = { hours: 11, minutes: 30 }; break;
+                                case '1800-2159': finalTechLimit = { hours: 10, minutes: 30 }; break;
+                                case '2200-0559': finalTechLimit = { hours: 9, minutes: 30 }; break;
+                            }
+                        } else if (dutyDecimal >= 11) {
+                            specialCondition = "Duty period 11h+, Sector 1";
+                            tableRef += " (Special Condition)";
+                            switch(timeBlock) {
+                                case '0600-0759': finalTechLimit = { hours: 10, minutes: 45 }; break;
+                                case '0800-1259': finalTechLimit = { hours: 11, minutes: 45 }; break;
+                                case '1300-1759': finalTechLimit = { hours: 10, minutes: 45 }; break;
+                                case '1800-2159': finalTechLimit = { hours: 9, minutes: 45 }; break;
+                                case '2200-0559': finalTechLimit = { hours: 9, minutes: 0 }; break;
+                            }
+                        }
+                    } else {
+                        if (dutyDecimal >= 7 && dutyDecimal < 9) {
+                            specialCondition = "Duty period 7h-8h59m, Sector 1";
+                            tableRef += " (Special Condition)";
+                            if (acclimatization.restHours <= 18 || acclimatization.restHours >= 30) {
+                                finalTechLimit = { hours: 10, minutes: 45 };
+                            } else {
+                                finalTechLimit = { hours: 9, minutes: 45 };
+                            }
+                        } else if (dutyDecimal >= 9 && dutyDecimal < 11) {
+                            specialCondition = "Duty period 9h-10h59m, Sector 1";
+                            tableRef += " (Special Condition)";
+                            if (acclimatization.restHours <= 18 || acclimatization.restHours >= 30) {
+                                finalTechLimit = { hours: 10, minutes: 45 };
+                            } else {
+                                finalTechLimit = { hours: 9, minutes: 45 };
+                            }
+                        } else if (dutyDecimal >= 11) {
+                            specialCondition = "Duty period 11h+, Sector 1 - NOT ALLOWED";
+                            tableRef += " (Special Condition)";
+                            finalTechLimit = null;
+                        }
+                    }
+                }
+                
+                return { finalTechLimit, specialCondition, tableRef };
+            }
+
+            displayTechResults(data) {
+                const aircraftTypeDisplay = this.elements.AircraftType.value === '737' ? '737' : '332/333/339/350';
+                
+                let resultHTML = '';
+                
+                // Aircraft info
+                resultHTML += `<div class="result-item ok">`;
+                resultHTML += `<strong>Crew Type:</strong> Tech Crew<br>`;
+                resultHTML += `<strong>Aircraft Type:</strong> ${aircraftTypeDisplay}`;
+                resultHTML += `</div>`;
+                
+                // Acclimatization result
+                resultHTML += `<div class="result-item ${data.acclimatization.status}">`;
+                resultHTML += `<strong>Acclimatization:</strong> ${data.acclimatization.message}<br>`;
+                resultHTML += `<strong>Rest Period:</strong> ${data.acclimatization.restPeriod}<br>`;
+                resultHTML += `<strong>Night Periods with 8+ hours rest:</strong> ${data.acclimatization.validNightPeriods} of ${CONFIG.REQUIRED_NIGHT_PERIODS} required`;
+                
+                if (data.acclimatization.timezoneExemption) {
+                    const lastDepartureGMT = parseFloat(this.elements.LastDepartureGMT.value);
+                    const baseGMT = parseFloat(this.elements.BaseGMT.value);
+                    resultHTML += `<div class="gmt-comparison">`;
+                    resultHTML += `<strong>Timezone Exemption:</strong> Last departure station GMT${lastDepartureGMT >= 0 ? '+' : ''}${lastDepartureGMT} is within ±${CONFIG.TIMEZONE_EXEMPTION_THRESHOLD} hours of Current GMT${baseGMT >= 0 ? '+' : ''}${baseGMT}`;
+                    resultHTML += `</div>`;
+                }
+                
+                if (!data.acclimatization.isAcclimatized) {
+                    resultHTML += `<div class="non-acclimatized-info">`;
+                    resultHTML += `<strong>Non-Acclimatized Limits Applied:</strong> `;
+                    if (data.acclimatization.restHours <= 18 || data.acclimatization.restHours >= 30) {
+                        resultHTML += `Rest period (${data.acclimatization.restPeriod}) is ≤18h OR ≥30h`;
+                    } else {
+                        resultHTML += `Rest period (${data.acclimatization.restPeriod}) is between 18:01h and 29:59h`;
+                    }
+                    resultHTML += `</div>`;
+                }
+                
+                if (data.acclimatization.nightPeriods.length > 0) {
+                    resultHTML += `<div class="night-periods">`;
+                    data.acclimatization.nightPeriods.forEach((period, index) => {
+                        const status = period.restHours >= 8 ? '✓' : '✗';
+                        resultHTML += `<div class="night-period">${status} Night ${index+1}: ${period.date} (${period.restHours.toFixed(1)}h rest)</div>`;
+                    });
+                    resultHTML += `</div>`;
+                }
+                
+                resultHTML += `</div>`;
+                
+                // Duty period result
+                resultHTML += `<div class="result-item">`;
+                resultHTML += `<strong>Duty Period:</strong>`;
+                resultHTML += `<div class="time-display">${data.dutyTimeFormatted}</div>`;
+                
+                const startTimeFormatted = data.startTimeLocal.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                resultHTML += `<div class="table-reference">Start Time: ${startTimeFormatted} (Local) - Reference: ${data.tableRef}, ${data.sectors} sector(s)</div>`;
+                
+                resultHTML += `<div class="crew-results">`;
+                resultHTML += `<div class="crew-result ${data.techStatus}">`;
+                resultHTML += `<div class="crew-title">Tech Crew</div>`;
+                resultHTML += `<strong>Limit:</strong> ${data.techDutyLimitFormatted}<br>`;
+                if (data.specialCondition) {
+                    resultHTML += `<div class="special-condition">${data.specialCondition}</div>`;
+                }
+                if (data.techDutyLimitFormatted === "N/A") {
+                    resultHTML += 'N/A - Not applicable';
+                } else {
+                    resultHTML += data.techStatus === 'ok' ? 
+                        '✓ Within limit' : 
+                        '✗ Exceeds limit!';
+                }
+                resultHTML += `</div>`;
+                resultHTML += `</div>`;
+                resultHTML += `</div>`;
+                
+                // Sectors result
+                resultHTML += `<div class="result-item ${data.sectorStatus}">`;
+                resultHTML += `<strong>Sectors:</strong> ${data.sectors}<br>`;
+                resultHTML += `<strong>Limit:</strong> ${data.sectorLimit}<br>`;
+                resultHTML += data.sectorStatus === 'ok' ? 
+                    '✓ Within limit' : 
+                    '✗ Exceeds limit!';
+                resultHTML += `</div>`;
+                
+                this.elements.resultContent.innerHTML = resultHTML;
+                this.elements.results.style.display = 'block';
+            }
+        }
+
+        // Standby Calculator Class
+        class StandbyFTLCalculator {
+            constructor() {
+                this.elements = {};
+                this.initializeElements();
+                this.bindEvents();
+                this.loadSavedData();
+            }
+
+            initializeElements() {
+                // Cache DOM elements
+                this.elements = {
+                    form: document.getElementById('standby-calculator'),
+                    calculateBtn: document.getElementById('calculateStandbyBtn'),
+                    results: document.getElementById('standbyResults'),
+                    resultContent: document.getElementById('standbyResultContent'),
+                    crewType: document.getElementById('standbyCrewType'),
+                    standbyType: document.getElementById('standbyType'),
+                    standbyStart: document.getElementById('standbyStart'),
+                    reporting: document.getElementById('reporting'),
+                    shortNotice: document.getElementById('shortNotice'),
+                    sectors: document.getElementById('standbySectors'),
+                    arrival: document.getElementById('arrival')
+                };
+            }
+
+            bindEvents() {
+                // Calculate button with debouncing
+                this.elements.calculateBtn.addEventListener('click', 
+                    Utils.debounce(() => this.calculate(), CONFIG.CALCULATION_DEBOUNCE));
+
+                // Auto-save on input changes
+                Object.values(this.elements).forEach(element => {
+                    if (element && element.tagName !== 'BUTTON' && element.id !== 'saveStatus') {
+                        element.addEventListener('input', () => {
+                            if (document.getElementById('autoSaveToggle').checked) {
+                                Utils.debounce(() => this.saveData(), CONFIG.AUTO_SAVE_DELAY)();
+                            }
+                        });
+                    }
+                });
+            }
+
+            calculate() {
+                try {
+                    // Show loading state
+                    this.elements.calculateBtn.disabled = true;
+                    this.elements.form.classList.add('loading');
+
+                    const standbyType = this.elements.standbyType.value;
+                    const standbyStart = this.elements.standbyStart.value;
+                    const reporting = this.elements.reporting.value;
+                    const shortNotice = this.elements.shortNotice.checked;
+                    const sectors = parseInt(this.elements.sectors.value);
+                    const arrival = this.elements.arrival.value;
+                    const crewType = this.elements.crewType.value;
+                    
+                    // Convert times to decimal for calculations
+                    const standbyStartDec = Utils.timeToDecimal(standbyStart);
+                    const reportingDec = Utils.timeToDecimal(reporting);
+                    const arrivalDec = Utils.timeToDecimal(arrival);
+                    
+                    // Calculate standby time
+                    let standbyTime = reportingDec - standbyStartDec;
+                    if (standbyTime < 0) standbyTime += 24; // Handle overnight
+                    
+                    // Determine FDP start time according to regulations
+                    let fdpStartTime;
+                    let fdpStartReason;
+                    
+                    if (standbyType === "home" && shortNotice) {
+                        // Home standby with ≤2 hours notice between 2200-0800
+                        fdpStartTime = reporting;
+                        fdpStartReason = "Home standby with ≤2 hours notice (2200-0800) - FDP starts at reporting time";
+                    } else if (standbyType === "airport") {
+                        // Airport standby - FDP starts at standby start
+                        fdpStartTime = standbyStart;
+                        fdpStartReason = "Airport standby - FDP starts at standby start time";
+                    } else {
+                        // Default case - FDP starts at standby start, but check if reporting time is more limiting
+                        const fdpFromStandbyStart = Utils.getFDP(standbyStart, sectors, crewType);
+                        const fdpFromReporting = Utils.getFDP(reporting, sectors, crewType);
+                        
+                        if (fdpFromReporting.decimal < fdpFromStandbyStart.decimal) {
+                            fdpStartTime = reporting;
+                            fdpStartReason = "Reporting time falls in more limiting time band";
+                        } else {
+                            fdpStartTime = standbyStart;
+                            fdpStartReason = "Standby start time determines FDP";
+                        }
+                    }
+                    
+                    // Get MAX FDP
+                    const maxFDP = Utils.getFDP(fdpStartTime, sectors, crewType);
+                    
+                    // Calculate actual FDP (flight duty period)
+                    let actualFDP = arrivalDec - reportingDec;
+                    if (actualFDP < 0) actualFDP += 24;
+                    
+                    // Calculate total duty period
+                    let totalDutyPeriod = (arrivalDec - standbyStartDec);
+                    if (totalDutyPeriod < 0) totalDutyPeriod += 24;
+                    
+                    // Determine case and calculate allowed duty
+                    let allowedTotalDuty;
+                    let caseType;
+                    let calculationDetails;
+                    
+                    if (standbyTime < 6) {
+                        // Case A - Standby less than 6 hours
+                        caseType = "A";
+                        allowedTotalDuty = standbyTime + maxFDP.decimal;
+                        calculationDetails = `Allowed Total Duty = Standby Time (${Utils.decimalToTime(standbyTime)}) + MAX FDP (${Utils.decimalToTime(maxFDP.decimal)}) = ${Utils.decimalToTime(allowedTotalDuty)}`;
+                    } else {
+                        // Case B - Standby 6 hours or more
+                        caseType = "B";
+                        const standbyExcess = standbyTime - 6;
+                        allowedTotalDuty = standbyTime + maxFDP.decimal - standbyExcess;
+                        calculationDetails = `Allowed Total Duty = Standby Time (${Utils.decimalToTime(standbyTime)}) + MAX FDP (${Utils.decimalToTime(maxFDP.decimal)}) - Standby Excess over 6h (${Utils.decimalToTime(standbyExcess)}) = ${Utils.decimalToTime(allowedTotalDuty)}`;
+                    }
+                    
+                    // Calculate last allowed ETA
+                    let lastAllowedETA = standbyStartDec + allowedTotalDuty;
+                    if (lastAllowedETA >= 24) lastAllowedETA -= 24;
+                    
+                    // Check limits
+                    const exceedsMaxStandby = standbyTime > CONFIG.MAX_STANDBY_HOURS;
+                    const exceedsAllowedDuty = totalDutyPeriod > allowedTotalDuty;
+                    
+                    this.displayResults({
+                        standbyTime,
+                        fdpStartReason,
+                        maxFDP,
+                        actualFDP,
+                        totalDutyPeriod,
+                        allowedTotalDuty,
+                        caseType,
+                        calculationDetails,
+                        lastAllowedETA,
+                        exceedsMaxStandby,
+                        exceedsAllowedDuty,
+                        arrival,
+                        crewType,
+                        sectors,
+                        fdpStartTime
+                    });
+
+                    // Save calculation
+                    this.saveData();
+
+                } catch (error) {
+                    console.error('Standby calculation error:', error);
+                    this.elements.resultContent.innerHTML = `<div class="result-item danger">Error in calculation: ${error.message}</div>`;
+                    this.elements.results.style.display = 'block';
+                } finally {
+                    // Remove loading state
+                    this.elements.calculateBtn.disabled = false;
+                    this.elements.form.classList.remove('loading');
+                }
+            }
+
+            displayResults(data) {
+                let resultHTML = '';
+                let resultClass = "result";
+                if (data.exceedsMaxStandby || data.exceedsAllowedDuty) {
+                    resultClass += " warning";
+                } else {
+                    resultClass += " success";
+                }
+                
+                resultHTML += `<h3>Standby Duty Results - Case ${data.caseType}</h3>`;
+                resultHTML += `<div class="result-item ${data.exceedsMaxStandby ? 'danger' : 'ok'}">`;
+                resultHTML += `<strong>Standby Time:</strong> ${Utils.decimalToTime(data.standbyTime)} `;
+                if (data.exceedsMaxStandby) {
+                    resultHTML += `<span style="color: red;">(EXCEEDS ${CONFIG.MAX_STANDBY_HOURS}-HOUR MAXIMUM!)</span>`;
+                }
+                resultHTML += `</div>`;
+                
+                resultHTML += `<div class="result-item ok">`;
+                resultHTML += `<strong>FDP Start Time Determination:</strong> ${data.fdpStartReason}<br>`;
+                resultHTML += `<strong>MAX FDP:</strong> ${Utils.formatTimeDisplay(data.maxFDP.hours, data.maxFDP.minutes)} (based on ${data.fdpStartTime} and ${data.sectors} sector${data.sectors > 1 ? 's' : ''})<br>`;
+                resultHTML += `<strong>Actual FDP:</strong> ${Utils.decimalToTime(data.actualFDP)}<br>`;
+                resultHTML += `<strong>Total Duty Period:</strong> ${Utils.decimalToTime(data.totalDutyPeriod)}<br>`;
+                resultHTML += `<strong>Calculation:</strong> ${data.calculationDetails}<br>`;
+                resultHTML += `<strong>Allowed Total Duty:</strong> ${Utils.decimalToTime(data.allowedTotalDuty)}`;
+                resultHTML += `</div>`;
+                
+                resultHTML += `<div class="eta-display ${data.exceedsAllowedDuty ? 'eta-exceeded' : 'eta-within-limit'}">`;
+                resultHTML += `<h3>Last Allowed ETA: ${Utils.decimalToTime(data.lastAllowedETA)}</h3>`;
+                resultHTML += `<p>You must arrive by ${Utils.decimalToTime(data.lastAllowedETA)} to stay within duty limits</p>`;
+                resultHTML += `</div>`;
+                
+                resultHTML += `<div class="result-item">`;
+                resultHTML += `<strong>Actual Arrival Time:</strong> ${data.arrival}`;
+                resultHTML += `</div>`;
+                
+                resultHTML += `<div class="result-item ${data.exceedsAllowedDuty ? 'danger' : 'ok'}">`;
+                resultHTML += `<strong>Status:</strong> `;
+                if (data.exceedsAllowedDuty) {
+                    const timeExceeded = data.totalDutyPeriod - data.allowedTotalDuty;
+                    resultHTML += `DUTY PERIOD EXCEEDS ALLOWED TOTAL DUTY! (Arrival at ${data.arrival} is ${Utils.decimalToTime(timeExceeded)} beyond limit)`;
+                } else {
+                    resultHTML += 'Duty period is within limits.';
+                }
+                resultHTML += `</div>`;
+                
+                if (data.exceedsMaxStandby) {
+                    resultHTML += `<div class="result-item danger">`;
+                    resultHTML += `<strong>VIOLATION:</strong> Standby duty exceeds ${CONFIG.MAX_STANDBY_HOURS}-hour maximum!`;
+                    resultHTML += `</div>`;
+                }
+                
+                this.elements.resultContent.innerHTML = resultHTML;
+                this.elements.results.style.display = 'block';
+                this.elements.results.className = resultClass;
+            }
+
+            saveData() {
+                const formData = {
+                    crewType: this.elements.crewType.value,
+                    standbyType: this.elements.standbyType.value,
+                    standbyStart: this.elements.standbyStart.value,
+                    reporting: this.elements.reporting.value,
+                    shortNotice: this.elements.shortNotice.checked,
+                    sectors: this.elements.sectors.value,
+                    arrival: this.elements.arrival.value
+                };
+                
+                localStorage.setItem('ftlCalculator_standby', JSON.stringify(formData));
+                Utils.showSaveStatus();
+            }
+
+            loadSavedData() {
+                const saved = localStorage.getItem('ftlCalculator_standby');
+                if (saved) {
+                    const formData = JSON.parse(saved);
+                    Object.keys(formData).forEach(key => {
+                        if (this.elements[key] !== undefined) {
+                            if (key === 'shortNotice') {
+                                this.elements[key].checked = formData[key];
+                            } else {
+                                this.elements[key].value = formData[key];
+                            }
+                        }
+                    });
+                }
+            }
+        }
+
+        // Initialize application
+        document.addEventListener('DOMContentLoaded', function() {
+            // Populate GMT selects
+            const gmtSelects = document.querySelectorAll('.gmt-select');
+            gmtSelects.forEach(select => {
+                GMT_OPTIONS.forEach(option => {
+                    const optionElement = document.createElement('option');
+                    optionElement.value = option.value;
+                    optionElement.textContent = option.label;
+                    if (option.value === CONFIG.DEFAULT_GMT) {
+                        optionElement.selected = true;
+                    }
+                    select.appendChild(optionElement);
+                });
+            });
+            
+            // Set default date/time values
+            const now = new Date();
+            const formatDateTime = (date) => date.toISOString().slice(0, 16);
+            
+            const dateInputs = [
+                'cabinLastDutyEnd', 'cabinDutyStart', 'cabinDutyEnd',
+                'techLastDutyEnd', 'techDutyStart', 'techDutyEnd'
+            ];
+            
+            dateInputs.forEach(id => {
+                document.getElementById(id).value = formatDateTime(now);
+            });
+            
+            // Initialize calculators
+            const cabinCalculator = new FTLCalculator('cabin');
+            const techCalculator = new TechFTLCalculator('tech');
+            const standbyCalculator = new StandbyFTLCalculator();
+            
+            // Calculator selector functionality
+            document.querySelectorAll('.calc-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    document.querySelectorAll('.calc-btn').forEach(btn => btn.classList.remove('active'));
+                    document.querySelectorAll('.calculator-form').forEach(form => form.classList.remove('active'));
+                    
+                    this.classList.add('active');
+                    const calcType = this.getAttribute('data-calc');
+                    document.getElementById(`${calcType}-calculator`).classList.add('active');
+                });
+            });
+            
+            // Auto-save toggle
+            document.getElementById('autoSaveToggle').addEventListener('change', function() {
+                if (this.checked) {
+                    cabinCalculator.saveData();
+                    techCalculator.saveData();
+                    standbyCalculator.saveData();
+                }
+            });
+            
+            // Load saved auto-save preference
+            const autoSavePref = localStorage.getItem('ftlCalculator_autoSave');
+            if (autoSavePref !== null) {
+                document.getElementById('autoSaveToggle').checked = JSON.parse(autoSavePref);
+            }
+            
+            // Save auto-save preference when changed
+            document.getElementById('autoSaveToggle').addEventListener('change', function() {
+                localStorage.setItem('ftlCalculator_autoSave', JSON.stringify(this.checked));
+            });
+        });
+    </script>
+</body>
+</html>
