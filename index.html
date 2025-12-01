@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FTL Calculator by *2100551*</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⏳</text></svg>">
-<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⏳/text></svg>">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⏳</text></svg>">
     <style>
         * {
             margin: 0;
@@ -29,7 +29,7 @@
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
             padding: 30px;
             width: 100%;
-            max-width: 800px;
+            max-width: 1000px;
         }
         
         .header {
@@ -396,6 +396,175 @@
                 flex-direction: column;
             }
         }
+        
+        .fraction-note {
+            font-size: 0.8rem;
+            color: #666;
+            margin-top: 5px;
+            font-style: italic;
+        }
+        
+        .post-flight-note {
+            margin-top: 15px;
+            padding: 10px;
+            background-color: #e3f2fd;
+            border-radius: 5px;
+            border-left: 4px solid #2196f3;
+            font-size: 0.85rem;
+        }
+        
+        /* NEW: Last Allowed ETA Styles */
+        .last-allowed-eta {
+            margin-top: 15px;
+            padding: 12px;
+            border-radius: 5px;
+            background-color: #f8f9fa;
+            border-left: 4px solid #6c757d;
+        }
+        
+        .last-allowed-eta.ok {
+            border-left-color: #28a745;
+            background-color: #e8f5e9;
+        }
+        
+        .last-allowed-eta.warning {
+            border-left-color: #ffc107;
+            background-color: #fff3cd;
+        }
+        
+        .last-allowed-eta.danger {
+            border-left-color: #dc3545;
+            background-color: #f8d7da;
+        }
+        
+        .eta-primary {
+            margin-bottom: 10px;
+        }
+        
+        .eta-status {
+            font-size: 0.95rem;
+            margin-top: 5px;
+            padding: 4px 8px;
+            border-radius: 3px;
+            display: inline-block;
+        }
+        
+        .eta-details {
+            margin-top: 10px;
+        }
+        
+        .eta-details summary {
+            cursor: pointer;
+            padding: 5px 10px;
+            background-color: #e9ecef;
+            border-radius: 3px;
+            font-size: 0.85rem;
+        }
+        
+        .eta-details[open] summary {
+            margin-bottom: 10px;
+        }
+        
+        .timezone-details {
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+            font-size: 0.85rem;
+        }
+        
+        .timezone-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+        
+        .tz-location {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .tz-label {
+            font-weight: 500;
+            color: #495057;
+            font-size: 0.8rem;
+        }
+        
+        .tz-time {
+            font-weight: bold;
+            color: #1a3a8f;
+            font-size: 0.95rem;
+        }
+        
+        .tz-gmt {
+            color: #6c757d;
+            font-size: 0.8rem;
+        }
+        
+        .tz-note {
+            font-size: 0.75rem;
+            color: #6c757d;
+            font-style: italic;
+            grid-column: span 2;
+            margin-bottom: 5px;
+        }
+        
+        .calculation-breakdown {
+            margin-top: 15px;
+            padding: 10px;
+            background-color: #e9ecef;
+            border-radius: 4px;
+        }
+        
+        .calc-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #495057;
+        }
+        
+        .calc-steps {
+            font-family: 'Courier New', monospace;
+            background-color: #f8f9fa;
+            padding: 8px;
+            border-radius: 3px;
+            font-size: 0.9rem;
+        }
+        
+        .calc-step {
+            margin-bottom: 4px;
+        }
+        
+        .buffer-display {
+            margin-top: 10px;
+            padding: 8px;
+            background-color: #e9ecef;
+            border-radius: 4px;
+            text-align: center;
+        }
+        
+        .buffer-title {
+            font-weight: 600;
+            margin-bottom: 4px;
+            color: #495057;
+        }
+        
+        .buffer-time {
+            font-weight: bold;
+            font-size: 1.1rem;
+            color: #1a3a8f;
+        }
+        
+        .planned-vs-allowed {
+            margin-top: 10px;
+            padding: 8px;
+            border-radius: 4px;
+            text-align: center;
+        }
+        
+        .planned-arrival-display {
+            font-weight: bold;
+            margin: 5px 0;
+        }
     </style>
 </head>
 <body>
@@ -421,7 +590,6 @@
         
         <!-- Cabin Crew Calculator -->
         <div id="cabin-calculator" class="calculator-form active">
-            <!-- Existing cabin crew calculator form -->
             <div class="input-group">
                 <label for="cabinAircraftType">Aircraft Type</label>
                 <select id="cabinAircraftType">
@@ -499,7 +667,7 @@
             
             <div class="input-group">
                 <label for="cabinSectors">Number of Sectors</label>
-                <input type="number" id="cabinSectors" min="1" max="4" value="1" required>
+                <input type="number" id="cabinSectors" min="1" max="8" value="1" required>
                 <div class="error-message" id="cabinSectorsError"></div>
             </div>
             
@@ -514,7 +682,6 @@
         
         <!-- Tech Crew Calculator -->
         <div id="tech-calculator" class="calculator-form">
-            <!-- Existing tech crew calculator form -->
             <div class="input-group">
                 <label for="techAircraftType">Aircraft Type</label>
                 <select id="techAircraftType">
@@ -592,7 +759,7 @@
             
             <div class="input-group">
                 <label for="techSectors">Number of Sectors</label>
-                <input type="number" id="techSectors" min="1" max="4" value="1" required>
+                <input type="number" id="techSectors" min="1" max="8" value="1" required>
                 <div class="error-message" id="techSectorsError"></div>
             </div>
             
@@ -605,7 +772,7 @@
             </div>
         </div>
         
-        <!-- NEW Standby Calculator -->
+        <!-- Standby Calculator -->
         <div id="standby-calculator" class="calculator-form">
             <div class="input-group">
                 <label for="standbyCrewType">Crew Type</label>
@@ -679,42 +846,158 @@
             </div>
         </div>
         
-        <!-- Reference Tables -->
+        <!-- Updated Reference Tables -->
         <div class="table-section">
-            <div class="section-title">Acclimatized Duty Limits</div>
+            <div class="section-title">Acclimatized Duty Limits (Official Manual)</div>
             <div class="limits-info">
+                <h4>Table C - Cabin Crew</h4>
                 <table class="limits-table">
                     <thead>
                         <tr>
-                            <th>Start Time</th>
-                            <th>Sectors</th>
-                            <th>Cabin Crew Limit</th>
-                            <th>Tech Crew Limit</th>
+                            <th>Local Time Of Start</th>
+                            <th>1 Sector</th>
+                            <th>2 Sectors</th>
+                            <th>3 Sectors</th>
+                            <th>4 Sectors</th>
+                            <th>5 Sectors</th>
+                            <th>6 Sectors</th>
+                            <th>7 Sectors</th>
+                            <th>8+ Sectors</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr><td>0600-0759</td><td>1</td><td>14:00</td><td>13:00</td></tr>
-                        <tr><td>0600-0759</td><td>2</td><td>13:15</td><td>12:15</td></tr>
-                        <tr><td>0600-0759</td><td>3</td><td>12:30</td><td>11:30</td></tr>
-                        <tr><td>0600-0759</td><td>4</td><td>11:45</td><td>10:45</td></tr>
-                        <tr><td>0800-1259</td><td>1</td><td>15:00</td><td>14:00</td></tr>
-                        <tr><td>0800-1259</td><td>2</td><td>14:15</td><td>13:15</td></tr>
-                        <tr><td>0800-1259</td><td>3</td><td>13:30</td><td>12:30</td></tr>
-                        <tr><td>0800-1259</td><td>4</td><td>12:45</td><td>11:45</td></tr>
-                        <tr><td>1300-1759</td><td>1</td><td>14:00</td><td>13:00</td></tr>
-                        <tr><td>1300-1759</td><td>2</td><td>13:15</td><td>12:15</td></tr>
-                        <tr><td>1300-1759</td><td>3</td><td>12:30</td><td>11:30</td></tr>
-                        <tr><td>1300-1759</td><td>4</td><td>11:45</td><td>10:45</td></tr>
-                        <tr><td>1800-2159</td><td>1</td><td>13:00</td><td>12:00</td></tr>
-                        <tr><td>1800-2159</td><td>2</td><td>12:15</td><td>11:15</td></tr>
-                        <tr><td>1800-2159</td><td>3</td><td>11:30</td><td>10:30</td></tr>
-                        <tr><td>1800-2159</td><td>4</td><td>10:45</td><td>09:45</td></tr>
-                        <tr><td>2200-0559</td><td>1</td><td>12:00</td><td>11:00</td></tr>
-                        <tr><td>2200-0559</td><td>2</td><td>11:15</td><td>10:15</td></tr>
-                        <tr><td>2200-0559</td><td>3</td><td>10:30</td><td>09:30</td></tr>
-                        <tr><td>2200-0559</td><td>4</td><td>10:00</td><td>09:00</td></tr>
+                        <tr>
+                            <td>06:00 - 07:59</td>
+                            <td>14:00</td>
+                            <td>13:15</td>
+                            <td>12:30</td>
+                            <td>11:45</td>
+                            <td>11:00</td>
+                            <td>10:30</td>
+                            <td>10:00</td>
+                            <td>10:00</td>
+                        </tr>
+                        <tr>
+                            <td>08:00 - 12:59</td>
+                            <td>15:00</td>
+                            <td>14:15</td>
+                            <td>13:30</td>
+                            <td>12:45</td>
+                            <td>12:00</td>
+                            <td>11:30</td>
+                            <td>11:00</td>
+                            <td>10:30</td>
+                        </tr>
+                        <tr>
+                            <td>13:00 - 17:59</td>
+                            <td>14:00</td>
+                            <td>13:15</td>
+                            <td>12:30</td>
+                            <td>11:45</td>
+                            <td>11:00</td>
+                            <td>10:30</td>
+                            <td>10:00</td>
+                            <td>10:00</td>
+                        </tr>
+                        <tr>
+                            <td>18:00 - 21:59</td>
+                            <td>13:00</td>
+                            <td>12:15</td>
+                            <td>11:30</td>
+                            <td>10:45</td>
+                            <td>10:00</td>
+                            <td>10:00</td>
+                            <td>10:00</td>
+                            <td>10:00</td>
+                        </tr>
+                        <tr>
+                            <td>22:00 - 05:59</td>
+                            <td>12:00</td>
+                            <td>11:15</td>
+                            <td>10:30</td>
+                            <td>10:00</td>
+                            <td>10:00</td>
+                            <td>10:00</td>
+                            <td>10:00</td>
+                            <td>10:00</td>
+                        </tr>
                     </tbody>
                 </table>
+
+                <h4>Table A - Tech Crew</h4>
+                <table class="limits-table">
+                    <thead>
+                        <tr>
+                            <th>Local Time Of Start</th>
+                            <th>1 Sector</th>
+                            <th>2 Sectors</th>
+                            <th>3 Sectors</th>
+                            <th>4 Sectors</th>
+                            <th>5 Sectors</th>
+                            <th>6 Sectors</th>
+                            <th>7 Sectors</th>
+                            <th>8+ Sectors</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>06:00 - 07:59</td>
+                            <td>13:00</td>
+                            <td>12:15</td>
+                            <td>11:30</td>
+                            <td>10:45</td>
+                            <td>10:00</td>
+                            <td>09:30</td>
+                            <td>09:00</td>
+                            <td>09:00</td>
+                        </tr>
+                        <tr>
+                            <td>08:00 - 12:59</td>
+                            <td>14:00</td>
+                            <td>13:15</td>
+                            <td>12:30</td>
+                            <td>11:45</td>
+                            <td>11:00</td>
+                            <td>10:30</td>
+                            <td>10:00</td>
+                            <td>09:30</td>
+                        </tr>
+                        <tr>
+                            <td>13:00 - 17:59</td>
+                            <td>13:00</td>
+                            <td>12:15</td>
+                            <td>11:30</td>
+                            <td>10:45</td>
+                            <td>10:00</td>
+                            <td>09:30</td>
+                            <td>09:00</td>
+                            <td>09:00</td>
+                        </tr>
+                        <tr>
+                            <td>18:00 - 21:59</td>
+                            <td>12:00</td>
+                            <td>11:15</td>
+                            <td>10:30</td>
+                            <td>09:45</td>
+                            <td>09:00</td>
+                            <td>09:00</td>
+                            <td>09:00</td>
+                            <td>09:00</td>
+                        </tr>
+                        <tr>
+                            <td>22:00 - 05:59</td>
+                            <td>11:00</td>
+                            <td>10:15</td>
+                            <td>09:30</td>
+                            <td>09:00</td>
+                            <td>09:00</td>
+                            <td>09:00</td>
+                            <td>09:00</td>
+                            <td>09:00</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="fraction-note">Note: Fractional hours shown as .14 = 15min, .12 = 30min, .34 = 45min</div>
             </div>
         </div>
         
@@ -744,15 +1027,23 @@
             </div>
         </div>
         
+        <div class="post-flight-note">
+            <strong>Post-Flight Duty Times:</strong><br>
+            • 30 minutes after "chocks on" for all Cabin Crew<br>
+            • 30 minutes after "chocks on" for B737 Flight Crew<br>
+            • 45 minutes after "chocks on" for A330 and A350 Flight Crew<br>
+            <em>Note: Post-flight duties are not part of FDP.</em>
+        </div>
+        
         <div class="footnote">
             by 2100551 16/10/25
         </div>
     </div>
 
     <script>
-        // Configuration and Constants
+        // UPDATED Configuration and Constants
         const CONFIG = {
-            MAX_SECTORS: 4,
+            MAX_SECTORS: 8,
             TIMEZONE_EXEMPTION_THRESHOLD: 2,
             REQUIRED_NIGHT_PERIODS: 2,
             MIN_REST_FOR_ACCLIMATIZATION: 34,
@@ -763,37 +1054,37 @@
             MAX_STANDBY_HOURS: 12
         };
 
-        // FDP Table data for standby calculator
+        // UPDATED FDP Table data for standby calculator - 8 sectors
         const FDP_TABLE = {
-            "06:00-07:59": [14.0, 13.25, 12.5, 11.75, 11.0, 10.5, 10.0, 10.0],
-            "08:00-12:59": [15.0, 14.25, 13.5, 12.75, 12.0, 11.5, 11.0, 10.5],
-            "13:00-17:59": [14.0, 13.25, 12.5, 11.75, 11.0, 10.5, 10.0, 10.0],
-            "18:00-21:59": [13.0, 12.25, 11.5, 10.75, 10.0, 10.0, 10.0, 10.0],
-            "22:00-05:59": [12.0, 11.25, 10.5, 10.0, 10.0, 10.0, 10.0, 11.0]
+            "0600-0759": [14.0, 13.25, 12.5, 11.75, 11.0, 10.5, 10.0, 10.0],
+            "0800-1259": [15.0, 14.25, 13.5, 12.75, 12.0, 11.5, 11.0, 10.5],
+            "1300-1759": [14.0, 13.25, 12.5, 11.75, 11.0, 10.5, 10.0, 10.0],
+            "1800-2159": [13.0, 12.25, 11.5, 10.75, 10.0, 10.0, 10.0, 10.0],
+            "2200-0559": [12.0, 11.25, 10.5, 10.0, 10.0, 10.0, 10.0, 10.0]
         };
 
-        // Centralized Limit Tables
+        // UPDATED Centralized Limit Tables - 8 sectors
         const LIMIT_TABLES = {
             acclimatized: {
                 '0600-0759': {
-                    cabin: [{ hours: 14, minutes: 0 }, { hours: 13, minutes: 15 }, { hours: 12, minutes: 30 }, { hours: 11, minutes: 45 }],
-                    tech: [{ hours: 13, minutes: 0 }, { hours: 12, minutes: 15 }, { hours: 11, minutes: 30 }, { hours: 10, minutes: 45 }]
+                    cabin: [{ hours: 14, minutes: 0 }, { hours: 13, minutes: 15 }, { hours: 12, minutes: 30 }, { hours: 11, minutes: 45 }, { hours: 11, minutes: 0 }, { hours: 10, minutes: 30 }, { hours: 10, minutes: 0 }, { hours: 10, minutes: 0 }],
+                    tech: [{ hours: 13, minutes: 0 }, { hours: 12, minutes: 15 }, { hours: 11, minutes: 30 }, { hours: 10, minutes: 45 }, { hours: 10, minutes: 0 }, { hours: 9, minutes: 30 }, { hours: 9, minutes: 0 }, { hours: 9, minutes: 0 }]
                 },
                 '0800-1259': {
-                    cabin: [{ hours: 15, minutes: 0 }, { hours: 14, minutes: 15 }, { hours: 13, minutes: 30 }, { hours: 12, minutes: 45 }],
-                    tech: [{ hours: 14, minutes: 0 }, { hours: 13, minutes: 15 }, { hours: 12, minutes: 30 }, { hours: 11, minutes: 45 }]
+                    cabin: [{ hours: 15, minutes: 0 }, { hours: 14, minutes: 15 }, { hours: 13, minutes: 30 }, { hours: 12, minutes: 45 }, { hours: 12, minutes: 0 }, { hours: 11, minutes: 30 }, { hours: 11, minutes: 0 }, { hours: 10, minutes: 30 }],
+                    tech: [{ hours: 14, minutes: 0 }, { hours: 13, minutes: 15 }, { hours: 12, minutes: 30 }, { hours: 11, minutes: 45 }, { hours: 11, minutes: 0 }, { hours: 10, minutes: 30 }, { hours: 10, minutes: 0 }, { hours: 9, minutes: 30 }]
                 },
                 '1300-1759': {
-                    cabin: [{ hours: 14, minutes: 0 }, { hours: 13, minutes: 15 }, { hours: 12, minutes: 30 }, { hours: 11, minutes: 45 }],
-                    tech: [{ hours: 13, minutes: 0 }, { hours: 12, minutes: 15 }, { hours: 11, minutes: 30 }, { hours: 10, minutes: 45 }]
+                    cabin: [{ hours: 14, minutes: 0 }, { hours: 13, minutes: 15 }, { hours: 12, minutes: 30 }, { hours: 11, minutes: 45 }, { hours: 11, minutes: 0 }, { hours: 10, minutes: 30 }, { hours: 10, minutes: 0 }, { hours: 10, minutes: 0 }],
+                    tech: [{ hours: 13, minutes: 0 }, { hours: 12, minutes: 15 }, { hours: 11, minutes: 30 }, { hours: 10, minutes: 45 }, { hours: 10, minutes: 0 }, { hours: 9, minutes: 30 }, { hours: 9, minutes: 0 }, { hours: 9, minutes: 0 }]
                 },
                 '1800-2159': {
-                    cabin: [{ hours: 13, minutes: 0 }, { hours: 12, minutes: 15 }, { hours: 11, minutes: 30 }, { hours: 10, minutes: 45 }],
-                    tech: [{ hours: 12, minutes: 0 }, { hours: 11, minutes: 15 }, { hours: 10, minutes: 30 }, { hours: 9, minutes: 45 }]
+                    cabin: [{ hours: 13, minutes: 0 }, { hours: 12, minutes: 15 }, { hours: 11, minutes: 30 }, { hours: 10, minutes: 45 }, { hours: 10, minutes: 0 }, { hours: 10, minutes: 0 }, { hours: 10, minutes: 0 }, { hours: 10, minutes: 0 }],
+                    tech: [{ hours: 12, minutes: 0 }, { hours: 11, minutes: 15 }, { hours: 10, minutes: 30 }, { hours: 9, minutes: 45 }, { hours: 9, minutes: 0 }, { hours: 9, minutes: 0 }, { hours: 9, minutes: 0 }, { hours: 9, minutes: 0 }]
                 },
                 '2200-0559': {
-                    cabin: [{ hours: 12, minutes: 0 }, { hours: 11, minutes: 15 }, { hours: 10, minutes: 30 }, { hours: 10, minutes: 0 }],
-                    tech: [{ hours: 11, minutes: 0 }, { hours: 10, minutes: 15 }, { hours: 9, minutes: 30 }, { hours: 9, minutes: 0 }]
+                    cabin: [{ hours: 12, minutes: 0 }, { hours: 11, minutes: 15 }, { hours: 10, minutes: 30 }, { hours: 10, minutes: 0 }, { hours: 10, minutes: 0 }, { hours: 10, minutes: 0 }, { hours: 10, minutes: 0 }, { hours: 10, minutes: 0 }],
+                    tech: [{ hours: 11, minutes: 0 }, { hours: 10, minutes: 15 }, { hours: 9, minutes: 30 }, { hours: 9, minutes: 0 }, { hours: 9, minutes: 0 }, { hours: 9, minutes: 0 }, { hours: 9, minutes: 0 }, { hours: 9, minutes: 0 }]
                 }
             },
             nonAcclimatized: {
@@ -883,11 +1174,11 @@
             getTimeRange(timeStr) {
                 const time = this.timeToDecimal(timeStr);
                 
-                if (time >= 6 && time < 8) return "06:00-07:59";
-                if (time >= 8 && time < 13) return "08:00-12:59";
-                if (time >= 13 && time < 18) return "13:00-17:59";
-                if (time >= 18 && time < 22) return "18:00-21:59";
-                return "22:00-05:59"; // Covers overnight
+                if (time >= 6 && time < 8) return "0600-0759";
+                if (time >= 8 && time < 13) return "0800-1259";
+                if (time >= 13 && time < 18) return "1300-1759";
+                if (time >= 18 && time < 22) return "1800-2159";
+                return "2200-0559"; // Covers overnight
             },
 
             getFDP(timeStr, sectors, crewType) {
@@ -908,6 +1199,20 @@
                 const hours = Math.floor(limitHours);
                 const minutes = Math.round((limitHours - hours) * 60);
                 return { hours, minutes, decimal: limitHours };
+            },
+
+            // NEW: Format date for display
+            formatDateWithMonth(date) {
+                const day = date.getDate();
+                const month = date.toLocaleString('default', { month: 'short' });
+                const hours = date.getHours().toString().padStart(2, '0');
+                const minutes = date.getMinutes().toString().padStart(2, '0');
+                return `${hours}:${minutes} (${day} ${month})`;
+            },
+
+            // NEW: Format GMT display
+            formatGMT(gmt) {
+                return `GMT${gmt >= 0 ? '+' : ''}${gmt}`;
             }
         };
 
@@ -1047,6 +1352,9 @@
                     const sectors = parseInt(this.elements.Sectors.value);
                     const sectorStatus = sectors <= sectorLimit ? 'ok' : 'danger';
                     
+                    // NEW: Calculate Last Allowed ETA
+                    const lastAllowedETA = this.calculateLastAllowedETA(limit);
+                    
                     this.displayResults({
                         dutyTimeFormatted,
                         acclimatization,
@@ -1058,7 +1366,8 @@
                         sectorLimit,
                         tableReference,
                         dutyDecimal,
-                        limitDecimal
+                        limitDecimal,
+                        lastAllowedETA
                     });
 
                     // Save calculation
@@ -1073,6 +1382,74 @@
                     this.elements.calculateBtn.disabled = false;
                     this.elements.form.classList.remove('loading');
                 }
+            }
+
+            // NEW: Calculate Last Allowed ETA
+            calculateLastAllowedETA(limit) {
+                const startDate = new Date(this.elements.DutyStart.value);
+                const startGMT = parseFloat(this.elements.StartGMT.value);
+                const endGMT = parseFloat(this.elements.EndGMT.value);
+                const plannedArrival = new Date(this.elements.DutyEnd.value);
+                
+                // Step 1: Get start time in UTC
+                const startUTC = startDate.getTime() - (startGMT * 60 * 60 * 1000);
+                
+                // Step 2: Add duty limit
+                const limitMs = (limit.hours * 60 * 60 * 1000) + (limit.minutes * 60 * 1000);
+                const lastAllowedUTC = startUTC + limitMs;
+                
+                // Step 3: Convert to destination timezone
+                const lastAllowedDest = new Date(lastAllowedUTC + (endGMT * 60 * 60 * 1000));
+                
+                // Step 4: Convert to origin timezone
+                const lastAllowedOrigin = new Date(lastAllowedUTC + (startGMT * 60 * 60 * 1000));
+                
+                // Step 5: Calculate buffer
+                const plannedUTC = plannedArrival.getTime() - (endGMT * 60 * 60 * 1000);
+                const bufferMs = lastAllowedUTC - plannedUTC;
+                const bufferHours = Math.floor(Math.abs(bufferMs) / (60 * 60 * 1000));
+                const bufferMinutes = Math.floor((Math.abs(bufferMs) % (60 * 60 * 1000)) / (60 * 1000));
+                
+                // Step 6: Determine status
+                let etaStatus = 'danger';
+                let statusText = '';
+                let bufferDisplay = '';
+                
+                if (bufferMs > 0) {
+                    if (bufferMs > 7200000) { // >2 hours
+                        etaStatus = 'ok';
+                        statusText = 'Within limits';
+                    } else if (bufferMs > 1800000) { // 30min-2 hours
+                        etaStatus = 'warning';
+                        statusText = 'Close to limit';
+                    } else { // <30 minutes
+                        etaStatus = 'danger';
+                        statusText = 'Very close';
+                    }
+                    bufferDisplay = `${bufferHours}h ${bufferMinutes}m remaining`;
+                } else {
+                    bufferDisplay = `${bufferHours}h ${bufferMinutes}m exceeded`;
+                    statusText = bufferMs === 0 ? 'At limit' : 'EXCEEDED';
+                }
+                
+                return {
+                    startTime: Utils.formatDateWithMonth(startDate),
+                    startGMT: Utils.formatGMT(startGMT),
+                    startUTC: Utils.formatDateWithMonth(new Date(startUTC)),
+                    limit: Utils.formatTimeDisplay(limit.hours, limit.minutes),
+                    lastAllowedUTC: Utils.formatDateWithMonth(new Date(lastAllowedUTC)),
+                    lastAllowedDest: Utils.formatDateWithMonth(lastAllowedDest),
+                    lastAllowedOrigin: Utils.formatDateWithMonth(lastAllowedOrigin),
+                    destGMT: Utils.formatGMT(endGMT),
+                    originGMT: Utils.formatGMT(startGMT),
+                    plannedArrival: Utils.formatDateWithMonth(plannedArrival),
+                    bufferHours,
+                    bufferMinutes,
+                    bufferMs,
+                    etaStatus,
+                    statusText,
+                    bufferDisplay
+                };
             }
 
             displayResults(data) {
@@ -1139,6 +1516,66 @@
                     '✗ Exceeds limit!';
                 resultHTML += `</div>`;
                 resultHTML += `</div>`;
+                resultHTML += `</div>`;
+                
+                // NEW: Last Allowed ETA Section
+                resultHTML += `<div class="last-allowed-eta ${data.lastAllowedETA.etaStatus}">`;
+                resultHTML += `<div class="eta-primary">`;
+                resultHTML += `<strong>Last Allowed ETA (at destination):</strong>`;
+                resultHTML += `<div class="time-display">${data.lastAllowedETA.lastAllowedDest}</div>`;
+                resultHTML += `<div class="eta-status">${data.lastAllowedETA.statusText}: ${data.lastAllowedETA.bufferDisplay}</div>`;
+                resultHTML += `</div>`;
+                
+                resultHTML += `<details class="eta-details">`;
+                resultHTML += `<summary>Show calculation details</summary>`;
+                resultHTML += `<div class="timezone-details">`;
+                resultHTML += `<div class="timezone-grid">`;
+                resultHTML += `<div class="tz-location">`;
+                resultHTML += `<span class="tz-label">At origin station:</span>`;
+                resultHTML += `<span class="tz-time">${data.lastAllowedETA.lastAllowedOrigin}</span>`;
+                resultHTML += `<span class="tz-gmt">${data.lastAllowedETA.originGMT}</span>`;
+                resultHTML += `</div>`;
+                resultHTML += `<div class="tz-note">The latest time you could finish at departure station</div>`;
+                
+                resultHTML += `<div class="tz-location">`;
+                resultHTML += `<span class="tz-label">At destination station:</span>`;
+                resultHTML += `<span class="tz-time">${data.lastAllowedETA.lastAllowedDest}</span>`;
+                resultHTML += `<span class="tz-gmt">${data.lastAllowedETA.destGMT}</span>`;
+                resultHTML += `</div>`;
+                resultHTML += `<div class="tz-note">The latest time you must arrive</div>`;
+                
+                resultHTML += `<div class="tz-location">`;
+                resultHTML += `<span class="tz-label">Planned arrival:</span>`;
+                resultHTML += `<span class="tz-time">${data.lastAllowedETA.plannedArrival}</span>`;
+                resultHTML += `<span class="tz-gmt">${data.lastAllowedETA.destGMT}</span>`;
+                resultHTML += `</div>`;
+                resultHTML += `<div class="tz-note">From your duty end input</div>`;
+                
+                resultHTML += `<div class="tz-location">`;
+                resultHTML += `<span class="tz-label">UTC reference:</span>`;
+                resultHTML += `<span class="tz-time">${data.lastAllowedETA.lastAllowedUTC}</span>`;
+                resultHTML += `<span class="tz-gmt">UTC</span>`;
+                resultHTML += `</div>`;
+                resultHTML += `<div class="tz-note">Universal reference time</div>`;
+                resultHTML += `</div>`;
+                
+                resultHTML += `<div class="calculation-breakdown">`;
+                resultHTML += `<div class="calc-title">Calculation breakdown:</div>`;
+                resultHTML += `<div class="calc-steps">`;
+                resultHTML += `<div class="calc-step">Start: ${data.lastAllowedETA.startTime} ${data.lastAllowedETA.startGMT}</div>`;
+                resultHTML += `<div class="calc-step">→ UTC: ${data.lastAllowedETA.startUTC} UTC</div>`;
+                resultHTML += `<div class="calc-step">+ Duty limit: ${data.lastAllowedETA.limit}</div>`;
+                resultHTML += `<div class="calc-step">= Last allowed (UTC): ${data.lastAllowedETA.lastAllowedUTC} UTC</div>`;
+                resultHTML += `<div class="calc-step">→ Destination (${data.lastAllowedETA.destGMT}): ${data.lastAllowedETA.lastAllowedDest}</div>`;
+                resultHTML += `</div>`;
+                resultHTML += `</div>`;
+                
+                resultHTML += `<div class="buffer-display">`;
+                resultHTML += `<div class="buffer-title">Time until limit:</div>`;
+                resultHTML += `<div class="buffer-time">${data.lastAllowedETA.bufferDisplay}</div>`;
+                resultHTML += `</div>`;
+                resultHTML += `</div>`;
+                resultHTML += `</details>`;
                 resultHTML += `</div>`;
                 
                 // Sectors result
@@ -1378,6 +1815,9 @@
                     const sectors = parseInt(this.elements.Sectors.value);
                     const sectorStatus = sectors <= sectorLimit ? 'ok' : 'danger';
                     
+                    // NEW: Calculate Last Allowed ETA for tech crew
+                    const lastAllowedETA = finalTechLimit ? this.calculateLastAllowedETA(finalTechLimit) : null;
+                    
                     this.displayTechResults({
                         dutyTimeFormatted,
                         acclimatization,
@@ -1390,7 +1830,9 @@
                         tableRef,
                         specialCondition,
                         dutyDecimal,
-                        techLimitDecimal
+                        techLimitDecimal,
+                        lastAllowedETA,
+                        finalTechLimit
                     });
 
                     // Save calculation
@@ -1558,6 +2000,68 @@
                 resultHTML += `</div>`;
                 resultHTML += `</div>`;
                 resultHTML += `</div>`;
+                
+                // NEW: Last Allowed ETA Section for Tech Crew
+                if (data.lastAllowedETA) {
+                    resultHTML += `<div class="last-allowed-eta ${data.lastAllowedETA.etaStatus}">`;
+                    resultHTML += `<div class="eta-primary">`;
+                    resultHTML += `<strong>Last Allowed ETA (at destination):</strong>`;
+                    resultHTML += `<div class="time-display">${data.lastAllowedETA.lastAllowedDest}</div>`;
+                    resultHTML += `<div class="eta-status">${data.lastAllowedETA.statusText}: ${data.lastAllowedETA.bufferDisplay}</div>`;
+                    resultHTML += `</div>`;
+                    
+                    resultHTML += `<details class="eta-details">`;
+                    resultHTML += `<summary>Show calculation details</summary>`;
+                    resultHTML += `<div class="timezone-details">`;
+                    resultHTML += `<div class="timezone-grid">`;
+                    resultHTML += `<div class="tz-location">`;
+                    resultHTML += `<span class="tz-label">At origin station:</span>`;
+                    resultHTML += `<span class="tz-time">${data.lastAllowedETA.lastAllowedOrigin}</span>`;
+                    resultHTML += `<span class="tz-gmt">${data.lastAllowedETA.originGMT}</span>`;
+                    resultHTML += `</div>`;
+                    resultHTML += `<div class="tz-note">The latest time you could finish at departure station</div>`;
+                    
+                    resultHTML += `<div class="tz-location">`;
+                    resultHTML += `<span class="tz-label">At destination station:</span>`;
+                    resultHTML += `<span class="tz-time">${data.lastAllowedETA.lastAllowedDest}</span>`;
+                    resultHTML += `<span class="tz-gmt">${data.lastAllowedETA.destGMT}</span>`;
+                    resultHTML += `</div>`;
+                    resultHTML += `<div class="tz-note">The latest time you must arrive</div>`;
+                    
+                    resultHTML += `<div class="tz-location">`;
+                    resultHTML += `<span class="tz-label">Planned arrival:</span>`;
+                    resultHTML += `<span class="tz-time">${data.lastAllowedETA.plannedArrival}</span>`;
+                    resultHTML += `<span class="tz-gmt">${data.lastAllowedETA.destGMT}</span>`;
+                    resultHTML += `</div>`;
+                    resultHTML += `<div class="tz-note">From your duty end input</div>`;
+                    
+                    resultHTML += `<div class="tz-location">`;
+                    resultHTML += `<span class="tz-label">UTC reference:</span>`;
+                    resultHTML += `<span class="tz-time">${data.lastAllowedETA.lastAllowedUTC}</span>`;
+                    resultHTML += `<span class="tz-gmt">UTC</span>`;
+                    resultHTML += `</div>`;
+                    resultHTML += `<div class="tz-note">Universal reference time</div>`;
+                    resultHTML += `</div>`;
+                    
+                    resultHTML += `<div class="calculation-breakdown">`;
+                    resultHTML += `<div class="calc-title">Calculation breakdown:</div>`;
+                    resultHTML += `<div class="calc-steps">`;
+                    resultHTML += `<div class="calc-step">Start: ${data.lastAllowedETA.startTime} ${data.lastAllowedETA.startGMT}</div>`;
+                    resultHTML += `<div class="calc-step">→ UTC: ${data.lastAllowedETA.startUTC} UTC</div>`;
+                    resultHTML += `<div class="calc-step">+ Duty limit: ${data.lastAllowedETA.limit}</div>`;
+                    resultHTML += `<div class="calc-step">= Last allowed (UTC): ${data.lastAllowedETA.lastAllowedUTC} UTC</div>`;
+                    resultHTML += `<div class="calc-step">→ Destination (${data.lastAllowedETA.destGMT}): ${data.lastAllowedETA.lastAllowedDest}</div>`;
+                    resultHTML += `</div>`;
+                    resultHTML += `</div>`;
+                    
+                    resultHTML += `<div class="buffer-display">`;
+                    resultHTML += `<div class="buffer-title">Time until limit:</div>`;
+                    resultHTML += `<div class="buffer-time">${data.lastAllowedETA.bufferDisplay}</div>`;
+                    resultHTML += `</div>`;
+                    resultHTML += `</div>`;
+                    resultHTML += `</details>`;
+                    resultHTML += `</div>`;
+                }
                 
                 // Sectors result
                 resultHTML += `<div class="result-item ${data.sectorStatus}">`;
