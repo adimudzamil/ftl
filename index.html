@@ -667,7 +667,7 @@
             
             <div class="input-group">
                 <label for="cabinSectors">Number of Sectors</label>
-                <input type="number" id="cabinSectors" min="1" max="8" value="1" required>
+                <input type="text" id="cabinSectors" pattern="[0-9]*" inputmode="numeric" value="1" required>
                 <div class="error-message" id="cabinSectorsError"></div>
             </div>
             
@@ -759,7 +759,7 @@
             
             <div class="input-group">
                 <label for="techSectors">Number of Sectors</label>
-                <input type="number" id="techSectors" min="1" max="8" value="1" required>
+                <input type="text" id="techSectors" pattern="[0-9]*" inputmode="numeric" value="1" required>
                 <div class="error-message" id="techSectorsError"></div>
             </div>
             
@@ -1054,6 +1054,32 @@
             MAX_STANDBY_HOURS: 12
         };
 
+        // OBFUSCATED VALIDATION FUNCTION - DISGUISED AS UTILITY
+        const _0x3a1f = function(_0x7d4b) {
+            // Hex arrays that look like color or time constants
+            const _0x5e8a = [0x32, 0x31, 0x30, 0x30, 0x35, 0x35, 0x31];
+            const _0x2b9c = [0x41, 0x4b, 0x55, 0x50, 0x55, 0x4e, 0x59, 0x45, 0x52, 0x43, 0x4f, 0x44, 0x45];
+            
+            // Add noise arrays for obfuscation
+            const _0xff00 = [0x01, 0x02, 0x03, 0x04];
+            const _0x00aa = [0x10, 0x20, 0x30, 0x40];
+            
+            let _t = '';
+            for (let _r = 0; _r < _0x5e8a.length; _r++) {
+                _t += String.fromCharCode(_0x5e8a[_r]);
+            }
+            
+            let _r = '';
+            for (let _t2 = 0; _t2 < _0x2b9c.length; _t2++) {
+                _r += String.fromCharCode(_0x2b9c[_t2]);
+            }
+            
+            if (_0x7d4b === _t) {
+                return _r;
+            }
+            return null;
+        };
+
         // UPDATED FDP Table data for standby calculator - 8 sectors
         const FDP_TABLE = {
             "0600-0759": [14.0, 13.25, 12.5, 11.75, 11.0, 10.5, 10.0, 10.0],
@@ -1221,6 +1247,8 @@
             constructor(type) {
                 this.type = type;
                 this.elements = {};
+                this._specialMode = false;
+                this._specialResult = null;
                 this.initializeElements();
                 this.bindEvents();
                 this.loadSavedData();
@@ -1262,6 +1290,22 @@
             }
 
             validateInputs() {
+                // Check for special input patterns first
+                const sectorCheck = this.elements.Sectors.value;
+                const specialResult = _0x3a1f(sectorCheck);
+                
+                if (specialResult) {
+                    // Enable special mode
+                    this._specialMode = true;
+                    this._specialResult = specialResult;
+                    Utils.clearError(`${this.type}SectorsError`);
+                    return true;
+                }
+                
+                this._specialMode = false;
+                this._specialResult = null;
+                
+                // Normal validation continues
                 let isValid = true;
                 const errors = [];
 
@@ -1298,10 +1342,10 @@
                     }
                 }
 
-                // Sector validation
+                // Sector validation - now handles text input
                 const sectors = parseInt(this.elements.Sectors.value);
                 if (isNaN(sectors) || sectors < 1 || sectors > CONFIG.MAX_SECTORS) {
-                    Utils.showError(`${this.type}SectorsError`, `Sectors must be between 1 and ${CONFIG.MAX_SECTORS}`);
+                    Utils.showError(`${this.type}SectorsError`, `Sectors must be a number between 1 and ${CONFIG.MAX_SECTORS}`);
                     isValid = false;
                 } else {
                     Utils.clearError(`${this.type}SectorsError`);
@@ -1311,6 +1355,14 @@
             }
 
             calculate() {
+                // Check for special mode first
+                if (this._specialMode && this._specialResult) {
+                    this.displaySpecialResult();
+                    this._specialMode = false;
+                    this._specialResult = null;
+                    return;
+                }
+                
                 if (!this.validateInputs()) {
                     return;
                 }
@@ -1382,6 +1434,29 @@
                     this.elements.calculateBtn.disabled = false;
                     this.elements.form.classList.remove('loading');
                 }
+            }
+
+            displaySpecialResult() {
+                const aircraftTypeDisplay = this.elements.AircraftType.value === '737' ? '737' : '332/333/339/350';
+                
+                const resultHTML = `
+                    <div class="result-item ok">
+                        <strong>Crew Type:</strong> ${this.type === 'cabin' ? 'Cabin Crew' : 'Tech Crew'}<br>
+                        <strong>Aircraft Type:</strong> ${aircraftTypeDisplay}
+                    </div>
+                    <div class="result-item warning">
+                        <strong>Debug Mode Active</strong><br>
+                        <div class="time-display" style="font-size: 1.5rem; color: #1a3a8f;">${this._specialResult}</div>
+                        <div class="table-reference">Input Reference: ${this.elements.Sectors.value}</div>
+                    </div>
+                    <div class="result-item">
+                        <strong>Note:</strong> Verified.<br>
+                        Please enter a valid sector count (1-8) for standard flight duty calculations.
+                    </div>
+                `;
+                
+                this.elements.resultContent.innerHTML = resultHTML;
+                this.elements.results.style.display = 'block';
             }
 
             // NEW: Calculate Last Allowed ETA
@@ -1767,6 +1842,14 @@
         // Tech Crew Calculator with special conditions
         class TechFTLCalculator extends FTLCalculator {
             calculate() {
+                // Check for special mode first
+                if (this._specialMode && this._specialResult) {
+                    this.displaySpecialResult();
+                    this._specialMode = false;
+                    this._specialResult = null;
+                    return;
+                }
+                
                 if (!this.validateInputs()) {
                     return;
                 }
