@@ -1,0 +1,573 @@
+{
+  "KUL": {
+    "name": "Kuala Lumpur International Airport",
+    "timezone": "Asia/Kuala_Lumpur",
+    "gmtOffset": 8,
+    "dst": null,
+    "country": "Malaysia"
+  },
+  "BWN": {
+    "name": "Brunei International Airport",
+    "timezone": "Asia/Brunei",
+    "gmtOffset": 8,
+    "dst": null,
+    "country": "Brunei"
+  },
+  "PNH": {
+    "name": "Phnom Penh International Airport",
+    "timezone": "Asia/Phnom_Penh",
+    "gmtOffset": 7,
+    "dst": null,
+    "country": "Cambodia"
+  },
+  "SAI": {
+    "name": "Siem Reap-Angkor International Airport",
+    "timezone": "Asia/Phnom_Penh",
+    "gmtOffset": 7,
+    "dst": null,
+    "country": "Cambodia"
+  },
+  "CGK": {
+    "name": "Soekarno-Hatta International Airport",
+    "timezone": "Asia/Jakarta",
+    "gmtOffset": 7,
+    "dst": null,
+    "country": "Indonesia"
+  },
+  "SUB": {
+    "name": "Juanda International Airport",
+    "timezone": "Asia/Jakarta",
+    "gmtOffset": 7,
+    "dst": null,
+    "country": "Indonesia"
+  },
+  "DPS": {
+    "name": "Ngurah Rai International Airport",
+    "timezone": "Asia/Makassar",
+    "gmtOffset": 8,
+    "dst": null,
+    "country": "Indonesia"
+  },
+  "KNO": {
+    "name": "Kualanamu International Airport",
+    "timezone": "Asia/Jakarta",
+    "gmtOffset": 7,
+    "dst": null,
+    "country": "Indonesia"
+  },
+  "UPG": {
+    "name": "Sultan Hasanuddin International Airport",
+    "timezone": "Asia/Makassar",
+    "gmtOffset": 8,
+    "dst": null,
+    "country": "Indonesia"
+  },
+  "RGN": {
+    "name": "Yangon International Airport",
+    "timezone": "Asia/Yangon",
+    "gmtOffset": 6.5,
+    "dst": null,
+    "country": "Myanmar"
+  },
+  "MNL": {
+    "name": "Ninoy Aquino International Airport",
+    "timezone": "Asia/Manila",
+    "gmtOffset": 8,
+    "dst": null,
+    "country": "Philippines"
+  },
+  "CEB": {
+    "name": "Mactan-Cebu International Airport",
+    "timezone": "Asia/Manila",
+    "gmtOffset": 8,
+    "dst": null,
+    "country": "Philippines"
+  },
+  "SIN": {
+    "name": "Singapore Changi Airport",
+    "timezone": "Asia/Singapore",
+    "gmtOffset": 8,
+    "dst": null,
+    "country": "Singapore"
+  },
+  "BKK": {
+    "name": "Suvarnabhumi Airport",
+    "timezone": "Asia/Bangkok",
+    "gmtOffset": 7,
+    "dst": null,
+    "country": "Thailand"
+  },
+  "HKT": {
+    "name": "Phuket International Airport",
+    "timezone": "Asia/Bangkok",
+    "gmtOffset": 7,
+    "dst": null,
+    "country": "Thailand"
+  },
+  "CNX": {
+    "name": "Chiang Mai International Airport",
+    "timezone": "Asia/Bangkok",
+    "gmtOffset": 7,
+    "dst": null,
+    "country": "Thailand"
+  },
+  "HAN": {
+    "name": "Noi Bai International Airport",
+    "timezone": "Asia/Ho_Chi_Minh",
+    "gmtOffset": 7,
+    "dst": null,
+    "country": "Vietnam"
+  },
+  "SGN": {
+    "name": "Tan Son Nhat International Airport",
+    "timezone": "Asia/Ho_Chi_Minh",
+    "gmtOffset": 7,
+    "dst": null,
+    "country": "Vietnam"
+  },
+  "DAD": {
+    "name": "Da Nang International Airport",
+    "timezone": "Asia/Ho_Chi_Minh",
+    "gmtOffset": 7,
+    "dst": null,
+    "country": "Vietnam"
+  },
+  "PKX": {
+    "name": "Beijing Daxing International Airport",
+    "timezone": "Asia/Shanghai",
+    "gmtOffset": 8,
+    "dst": null,
+    "country": "China"
+  },
+  "PVG": {
+    "name": "Shanghai Pudong International Airport",
+    "timezone": "Asia/Shanghai",
+    "gmtOffset": 8,
+    "dst": null,
+    "country": "China"
+  },
+  "CAN": {
+    "name": "Guangzhou Baiyun International Airport",
+    "timezone": "Asia/Shanghai",
+    "gmtOffset": 8,
+    "dst": null,
+    "country": "China"
+  },
+  "XMN": {
+    "name": "Xiamen Gaoqi International Airport",
+    "timezone": "Asia/Shanghai",
+    "gmtOffset": 8,
+    "dst": null,
+    "country": "China"
+  },
+  "WUH": {
+    "name": "Wuhan Tianhe International Airport",
+    "timezone": "Asia/Shanghai",
+    "gmtOffset": 8,
+    "dst": null,
+    "country": "China"
+  },
+  "CGO": {
+    "name": "Zhengzhou Xinzheng International Airport",
+    "timezone": "Asia/Shanghai",
+    "gmtOffset": 8,
+    "dst": null,
+    "country": "China"
+  },
+  "NKG": {
+    "name": "Nanjing Lukou International Airport",
+    "timezone": "Asia/Shanghai",
+    "gmtOffset": 8,
+    "dst": null,
+    "country": "China"
+  },
+  "HAK": {
+    "name": "Haikou Meilan International Airport",
+    "timezone": "Asia/Shanghai",
+    "gmtOffset": 8,
+    "dst": null,
+    "country": "China"
+  },
+  "CSX": {
+    "name": "Changsha Huanghua International Airport",
+    "timezone": "Asia/Shanghai",
+    "gmtOffset": 8,
+    "dst": null,
+    "country": "China"
+  },
+  "KMG": {
+    "name": "Kunming Changshui International Airport",
+    "timezone": "Asia/Shanghai",
+    "gmtOffset": 8,
+    "dst": null,
+    "country": "China"
+  },
+  "HKG": {
+    "name": "Hong Kong International Airport",
+    "timezone": "Asia/Hong_Kong",
+    "gmtOffset": 8,
+    "dst": null,
+    "country": "Hong Kong"
+  },
+  "NRT": {
+    "name": "Narita International Airport",
+    "timezone": "Asia/Tokyo",
+    "gmtOffset": 9,
+    "dst": null,
+    "country": "Japan"
+  },
+  "KIX": {
+    "name": "Kansai International Airport",
+    "timezone": "Asia/Tokyo",
+    "gmtOffset": 9,
+    "dst": null,
+    "country": "Japan"
+  },
+  "HND": {
+    "name": "Haneda Airport",
+    "timezone": "Asia/Tokyo",
+    "gmtOffset": 9,
+    "dst": null,
+    "country": "Japan"
+  },
+  "ICN": {
+    "name": "Incheon International Airport",
+    "timezone": "Asia/Seoul",
+    "gmtOffset": 9,
+    "dst": null,
+    "country": "South Korea"
+  },
+  "TPE": {
+    "name": "Taiwan Taoyuan International Airport",
+    "timezone": "Asia/Taipei",
+    "gmtOffset": 8,
+    "dst": null,
+    "country": "Taiwan"
+  },
+  "DAC": {
+    "name": "Shahjalal International Airport",
+    "timezone": "Asia/Dhaka",
+    "gmtOffset": 6,
+    "dst": null,
+    "country": "Bangladesh"
+  },
+  "DEL": {
+    "name": "Indira Gandhi International Airport",
+    "timezone": "Asia/Kolkata",
+    "gmtOffset": 5.5,
+    "dst": null,
+    "country": "India"
+  },
+  "BOM": {
+    "name": "Chhatrapati Shivaji Maharaj International Airport",
+    "timezone": "Asia/Kolkata",
+    "gmtOffset": 5.5,
+    "dst": null,
+    "country": "India"
+  },
+  "MAA": {
+    "name": "Chennai International Airport",
+    "timezone": "Asia/Kolkata",
+    "gmtOffset": 5.5,
+    "dst": null,
+    "country": "India"
+  },
+  "BLR": {
+    "name": "Kempegowda International Airport",
+    "timezone": "Asia/Kolkata",
+    "gmtOffset": 5.5,
+    "dst": null,
+    "country": "India"
+  },
+  "HYD": {
+    "name": "Rajiv Gandhi International Airport",
+    "timezone": "Asia/Kolkata",
+    "gmtOffset": 5.5,
+    "dst": null,
+    "country": "India"
+  },
+  "MLE": {
+    "name": "Velana International Airport",
+    "timezone": "Indian/Maldives",
+    "gmtOffset": 5,
+    "dst": null,
+    "country": "Maldives"
+  },
+  "KTM": {
+    "name": "Tribhuvan International Airport",
+    "timezone": "Asia/Kathmandu",
+    "gmtOffset": 5.75,
+    "dst": null,
+    "country": "Nepal"
+  },
+  "KHI": {
+    "name": "Jinnah International Airport",
+    "timezone": "Asia/Karachi",
+    "gmtOffset": 5,
+    "dst": null,
+    "country": "Pakistan"
+  },
+  "CMB": {
+    "name": "Bandaranaike International Airport",
+    "timezone": "Asia/Colombo",
+    "gmtOffset": 5.5,
+    "dst": null,
+    "country": "Sri Lanka"
+  },
+  "SYD": {
+    "name": "Sydney Kingsford Smith Airport",
+    "timezone": "Australia/Sydney",
+    "gmtOffset": 10,
+    "dst": {
+      "observed": true,
+      "gmtOffset": 11,
+      "period": "Oct-Apr"
+    },
+    "country": "Australia"
+  },
+  "MEL": {
+    "name": "Melbourne Airport",
+    "timezone": "Australia/Melbourne",
+    "gmtOffset": 10,
+    "dst": {
+      "observed": true,
+      "gmtOffset": 11,
+      "period": "Oct-Apr"
+    },
+    "country": "Australia"
+  },
+  "PER": {
+    "name": "Perth Airport",
+    "timezone": "Australia/Perth",
+    "gmtOffset": 8,
+    "dst": null,
+    "country": "Australia"
+  },
+  "BNE": {
+    "name": "Brisbane Airport",
+    "timezone": "Australia/Brisbane",
+    "gmtOffset": 10,
+    "dst": null,
+    "country": "Australia"
+  },
+  "ADL": {
+    "name": "Adelaide Airport",
+    "timezone": "Australia/Adelaide",
+    "gmtOffset": 9.5,
+    "dst": {
+      "observed": true,
+      "gmtOffset": 10.5,
+      "period": "Oct-Apr"
+    },
+    "country": "Australia"
+  },
+  "AKL": {
+    "name": "Auckland Airport",
+    "timezone": "Pacific/Auckland",
+    "gmtOffset": 12,
+    "dst": {
+      "observed": true,
+      "gmtOffset": 13,
+      "period": "Sep-Apr"
+    },
+    "country": "New Zealand"
+  },
+  "IKA": {
+    "name": "Imam Khomeini International Airport",
+    "timezone": "Asia/Tehran",
+    "gmtOffset": 3.5,
+    "dst": {
+      "observed": true,
+      "gmtOffset": 4.5,
+      "period": "Mar-Sep"
+    },
+    "country": "Iran"
+  },
+  "JED": {
+    "name": "King Abdulaziz International Airport",
+    "timezone": "Asia/Riyadh",
+    "gmtOffset": 3,
+    "dst": null,
+    "country": "Saudi Arabia"
+  },
+  "RUH": {
+    "name": "King Khalid International Airport",
+    "timezone": "Asia/Riyadh",
+    "gmtOffset": 3,
+    "dst": null,
+    "country": "Saudi Arabia"
+  },
+  "DXB": {
+    "name": "Dubai International Airport",
+    "timezone": "Asia/Dubai",
+    "gmtOffset": 4,
+    "dst": null,
+    "country": "United Arab Emirates"
+  },
+  "DOH": {
+    "name": "Hamad International Airport",
+    "timezone": "Asia/Qatar",
+    "gmtOffset": 3,
+    "dst": null,
+    "country": "Qatar"
+  },
+  "LHR": {
+    "name": "London Heathrow Airport",
+    "timezone": "Europe/London",
+    "gmtOffset": 0,
+    "dst": {
+      "observed": true,
+      "gmtOffset": 1,
+      "period": "Mar-Oct"
+    },
+    "country": "United Kingdom"
+  },
+  "CDG": {
+    "name": "Paris Charles de Gaulle Airport",
+    "timezone": "Europe/Paris",
+    "gmtOffset": 1,
+    "dst": {
+      "observed": true,
+      "gmtOffset": 2,
+      "period": "Mar-Oct"
+    },
+    "country": "France"
+  },
+  "AMS": {
+    "name": "Amsterdam Airport Schiphol",
+    "timezone": "Europe/Amsterdam",
+    "gmtOffset": 1,
+    "dst": {
+      "observed": true,
+      "gmtOffset": 2,
+      "period": "Mar-Oct"
+    },
+    "country": "Netherlands"
+  },
+  "IST": {
+    "name": "Istanbul Airport",
+    "timezone": "Europe/Istanbul",
+    "gmtOffset": 3,
+    "dst": null,
+    "country": "Turkey"
+  },
+  "BKI": {
+    "name": "Kota Kinabalu International Airport",
+    "timezone": "Asia/Kuala_Lumpur",
+    "gmtOffset": 8,
+    "dst": null,
+    "country": "Malaysia"
+  },
+  "KCH": {
+    "name": "Kuching International Airport",
+    "timezone": "Asia/Kuala_Lumpur",
+    "gmtOffset": 8,
+    "dst": null,
+    "country": "Malaysia"
+  },
+  "LGK": {
+    "name": "Langkawi International Airport",
+    "timezone": "Asia/Kuala_Lumpur",
+    "gmtOffset": 8,
+    "dst": null,
+    "country": "Malaysia"
+  },
+  "MYY": {
+    "name": "Miri Airport",
+    "timezone": "Asia/Kuala_Lumpur",
+    "gmtOffset": 8,
+    "dst": null,
+    "country": "Malaysia"
+  },
+  "PEN": {
+    "name": "Penang International Airport",
+    "timezone": "Asia/Kuala_Lumpur",
+    "gmtOffset": 8,
+    "dst": null,
+    "country": "Malaysia"
+  },
+  "JHB": {
+    "name": "Senai International Airport",
+    "timezone": "Asia/Kuala_Lumpur",
+    "gmtOffset": 8,
+    "dst": null,
+    "country": "Malaysia"
+  },
+  "SBW": {
+    "name": "Sibu Airport",
+    "timezone": "Asia/Kuala_Lumpur",
+    "gmtOffset": 8,
+    "dst": null,
+    "country": "Malaysia"
+  },
+  "MZV": {
+    "name": "Mulu Airport",
+    "timezone": "Asia/Kuala_Lumpur",
+    "gmtOffset": 8,
+    "dst": null,
+    "country": "Malaysia"
+  },
+  "LMN": {
+    "name": "Limbang Airport",
+    "timezone": "Asia/Kuala_Lumpur",
+    "gmtOffset": 8,
+    "dst": null,
+    "country": "Malaysia"
+  },
+  "BTU": {
+    "name": "Bintulu Airport",
+    "timezone": "Asia/Kuala_Lumpur",
+    "gmtOffset": 8,
+    "dst": null,
+    "country": "Malaysia"
+  },
+  "KBR": {
+    "name": "Kota Bharu Airport",
+    "timezone": "Asia/Kuala_Lumpur",
+    "gmtOffset": 8,
+    "dst": null,
+    "country": "Malaysia"
+  },
+  "TGG": {
+    "name": "Kuala Terengganu Airport",
+    "timezone": "Asia/Kuala_Lumpur",
+    "gmtOffset": 8,
+    "dst": null,
+    "country": "Malaysia"
+  },
+  "AOR": {
+    "name": "Alor Setar Airport",
+    "timezone": "Asia/Kuala_Lumpur",
+    "gmtOffset": 8,
+    "dst": null,
+    "country": "Malaysia"
+  },
+  "LBU": {
+    "name": "Labuan Airport",
+    "timezone": "Asia/Kuala_Lumpur",
+    "gmtOffset": 8,
+    "dst": null,
+    "country": "Malaysia"
+  },
+  "SDK": {
+    "name": "Sandakan Airport",
+    "timezone": "Asia/Kuala_Lumpur",
+    "gmtOffset": 8,
+    "dst": null,
+    "country": "Malaysia"
+  },
+  "TWU": {
+    "name": "Tawau Airport",
+    "timezone": "Asia/Kuala_Lumpur",
+    "gmtOffset": 8,
+    "dst": null,
+    "country": "Malaysia"
+  },
+  "LDU": {
+    "name": "Lahad Datu Airport",
+    "timezone": "Asia/Kuala_Lumpur",
+    "gmtOffset": 8,
+    "dst": null,
+    "country": "Malaysia"
+  }
+}

@@ -586,17 +586,6 @@
             <button class="calc-btn active" data-calc="cabin">Cabin Crew Calculator</button>
             <button class="calc-btn" data-calc="tech">Tech Crew Calculator</button>
             <button class="calc-btn" data-calc="standby">Standby Calculator</button>
-            <!-- In the calculator selector section -->
-<button class="calc-btn" data-calc="roster">Roster Parser</button>
-
-<!-- Add this form -->
-<div id="roster-calculator" class="calculator-form">
-    <div style="text-align: center; padding: 40px;">
-        <h3>Roster Parser</h3>
-        <p>For automatic roster parsing and FTL calculation, use our dedicated tool:</p>
-        <a href="roster-parser.html" style="display: inline-block; padding: 12px 24px; background-color: #1a3a8f; color: white; text-decoration: none; border-radius: 5px; margin-top: 15px;">Open Roster Parser</a>
-    </div>
-</div>
         </div>
         
         <!-- Cabin Crew Calculator -->
