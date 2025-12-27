@@ -4,9 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Flight Roster Parser with FTL Calculation & Auto-Save</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✈️</text></svg>">
-<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✈️</text></svg>">
-<link rel="stylesheet" href="style.css">
+     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✈️</text></svg>">
+ <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✈️</text></svg>">
+ <link rel="stylesheet" href="style.css">
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -268,17 +268,33 @@
         .save-status-warning {
             color: #ffc107 !important;
         }
-        /* Export/Import panel */
-        .export-panel {
-            background: #f8f9fa;
-            padding: 10px 15px;
-            margin-top: 15px;
-            border-radius: 4px;
-            border: 1px dashed #6c757d;
+        /* Timer explanation tooltip */
+        .tooltip {
+            position: relative;
+            display: inline-block;
+            cursor: help;
         }
-        .export-panel h4 {
-            margin-top: 0;
-            color: #495057;
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 300px;
+            background-color: #555;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 8px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -150px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 11px;
+            line-height: 1.4;
+        }
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
         }
     </style>
 </head>
@@ -364,7 +380,7 @@
     <script>
         // ============ GLOBAL CONSTANTS AND VARIABLES ============
         const CREW_BASE = 'KUL';
-        const AUTO_SAVE_KEY = 'flightRosterData_v3';
+        const AUTO_SAVE_KEY = 'flightRosterData_v4';
         const STATION_CACHE_KEY = 'userStationsCache';
         const AUTO_SAVE_SETTING_KEY = 'autoSaveEnabled';
         
@@ -414,7 +430,7 @@
                 // Load any saved data
                 setTimeout(() => {
                     loadSavedData();
-                }, 500); // Small delay to ensure page is fully loaded
+                }, 500);
                 
                 console.log('Auto-save initialized');
             } catch (error) {
@@ -426,12 +442,10 @@
         function triggerAutoSave(source = 'manual') {
             if (!autoSaveEnabled && source !== 'manual') return;
             
-            // Clear existing timer
             if (saveDebounceTimer) {
                 clearTimeout(saveDebounceTimer);
             }
             
-            // Set new timer (1-second debounce for text input, 100ms for others)
             saveDebounceTimer = setTimeout(() => {
                 saveData(source);
             }, source === 'roster-input' ? 1000 : 100);
@@ -444,7 +458,7 @@
             try {
                 const saveData = {
                     timestamp: new Date().toISOString(),
-                    version: '3.0',
+                    version: '4.0',
                     data: {
                         rosterText: document.getElementById('rosterInput').value,
                         crewType: document.getElementById('crewTypeSelect').value,
@@ -452,23 +466,13 @@
                         ftlSettings: currentFtlSettings,
                         userStationsCache: userStationsCache,
                         allFlights: allFlights,
-                        currentCrewBase: currentCrewBase,
-                        flightsSummary: allFlights.map(f => ({
-                            date: f.date,
-                            flight: f.flight,
-                            departure: f.departure,
-                            arrival: f.arrival,
-                            dutyStart: f.dutyStart,
-                            dutyEnd: f.dutyEnd,
-                            ftlData: f.ftlData
-                        }))
+                        currentCrewBase: currentCrewBase
                     }
                 };
                 
                 localStorage.setItem(AUTO_SAVE_KEY, JSON.stringify(saveData));
                 localStorage.setItem(AUTO_SAVE_SETTING_KEY, JSON.stringify(autoSaveEnabled));
                 
-                // Update status
                 const now = new Date();
                 const timeStr = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
                 updateSaveStatus(`Saved at ${timeStr}`, 'success');
@@ -494,12 +498,10 @@
                 
                 const savedData = JSON.parse(saved);
                 
-                // Check version compatibility
                 if (!savedData.version || savedData.version < '1.0') {
                     console.warn('Old save format detected');
                 }
                 
-                // Restore form data
                 if (savedData.data.rosterText) {
                     document.getElementById('rosterInput').value = savedData.data.rosterText;
                 }
@@ -514,10 +516,8 @@
                     currentFtlSettings.acclimatization = savedData.data.acclimatization;
                 }
                 
-                // Restore cached data
                 if (savedData.data.userStationsCache) {
                     userStationsCache = savedData.data.userStationsCache;
-                    // Also save to sessionStorage for compatibility
                     sessionStorage.setItem(STATION_CACHE_KEY, JSON.stringify(userStationsCache));
                 }
                 
@@ -525,18 +525,15 @@
                     currentCrewBase = savedData.data.currentCrewBase;
                 }
                 
-                // Restore flights if we have them
                 if (savedData.data.allFlights && savedData.data.allFlights.length > 0) {
                     allFlights = savedData.data.allFlights;
                     
-                    // Re-display results if we have flights
                     if (allFlights.length > 0) {
                         displayResults(allFlights, currentCrewBase);
                         displayStatistics(allFlights);
                     }
                 }
                 
-                // Update status
                 const savedDate = new Date(savedData.timestamp);
                 const dateStr = savedDate.toLocaleDateString();
                 const timeStr = savedDate.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
@@ -559,12 +556,10 @@
                 sessionStorage.removeItem(STATION_CACHE_KEY);
                 localStorage.removeItem(AUTO_SAVE_SETTING_KEY);
                 
-                // Reset form
                 document.getElementById('rosterInput').value = '';
                 document.getElementById('crewTypeSelect').value = 'cabin';
                 document.getElementById('acclimatizationSelect').value = 'acclimatized';
                 
-                // Reset variables
                 allFlights = [];
                 userStationsCache = {};
                 autoSaveEnabled = true;
@@ -572,11 +567,9 @@
                 
                 updateSaveStatus('All data cleared', 'warning');
                 
-                // Clear display
                 document.getElementById('results').innerHTML = '';
                 document.getElementById('stats').innerHTML = '';
                 
-                // Stop timer
                 stopLiveTimer();
                 
                 console.log('All saved data cleared');
@@ -588,7 +581,7 @@
             try {
                 const exportObj = {
                     timestamp: new Date().toISOString(),
-                    version: '3.0',
+                    version: '4.0',
                     roster: document.getElementById('rosterInput').value,
                     ftlSettings: currentFtlSettings,
                     flights: allFlights,
@@ -629,40 +622,33 @@
                 try {
                     const importedData = JSON.parse(e.target.result);
                     
-                    // Validate imported data
                     if (!importedData.version) {
                         throw new Error('Invalid file format');
                     }
                     
-                    // Import roster text
                     if (importedData.roster) {
                         document.getElementById('rosterInput').value = importedData.roster;
                     }
                     
-                    // Import FTL settings
                     if (importedData.ftlSettings) {
                         document.getElementById('crewTypeSelect').value = importedData.ftlSettings.crewType || 'cabin';
                         document.getElementById('acclimatizationSelect').value = importedData.ftlSettings.acclimatization || 'acclimatized';
                         currentFtlSettings = importedData.ftlSettings;
                     }
                     
-                    // Import stations cache
                     if (importedData.userStations) {
                         userStationsCache = importedData.userStations;
                         saveUserStationsCache();
                     }
                     
-                    // Import flights
                     if (importedData.flights) {
                         allFlights = importedData.flights;
                     }
                     
-                    // Import crew base
                     if (importedData.currentCrewBase) {
                         currentCrewBase = importedData.currentCrewBase;
                     }
                     
-                    // Update display
                     if (allFlights.length > 0) {
                         displayResults(allFlights, currentCrewBase);
                         displayStatistics(allFlights);
@@ -670,7 +656,6 @@
                     
                     updateSaveStatus('Data imported successfully', 'success');
                     
-                    // Auto-save the imported data
                     triggerAutoSave('import');
                     
                 } catch (error) {
@@ -681,7 +666,6 @@
             };
             reader.readAsText(file);
             
-            // Reset file input
             event.target.value = '';
         }
         
@@ -743,10 +727,8 @@
             try {
                 updateFtlStatus('Loading configuration files...', 'loading');
                 
-                // Initialize user stations cache
                 initializeUserStationsCache();
                 
-                // Try to load all three configuration files
                 const filesToLoad = [
                     { name: 'stations.json', url: 'stations.json' },
                     { name: 'aircraft-groups.json', url: 'aircraft-groups.json' },
@@ -765,7 +747,6 @@
                         console.log(`✓ Loaded ${file.name}`);
                     } catch (fileError) {
                         console.warn(`Could not load ${file.name}:`, fileError.message);
-                        // Create default data for missing files
                         if (file.name === 'aircraft-groups.json') {
                             loadedData[file.name] = {
                                 "737": "Narrowbody",
@@ -785,7 +766,6 @@
                     }
                 }
                 
-                // Assign loaded data to configuration
                 ftlConfig.stations = loadedData['stations.json'] || {};
                 ftlConfig.aircraftGroups = loadedData['aircraft-groups.json'] || {};
                 ftlConfig.limits = loadedData['ftl-limits.json'] || {};
@@ -805,7 +785,6 @@
                 console.error('Failed to load FTL configuration:', error);
                 updateFtlStatus(`Error: ${error.message}`, 'error');
                 
-                // Create fallback configuration
                 createFallbackConfiguration();
                 updateFtlStatus('Using fallback configuration', 'warning');
                 return false;
@@ -826,7 +805,6 @@
                 "359": "Widebody"
             };
             
-            // Create simple limits for testing
             ftlConfig.limits = {
                 acclimatized: {
                     cabin: {
@@ -923,21 +901,17 @@
         function isDateInDstPeriod(date, dstPeriod) {
             if (!dstPeriod || !dstPeriod.observed) return false;
             
-            const month = date.getMonth() + 1; // JavaScript months are 0-11
+            const month = date.getMonth() + 1;
             const period = dstPeriod.period || '';
             
-            // Handle common period formats
             if (period.includes('-')) {
                 const [startMonthStr, endMonthStr] = period.split('-');
                 const startMonth = parseMonth(startMonthStr) + 1;
                 const endMonth = parseMonth(endMonthStr) + 1;
                 
-                // Handle year boundary (e.g., Oct-Apr)
                 if (startMonth > endMonth) {
-                    // Crosses year boundary (e.g., Oct to Apr)
                     return month >= startMonth || month <= endMonth;
                 } else {
-                    // Within same year (e.g., Mar-Oct)
                     return month >= startMonth && month <= endMonth;
                 }
             }
@@ -947,19 +921,15 @@
         
         // Get station GMT offset for a specific date (with DST if applicable)
         function getStationOffset(stationCode, date) {
-            // First check user cache
             if (userStationsCache[stationCode]) {
                 return parseFloat(userStationsCache[stationCode]);
             }
             
-            // Then check configuration
             const station = ftlConfig.stations[stationCode];
             if (!station) {
-                // Station not found - ask user
                 const offsetStr = prompt(`Station ${stationCode} not found in database.\nPlease enter GMT offset (e.g., +8, -5.5, 0):`, '+0');
                 
                 if (offsetStr !== null) {
-                    // Parse offset
                     let offset = 0;
                     try {
                         offset = parseFloat(offsetStr.replace('+', ''));
@@ -968,17 +938,15 @@
                         offset = 0;
                     }
                     
-                    // Cache for this session
                     userStationsCache[stationCode] = offset;
                     saveUserStationsCache();
                     triggerAutoSave('station-cache');
                     
                     return offset;
                 }
-                return 0; // Default to GMT+0 if user cancels
+                return 0;
             }
             
-            // Check DST
             if (station.dst && isDateInDstPeriod(date, station.dst)) {
                 return station.dst.gmtOffset;
             }
@@ -992,7 +960,7 @@
         function getLocalStartTimeBand(localTimeStr) {
             if (!localTimeStr || !localTimeStr.includes(':')) {
                 console.warn('Invalid time format:', localTimeStr);
-                return '0800-1259'; // Default band
+                return '0800-1259';
             }
             
             const hour = parseInt(localTimeStr.split(':')[0]);
@@ -1032,7 +1000,6 @@
                 }
                 limitTable = ftlConfig.limits.acclimatized[crewType][timeBand];
             } else {
-                // Non-acclimatized logic
                 let ruleKey = 'rest_period_leq18_or_geq30';
                 if (restHours !== null && restHours > 18 && restHours < 30) {
                     ruleKey = 'rest_period_18_01_to_29_59';
@@ -1044,7 +1011,7 @@
                 }
                 
                 limitTable = ftlConfig.limits.non_acclimatized[ruleKey][crewType];
-                sectorCount = Math.min(sectorCount, 4); // Max 4 sectors for non-acclimatized
+                sectorCount = Math.min(sectorCount, 4);
             }
             
             if (!limitTable || limitTable.length === 0) {
@@ -1060,7 +1027,7 @@
             return limitHours;
         }
         
-        // Calculate latest arrival time (CORRECTED VERSION)
+        // Calculate latest arrival time
         function calculateLatestArrival(dutyStartDateStr, dutyStartTimeStr, departureStation, arrivalStation, ftlLimitHours) {
             console.log('Calculating latest arrival:', {
                 dutyStartDateStr,
@@ -1076,7 +1043,6 @@
             }
             
             try {
-                // Parse duty start date and time
                 const dutyStartDate = parseDateString(dutyStartDateStr);
                 const dutyStartTime = parseTimeString(dutyStartTimeStr);
                 
@@ -1085,10 +1051,8 @@
                     return 'N/A';
                 }
                 
-                // Set time on date object
                 dutyStartDate.setHours(dutyStartTime.hours, dutyStartTime.minutes, 0, 0);
                 
-                // Get station offsets
                 const departureOffset = getStationOffset(departureStation, dutyStartDate);
                 const arrivalOffset = getStationOffset(arrivalStation, dutyStartDate);
                 
@@ -1099,8 +1063,6 @@
                     arrivalOffset
                 });
                 
-                // Step 1: Convert duty start (departure local) to UTC
-                // UTC = Local - Offset
                 const dutyStartUTC = new Date(dutyStartDate.getTime() - (departureOffset * 60 * 60 * 1000));
                 
                 console.log('UTC conversion:', {
@@ -1109,7 +1071,6 @@
                     dutyStartUTC: dutyStartUTC.toISOString()
                 });
                 
-                // Step 2: Add FTL limit hours
                 const latestArrivalUTC = new Date(dutyStartUTC.getTime() + (ftlLimitHours * 60 * 60 * 1000));
                 
                 console.log('Added FTL limit:', {
@@ -1117,8 +1078,6 @@
                     latestArrivalUTC: latestArrivalUTC.toISOString()
                 });
                 
-                // Step 3: Convert to arrival station local time
-                // Local = UTC + Offset
                 const latestArrivalLocal = new Date(latestArrivalUTC.getTime() + (arrivalOffset * 60 * 60 * 1000));
                 
                 console.log('Final conversion:', {
@@ -1126,7 +1085,6 @@
                     latestArrivalLocal: latestArrivalLocal.toISOString()
                 });
                 
-                // Format as HH:MM
                 const hours = latestArrivalLocal.getHours().toString().padStart(2, '0');
                 const minutes = latestArrivalLocal.getMinutes().toString().padStart(2, '0');
                 
@@ -1148,7 +1106,6 @@
             }
             
             try {
-                // Parse dates
                 const parseDate = (dateStr) => {
                     const parts = dateStr.split('-');
                     if (parts.length !== 3) return null;
@@ -1173,14 +1130,12 @@
                 
                 if (!endDate || !startDate) return null;
                 
-                // Add times to dates
                 const [endHour, endMin] = previousDutyEndTime.split(':').map(Number);
                 const [startHour, startMin] = currentDutyStartTime.split(':').map(Number);
                 
                 endDate.setHours(endHour, endMin, 0, 0);
                 startDate.setHours(startHour, startMin, 0, 0);
                 
-                // Calculate difference in hours
                 const diffMs = startDate - endDate;
                 const diffHours = diffMs / (1000 * 60 * 60);
                 
@@ -1191,7 +1146,7 @@
             }
         }
         
-        // ============ TIME TO LIMIT FUNCTIONS ============
+        // ============ TIME TO LIMIT FUNCTIONS (FIXED VERSION) ============
         
         // Start the live timer
         function startLiveTimer() {
@@ -1202,10 +1157,8 @@
             timerRunning = true;
             updateTimerStatus();
             
-            // Update immediately
             updateAllTimers();
             
-            // Update every second
             timerInterval = setInterval(updateAllTimers, 1000);
             
             console.log('Live timer started');
@@ -1262,15 +1215,14 @@
             });
         }
         
-        // Calculate time to limit
+        // Calculate time to limit - FIXED VERSION (consistent display and logic)
         function calculateTimeToLimit(flight) {
-            // Only calculate for flights with FTL data
             if (!flight.ftlData || !flight.dutyStart || !flight.date) {
                 return { status: 'no-data', display: '---' };
             }
             
             try {
-                const now = new Date(); // Current UTC time
+                const now = new Date();
                 
                 // Parse duty start date and time
                 const dutyStartDate = parseDateString(flight.date);
@@ -1280,7 +1232,6 @@
                     return { status: 'error', display: 'Error' };
                 }
                 
-                // Set time on date
                 dutyStartDate.setHours(dutyStartTime.hours, dutyStartTime.minutes, 0, 0);
                 
                 // Get departure station offset
@@ -1293,29 +1244,48 @@
                 const ftlLimitHours = flight.ftlData.limitHours;
                 const dutyLimitUTC = new Date(dutyStartUTC.getTime() + (ftlLimitHours * 60 * 60 * 1000));
                 
-                // Get arrival station offset
+                // Get arrival station offset for display
                 const arrivalStation = flight.ftlData.arrivalStation || flight.departureAirport;
                 const arrivalOffset = getStationOffset(arrivalStation, now);
                 
-                // Calculate time difference in milliseconds (UTC to UTC)
+                // CRITICAL FIX: Calculate the ACTUAL limit time in arrival station local time
+                // This is what the crew actually cares about - when they need to arrive by
+                const dutyLimitArrivalLocal = new Date(dutyLimitUTC.getTime() + (arrivalOffset * 60 * 60 * 1000));
+                
+                // Current time in arrival station local time
+                const nowArrivalLocal = new Date(now.getTime() + (arrivalOffset * 60 * 60 * 1000));
+                
+                // Calculate time difference in arrival station local time
+                const diffMsArrivalLocal = dutyLimitArrivalLocal - nowArrivalLocal;
+                
+                // Calculate time difference in UTC (for status logic - keep consistent)
                 const diffMsUTC = dutyLimitUTC - now;
                 
-                // Add destination offset to the countdown for display
-                const diffMsDisplay = diffMsUTC + (arrivalOffset * 60 * 60 * 1000);
+                console.log(`Timer calculation for ${flight.flight}:`, {
+                    dutyStartLocal: dutyStartDate.toISOString(),
+                    dutyStartUTC: dutyStartUTC.toISOString(),
+                    dutyLimitUTC: dutyLimitUTC.toISOString(),
+                    dutyLimitArrivalLocal: dutyLimitArrivalLocal.toISOString(),
+                    nowArrivalLocal: nowArrivalLocal.toISOString(),
+                    nowUTC: now.toISOString(),
+                    diffMsArrivalLocal,
+                    diffMsUTC,
+                    arrivalOffset
+                });
                 
-                // Check if duty hasn't started yet
+                // Check if duty hasn't started yet (using UTC for consistency)
                 if (diffMsUTC > ftlLimitHours * 60 * 60 * 1000 + 60 * 60 * 1000) {
                     return { status: 'not-started', display: 'Not Started' };
                 }
                 
-                // Check if duty is completed
+                // Check if duty is completed (using UTC)
                 if (diffMsUTC < -60 * 60 * 1000) {
                     return { status: 'completed', display: 'Completed' };
                 }
                 
-                // Check if exceeded (use UTC difference for logic)
-                if (diffMsUTC < 0) {
-                    const exceededMs = Math.abs(diffMsUTC);
+                // Check if exceeded - NOW USING ARRIVAL LOCAL TIME FOR LOGIC TOO!
+                if (diffMsArrivalLocal < 0) {
+                    const exceededMs = Math.abs(diffMsArrivalLocal);
                     const hours = Math.floor(exceededMs / (1000 * 60 * 60));
                     const minutes = Math.floor((exceededMs % (1000 * 60 * 60)) / (1000 * 60));
                     const seconds = Math.floor((exceededMs % (1000 * 60)) / 1000);
@@ -1323,31 +1293,32 @@
                     return {
                         status: 'exceeded',
                         display: `EXCEEDED by ${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`,
-                        totalSeconds: -Math.floor(diffMsUTC / 1000)
+                        totalSeconds: -Math.floor(diffMsArrivalLocal / 1000)
                     };
                 }
                 
-                // Calculate remaining time FOR DISPLAY (with destination offset added)
-                const totalSecondsDisplay = Math.floor(diffMsDisplay / 1000);
-                const hours = Math.floor(totalSecondsDisplay / 3600);
-                const minutes = Math.floor((totalSecondsDisplay % 3600) / 60);
-                const seconds = totalSecondsDisplay % 60;
+                // Calculate remaining time for display (using arrival local time)
+                const totalSecondsArrivalLocal = Math.floor(diffMsArrivalLocal / 1000);
+                const hours = Math.floor(totalSecondsArrivalLocal / 3600);
+                const minutes = Math.floor((totalSecondsArrivalLocal % 3600) / 60);
+                const seconds = totalSecondsArrivalLocal % 60;
                 
-                // Determine status (use UTC difference for status logic)
-                const totalSecondsUTC = Math.floor(diffMsUTC / 1000);
+                // Determine status based on UTC difference (for consistency with FTL rules)
                 let status = 'safe';
-                if (totalSecondsUTC <= 30 * 60) {
+                if (diffMsUTC <= 30 * 60 * 1000) {
                     status = 'critical';
-                } else if (totalSecondsUTC <= 60 * 60) {
+                } else if (diffMsUTC <= 60 * 60 * 1000) {
                     status = 'caution';
-                } else if (totalSecondsUTC <= 2 * 60 * 60) {
+                } else if (diffMsUTC <= 2 * 60 * 60 * 1000) {
                     status = 'warning';
                 }
                 
                 return {
                     status: status,
                     display: `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`,
-                    totalSeconds: totalSecondsDisplay,
+                    totalSeconds: totalSecondsArrivalLocal,
+                    diffMsUTC: diffMsUTC,
+                    diffMsArrivalLocal: diffMsArrivalLocal,
                     arrivalOffset: arrivalOffset
                 };
                 
@@ -1369,7 +1340,15 @@
                 default: emoji = '';
             }
             
-            return emoji ? `${emoji} ${timerData.display}` : timerData.display;
+            let displayText = timerData.display;
+            if (timerData.status === 'safe' || timerData.status === 'warning' || 
+                timerData.status === 'caution' || timerData.status === 'critical') {
+                displayText = emoji + ' ' + displayText;
+            } else if (timerData.status === 'exceeded') {
+                displayText = emoji + ' ' + displayText;
+            }
+            
+            return displayText;
         }
         
         // Get CSS class for timer
@@ -1391,7 +1370,6 @@
         
         // Main FTL calculation function
         function calculateFTL() {
-            // Update settings from UI
             currentFtlSettings.crewType = document.getElementById('crewTypeSelect').value;
             currentFtlSettings.acclimatization = document.getElementById('acclimatizationSelect').value;
             
@@ -1410,43 +1388,33 @@
             updateFtlStatus('Calculating FTL limits...', 'loading');
             
             try {
-                // Process flights to add FTL data
                 let dutyCycleFlights = [];
                 let dutyStartFlight = null;
                 let previousDutyEndFlight = null;
                 
-                // Clear existing FTL data
                 allFlights.forEach(flight => {
                     delete flight.ftlData;
                 });
                 
-                // Process each flight
                 for (let i = 0; i < allFlights.length; i++) {
                     const flight = allFlights[i];
                     
-                    // Skip day offs
                     if (flight.type === 'D') {
                         continue;
                     }
                     
-                    // Start of new duty cycle
                     if (flight.dutyStart && flight.dutyStart !== '') {
                         dutyStartFlight = flight;
-                        // Only add if it has a flight number (not continuation)
                         dutyCycleFlights = flight.flight ? [flight] : [];
                     }
-                    // Continue existing duty cycle
                     else if (dutyStartFlight && flight.flight && flight.flight.trim() !== '') {
-                        // Only add flights with actual flight numbers (not arrival-only continuations)
                         dutyCycleFlights.push(flight);
                     }
                     
-                    // End of duty cycle
                     if (flight.dutyEnd && dutyStartFlight && dutyCycleFlights.length > 0) {
                         const sectorCount = dutyCycleFlights.length;
                         const lastFlight = dutyCycleFlights[dutyCycleFlights.length - 1];
                         
-                        // Calculate rest hours if we have previous duty end
                         let restHours = null;
                         if (previousDutyEndFlight && previousDutyEndFlight.dutyEnd) {
                             restHours = calculateRestHours(
@@ -1457,7 +1425,6 @@
                             );
                         }
                         
-                        // Get FTL limit
                         const dutyStartTime = dutyStartFlight.dutyStart.includes(' ') 
                             ? dutyStartFlight.dutyStart.split(' ')[1]
                             : dutyStartFlight.dutyStart;
@@ -1465,8 +1432,6 @@
                         const ftlLimitHours = getFtlLimitHours(dutyStartTime, sectorCount, restHours);
                         
                         if (ftlLimitHours !== null) {
-                            // Calculate latest arrival
-                            // For multi-day flights, use arrival airport from the last flight
                             const arrivalAirport = lastFlight.arrivalAirport || lastFlight.departureAirport;
                             const latestArrival = calculateLatestArrival(
                                 dutyStartFlight.date,
@@ -1476,7 +1441,6 @@
                                 ftlLimitHours
                             );
                             
-                            // Store FTL data on the DUTY START FLIGHT (departure row) for display
                             dutyStartFlight.ftlData = {
                                 limitHours: ftlLimitHours,
                                 latestArrivalTime: latestArrival,
@@ -1490,30 +1454,23 @@
                             
                             console.log(`Added FTL data to ${dutyStartFlight.flight || 'duty start flight'}:`, dutyStartFlight.ftlData);
                             
-                            // Also store reference on last flight for data consistency
                             lastFlight.hasFtlData = true;
                             lastFlight.associatedFtlFlight = dutyStartFlight.flight;
                         }
                         
-                        // Store this as previous duty end for next cycle
                         previousDutyEndFlight = flight;
-                        
-                        // Reset for next cycle
                         dutyStartFlight = null;
                         dutyCycleFlights = [];
                     }
                 }
                 
-                // Update display
                 displayResults(allFlights, currentCrewBase);
                 displayStatistics(allFlights);
                 
                 updateFtlStatus('FTL calculation complete', 'success');
                 
-                // Auto-save after calculation
                 triggerAutoSave('ftl-calculation');
                 
-                // Start timer automatically after FTL calculation
                 startLiveTimer();
                 
             } catch (error) {
@@ -1531,14 +1488,12 @@
             console.log('Flights loaded:', allFlights.length);
             console.log('User stations cache:', userStationsCache);
             
-            // Test with MH139 example
             console.log('\n=== Testing MH139 Calculation ===');
             console.log('Duty Start: 03-DEC-2025 21:00');
             console.log('Departure Station: KUL');
             console.log('Arrival Station: ADL');
             console.log('FTL Limit (Tech, 1 sector, 2100 duty start): 13 hours');
             
-            // Test calculation
             const testResult = calculateLatestArrival(
                 '03-DEC-2025',
                 '21:00',
@@ -1569,7 +1524,6 @@
             let currentDay = '';
             let crewBase = CREW_BASE;
             
-            // Extract crew base from the header
             for (const line of lines) {
                 if (line.includes('Base')) {
                     const baseMatch = line.match(/Base\s*:\s*([A-Z]{3})/);
@@ -1582,47 +1536,36 @@
             
             currentCrewBase = crewBase;
             
-            // Parse each line
             for (let i = 0; i < lines.length; i++) {
                 const line = lines[i].trim();
                 if (!line) continue;
                 
-                // Skip header/footer lines
                 if (shouldSkipLine(line)) continue;
                 
-                // Check for date line (format: "01-DEC-2025\tMon")
                 const dateMatch = line.match(/^(\d{2}-[A-Z]{3}-\d{4})\s+([A-Za-z]{2,3})/);
                 if (dateMatch) {
                     currentDate = dateMatch[1];
                     currentDay = dateMatch[2];
                     
-                    // Always create an entry for the date
                     parseDateLine(line, currentDate, currentDay, flights, i, lines);
                 } 
-                // Check for continuation flight that starts with time
                 else if (line.match(/^\d{2}:\d{2}\s+MH/)) {
                     parseContinuationFlightWithTime(line, currentDate, currentDay, flights, i, lines);
                 }
-                // Check for continuation flight without time
                 else if (line.match(/^MH\s+\d+/)) {
                     parseContinuationFlight(line, currentDate, currentDay, flights, i, lines);
                 }
             }
             
-            // Post-process to mark NS/RTB and duty starts
             postProcessFlights(flights, crewBase);
             
-            // Store flights globally
             allFlights = flights;
             
-            // Display results
             displayResults(flights, crewBase);
             displayStatistics(flights);
             
-            // Update FTL status
             updateFtlStatus(`Parsed ${flights.length} flights. Ready for FTL calculation.`, 'success');
             
-            // Auto-save after parsing
             triggerAutoSave('roster-parse');
         }
         
@@ -1649,20 +1592,17 @@
         function parseDateLine(line, date, day, flights, lineIndex, lines) {
             const cells = line.split('\t').filter(cell => cell.trim() !== '');
             
-            // Check for day off (D, DO, DO1)
             if (cells.length >= 3 && (cells[2] === 'D' || cells[2] === 'DO' || cells[2] === 'DO1')) {
                 flights.push(createDayOff(date, day));
                 return;
             }
             
-            // Check for arrival-only line (no time, no flight number, but has destination)
             const arrivalPattern = line.match(/([A-Z]{3})\s+(\d{2}:\d{2})\s+(\d{2}:\d{2})/);
             if (arrivalPattern && !line.includes('MH')) {
                 const arrivalAirport = arrivalPattern[1];
                 const arrivalTime = arrivalPattern[2];
                 const dutyEnd = arrivalPattern[3];
                 
-                // Find the most recent flight without arrival/duty end
                 let departureFlight = null;
                 for (let j = flights.length - 1; j >= 0; j--) {
                     const flight = flights[j];
@@ -1673,7 +1613,6 @@
                 }
                 
                 if (departureFlight) {
-                    // Create arrival flight entry with EMPTY flight number
                     const arrivalFlight = {
                         date: date,
                         day: day,
@@ -1703,36 +1642,29 @@
                 return;
             }
             
-            // Check for empty date line
             if (cells.length <= 2) {
                 flights.push(createEmptyDateEntry(date, day));
                 return;
             }
             
-            // Check for flight with duty start time on this date line
             for (let j = 0; j < cells.length; j++) {
                 if (cells[j].startsWith('MH')) {
                     const flightIndex = j;
                     
-                    // Check if there's a time before the flight number (duty start)
                     let dutyStart = '';
                     if (flightIndex > 0 && cells[flightIndex - 1].match(/^\d{2}:\d{2}$/)) {
                         dutyStart = cells[flightIndex - 1];
                     }
                     
-                    // Parse the flight data
                     const flight = parseFlightDataExact(cells, flightIndex, date, day, dutyStart, true);
                     if (flight) {
                         flights.push(flight);
-                        
-                        // Check next line for aircraft
                         checkForAircraft(flight, lineIndex, lines);
                     }
                     return;
                 }
             }
             
-            // If we get here and haven't created an entry, create empty date entry
             flights.push(createEmptyDateEntry(date, day));
         }
         
@@ -1740,7 +1672,6 @@
         function parseContinuationFlightWithTime(line, date, day, flights, lineIndex, lines) {
             const cells = line.split('\t').filter(cell => cell.trim() !== '');
             
-            // Time before flight number is duty start time
             let dutyStart = '';
             let flightIndex = -1;
             
@@ -1767,7 +1698,6 @@
         function parseContinuationFlight(line, date, day, flights, lineIndex, lines) {
             const cells = line.split('\t').filter(cell => cell.trim() !== '');
             
-            // Find flight number
             let flightIndex = -1;
             for (let j = 0; j < cells.length; j++) {
                 if (cells[j].startsWith('MH')) {
@@ -1809,10 +1739,8 @@
                 dutyCycleComplete: false
             };
             
-            // Extract flight number
             flight.flight = cells[flightIndex];
             
-            // Start parsing from after the flight number
             let dataStartIndex = flightIndex + 1;
             
             let foundDeparture = false;
@@ -1821,7 +1749,6 @@
             for (let i = dataStartIndex; i < cells.length; i++) {
                 const cell = cells[i];
                 
-                // Look for departure (airport + time)
                 if (!foundDeparture && cell.match(/[A-Z]{3}\s+\d{2}:\d{2}/)) {
                     flight.departure = cell;
                     const depMatch = cell.match(/([A-Z]{3})\s+\d{2}:\d{2}/);
@@ -1832,7 +1759,6 @@
                     continue;
                 }
                 
-                // Look for arrival (airport + time)
                 if (foundDeparture && !foundArrival && cell.match(/[A-Z]{3}\s+\d{2}:\d{2}/)) {
                     flight.arrival = cell;
                     const arrMatch = cell.match(/([A-Z]{3})\s+\d{2}:\d{2}/);
@@ -1841,12 +1767,10 @@
                     }
                     foundArrival = true;
                     
-                    // Check if next cell is a time (this would be duty end)
                     if (i + 1 < cells.length && cells[i + 1].match(/^\d{2}:\d{2}$/)) {
                         let nextIndex = i + 2;
                         let isDutyEnd = false;
                         
-                        // Look ahead to see if we find OP
                         while (nextIndex < cells.length) {
                             if (cells[nextIndex] === 'OP' || cells[nextIndex] === 'PS') {
                                 isDutyEnd = true;
@@ -1864,15 +1788,12 @@
                     continue;
                 }
                 
-                // Look for OP/PS
                 if (cell === 'OP' || cell === 'PS') {
                     flight.type = cell;
                     
-                    // Time immediately after OP is BLOCK HOURS
                     if (i + 1 < cells.length && cells[i + 1].match(/^\d{2}:\d{2}$/)) {
                         flight.blockHours = cells[i + 1];
                         
-                        // Time after block hours is DUTY HOURS
                         if (i + 2 < cells.length && cells[i + 2].match(/^\d{2}:\d{2}$/)) {
                             flight.dutyHours = cells[i + 2];
                         }
@@ -1949,12 +1870,10 @@
         function postProcessFlights(flights, crewBase) {
             console.log('=== DEBUG: Crew Base:', crewBase);
             
-            // First pass: Mark NS/RTB for flights with duty end
             for (let i = 0; i < flights.length; i++) {
                 const flight = flights[i];
                 if (flight.type === 'D' || !flight.dutyEnd) continue;
                 
-                // Determine if this is NS or RTB
                 if (flight.arrivalAirport === crewBase) {
                     flight.isReturnToBase = true;
                     flight.hasNightStop = false;
@@ -1963,13 +1882,11 @@
                     flight.isReturnToBase = false;
                 }
                 
-                // Mark next flight as duty start and check for OB
                 if (flight.hasNightStop) {
                     for (let j = i + 1; j < flights.length; j++) {
                         if (flights[j].type !== 'D' && flights[j].flight) {
                             flights[j].isDutyStart = true;
                             
-                            // OB = has duty start time AND departure is NOT from base
                             if (flights[j].dutyStart &&
                                 flights[j].departureAirport &&
                                 flights[j].departureAirport !== crewBase) {
@@ -1981,23 +1898,19 @@
                 }
             }
             
-            // Second pass: Ensure duty starts are marked for flights with duty start time
             for (let i = 0; i < flights.length; i++) {
                 const flight = flights[i];
                 if (flight.type === 'D' || !flight.flight) continue;
                 
-                // If flight has duty start time, mark as duty start
                 if (flight.dutyStart && flight.dutyStart !== '') {
                     flight.isDutyStart = true;
                 }
             }
             
-            // Third pass: Check ALL flights for OB (duty start not from base)
             for (let i = 0; i < flights.length; i++) {
                 const flight = flights[i];
                 if (flight.type === 'D' || !flight.flight) continue;
                 
-                // If flight has duty start time and departs from non-base location
                 if (flight.dutyStart &&
                     flight.departureAirport &&
                     flight.departureAirport !== crewBase) {
@@ -2042,7 +1955,6 @@
                 if (flight.type === 'D') {
                     rowClass = 'day-off';
                 } else {
-                    // Order matters: RTB > NS > OB > Duty Start
                     if (flight.isReturnToBase) {
                         rowClass = 'return-to-base';
                     } else if (flight.hasNightStop) {
@@ -2054,7 +1966,6 @@
                     }
                 }
                 
-                // Determine aircraft type
                 let aircraftClass = '';
                 let aircraftDisplay = flight.aircraft || '';
                 if (flight.aircraft) {
@@ -2071,12 +1982,10 @@
                     }
                 }
                 
-                // Don't apply aircraft colors to NS/RTB rows
                 if (flight.hasNightStop || flight.isReturnToBase) {
                     aircraftClass = '';
                 }
                 
-                // Format FTL data
                 const ftlLimit = flight.ftlData ? flight.ftlData.limitHours.toFixed(2) : '';
                 const latestArrival = flight.ftlData ? flight.ftlData.latestArrivalTime : '';
                 const sectors = flight.ftlData ? flight.ftlData.sectorCount : '';
@@ -2103,7 +2012,6 @@
                 html += `<td>${latestArrival}</td>`;
                 html += `<td>${sectors}</td>`;
                 
-                // Time to Limit column
                 if (flight.ftlData) {
                     const timerData = calculateTimeToLimit(flight);
                     html += `<td class="${getTimerClass(timerData)} time-to-limit-cell" data-flight-index="${index}">${formatTimerDisplay(timerData)}</td>`;
@@ -2115,14 +2023,12 @@
             
             html += '</table>';
             
-            // Add timer controls
             html += '<div class="timer-controls">';
             html += '<button onclick="toggleTimer()" style="background: #17a2b8;">Toggle Timer</button>';
             html += '<button onclick="updateAllTimers()" style="background: #28a745;">Refresh Timers</button>';
             html += '<span id="timer-status-indicator"></span>';
             html += '</div>';
             
-            // Add legend
             html += '<div class="legend">';
             html += '<strong>Legend:</strong> ';
             html += '<span style="background: #fff3cd;">Day Off</span> ';
@@ -2136,7 +2042,7 @@
             html += '<span style="color:#6f42c1;font-size:8px;background:white;padding:1px 3px;border-radius:2px;">MULTI-DAY = FTL spans multiple days</span>';
             html += '<br><small>NS = Night Stop | RTB = Return to Base | OB = Out of Base | CONT = Multi-day flight continuation</small>';
             html += '<br><small><strong>Time to Limit:</strong> 🟢 Safe (>2h) | 🟡 Warning (1-2h) | 🟠 Caution (30min-1h) | 🔴 Critical (<30min) | ⛔ EXCEEDED</small>';
-            html += '<br><small><strong>Timer counts down to destination local time (UTC + destination GMT)</strong></small>';
+            html += '<br><small><strong class="tooltip">Timer Logic: Counts down to arrival station local time limit<span class="tooltiptext">Timer displays countdown to when you must arrive at destination (local time).<br>FTL limits are calculated from duty start (departure local time).<br>The "EXCEEDED" status triggers when arrival station local time passes the limit.</span></strong></small>';
             html += '</div>';
             
             document.getElementById('results').innerHTML = html;
@@ -2162,7 +2068,6 @@
             const narrowbodyTypes = ['737', '73H', '7M8', '738'];
             const widebodyTypes = ['332', '333', '350', '359', '339'];
             
-            // Track previous duty end for day off location
             let previousDutyEndLocation = CREW_BASE;
             
             flights.forEach(flight => {
@@ -2174,26 +2079,22 @@
                         dayOffsAway++;
                     }
                 } else if (flight.flight && flight.flight.trim() !== '') {
-                    // Parse block hours
                     if (flight.blockHours) {
                         const [hours, minutes] = flight.blockHours.split(':').map(Number);
                         totalBlockHours += hours * 60 + minutes;
                     }
                     
-                    // Parse duty hours
                     if (flight.dutyHours) {
                         const [hours, minutes] = flight.dutyHours.split(':').map(Number);
                         totalDutyHours += hours * 60 + minutes;
                     }
                     
-                    // Count aircraft
                     if (flight.aircraft) {
                         const acType = flight.aircraft.substring(0, 3);
                         if (narrowbodyTypes.includes(acType)) narrowbodyFlights++;
                         if (widebodyTypes.includes(acType)) widebodyFlights++;
                     }
                     
-                    // Count other statistics
                     if (flight.hasNightStop) {
                         nightStops++;
                         previousDutyEndLocation = flight.arrivalAirport;
@@ -2205,7 +2106,6 @@
                     if (flight.isMultiDay) multiDayFlights++;
                     if (flight.isOutOfBase) outOfBaseFlights++;
                     
-                    // FTL statistics
                     if (flight.ftlData) {
                         ftlCalculatedFlights++;
                         if (flight.ftlData.isMultiDayDuty) {
@@ -2215,14 +2115,12 @@
                 }
             });
             
-            // Convert minutes to HH:MM
             const formatTime = (minutes) => {
                 const hours = Math.floor(minutes / 60);
                 const mins = minutes % 60;
                 return `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}`;
             };
             
-            // FTL settings info
             const ftlSettingsInfo = ftlCalculatedFlights > 0 ? 
                 `<div style="margin-top: 10px; padding: 10px; background-color: #e9ecef; border-radius: 4px;">
                     <strong>FTL Settings:</strong> ${currentFtlSettings.crewType === 'cabin' ? 'Cabin Crew' : 'Tech Crew'}, 
@@ -2256,21 +2154,17 @@
             document.getElementById('results').innerHTML = '';
             document.getElementById('stats').innerHTML = '';
             allFlights = [];
-            // Stop timer
             stopLiveTimer();
             updateFtlStatus('Ready to calculate FTL', 'info');
         }
         
         // ============ INITIALIZATION ============
         
-        // Initialize everything when the page loads
         document.addEventListener('DOMContentLoaded', async function() {
             console.log('Initializing Flight Roster Parser...');
             
-            // Initialize auto-save first
             initializeAutoSave();
             
-            // Set up FTL setting change listeners
             document.getElementById('crewTypeSelect').addEventListener('change', function() {
                 currentFtlSettings.crewType = this.value;
                 console.log('Crew type changed to:', this.value);
@@ -2283,7 +2177,6 @@
                 triggerAutoSave('ftl-setting');
             });
             
-            // Load FTL configuration
             await loadFtlConfiguration();
             
             console.log('Flight Roster Parser fully initialized');
