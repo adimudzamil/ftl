@@ -919,39 +919,49 @@
             return false;
         }
         
-        // Get station GMT offset for a specific date (with DST if applicable)
+        // ============ CHANGE 1: Fixed getStationOffset() function ============
         function getStationOffset(stationCode, date) {
+            // First check user cache
             if (userStationsCache[stationCode]) {
                 return parseFloat(userStationsCache[stationCode]);
             }
             
-            const station = ftlConfig.stations[stationCode];
-            if (!station) {
-                const offsetStr = prompt(`Station ${stationCode} not found in database.\nPlease enter GMT offset (e.g., +8, -5.5, 0):`, '+0');
+            // Then check if FTL data is loaded and station exists
+            if (ftlDataLoaded && ftlConfig.stations && ftlConfig.stations[stationCode]) {
+                const station = ftlConfig.stations[stationCode];
                 
-                if (offsetStr !== null) {
-                    let offset = 0;
-                    try {
-                        offset = parseFloat(offsetStr.replace('+', ''));
-                        if (isNaN(offset)) offset = 0;
-                    } catch (e) {
-                        offset = 0;
-                    }
-                    
-                    userStationsCache[stationCode] = offset;
-                    saveUserStationsCache();
-                    triggerAutoSave('station-cache');
-                    
-                    return offset;
+                if (station.dst && isDateInDstPeriod(date, station.dst)) {
+                    return station.dst.gmtOffset;
                 }
-                return 0;
+                
+                return station.gmtOffset;
             }
             
-            if (station.dst && isDateInDstPeriod(date, station.dst)) {
-                return station.dst.gmtOffset;
+            // If FTL data not loaded yet, return null to signal waiting
+            if (!ftlDataLoaded) {
+                console.warn(`Station ${stationCode} requested but FTL data not loaded yet`);
+                return null;
             }
             
-            return station.gmtOffset;
+            // Station not found in database - prompt user
+            const offsetStr = prompt(`Station ${stationCode} not found in database.\nPlease enter GMT offset (e.g., +8, -5.5, 0):`, '+0');
+            
+            if (offsetStr !== null) {
+                let offset = 0;
+                try {
+                    offset = parseFloat(offsetStr.replace('+', ''));
+                    if (isNaN(offset)) offset = 0;
+                } catch (e) {
+                    offset = 0;
+                }
+                
+                userStationsCache[stationCode] = offset;
+                saveUserStationsCache();
+                triggerAutoSave('station-cache');
+                
+                return offset;
+            }
+            return 0;
         }
         
         // ============ FTL CALCULATION FUNCTIONS ============
@@ -1404,8 +1414,8 @@
             }
         }
         
-        // Main FTL calculation function
-        function calculateFTL() {
+        // ============ CHANGE 2: Make calculateFTL() async ============
+        async function calculateFTL() {
             currentFtlSettings.crewType = document.getElementById('crewTypeSelect').value;
             currentFtlSettings.acclimatization = document.getElementById('acclimatizationSelect').value;
             
@@ -1416,9 +1426,14 @@
                 return;
             }
             
+            // ============ CHANGE 2: Updated FTL data loading check ============
             if (!ftlDataLoaded) {
-                alert('FTL data not loaded. Please wait or check configuration files.');
-                return;
+                updateFtlStatus('FTL data not loaded. Loading now...', 'loading');
+                const loaded = await loadFtlConfiguration();
+                if (!loaded) {
+                    alert('Failed to load FTL configuration. Please check console for errors.');
+                    return;
+                }
             }
             
             updateFtlStatus('Calculating FTL limits...', 'loading');
@@ -2087,7 +2102,7 @@ if (flight.ftlData) {
             updateTimerStatus();
         }
         
-        // Display statistics
+        // ============ CHANGE 3: Fixed night stop counting in displayStatistics() ============
         function displayStatistics(flights) {
             let totalBlockHours = 0;
             let totalDutyHours = 0;
@@ -2116,7 +2131,8 @@ if (flight.ftlData) {
                     } else {
                         dayOffsAway++;
                     }
-                } else if (flight.flight && flight.flight.trim() !== '') {
+                } else if (flight.flight && flight.flight.trim()) {
+                    // Flight with flight number
                     if (flight.blockHours) {
                         const [hours, minutes] = flight.blockHours.split(':').map(Number);
                         totalBlockHours += hours * 60 + minutes;
@@ -2133,14 +2149,6 @@ if (flight.ftlData) {
                         if (widebodyTypes.includes(acType)) widebodyFlights++;
                     }
                     
-                    if (flight.hasNightStop) {
-                        nightStops++;
-                        previousDutyEndLocation = flight.arrivalAirport;
-                    }
-                    if (flight.isReturnToBase) {
-                        returnToBaseFlights++;
-                        previousDutyEndLocation = CREW_BASE;
-                    }
                     if (flight.isMultiDay) multiDayFlights++;
                     if (flight.isOutOfBase) outOfBaseFlights++;
                     
@@ -2150,6 +2158,17 @@ if (flight.ftlData) {
                             multiDayFtlCalculations++;
                         }
                     }
+                }
+                
+                // Count night stops and RTB regardless of flight number
+                // This ensures multi-day continuation rows are counted
+                if (flight.hasNightStop) {
+                    nightStops++;
+                    previousDutyEndLocation = flight.arrivalAirport;
+                }
+                if (flight.isReturnToBase) {
+                    returnToBaseFlights++;
+                    previousDutyEndLocation = CREW_BASE;
                 }
             });
             
