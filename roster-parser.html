@@ -2109,49 +2109,52 @@ if (flight.ftlData) {
             let previousDutyEndLocation = CREW_BASE;
             
             flights.forEach(flight => {
-                if (flight.type === 'D') {
-                    dayOffs++;
-                    if (previousDutyEndLocation === CREW_BASE) {
-                        dayOffsAtBase++;
-                    } else {
-                        dayOffsAway++;
-                    }
-                } else if (flight.flight && flight.flight.trim() !== '') {
-                    if (flight.blockHours) {
-                        const [hours, minutes] = flight.blockHours.split(':').map(Number);
-                        totalBlockHours += hours * 60 + minutes;
-                    }
-                    
-                    if (flight.dutyHours) {
-                        const [hours, minutes] = flight.dutyHours.split(':').map(Number);
-                        totalDutyHours += hours * 60 + minutes;
-                    }
-                    
-                    if (flight.aircraft) {
-                        const acType = flight.aircraft.substring(0, 3);
-                        if (narrowbodyTypes.includes(acType)) narrowbodyFlights++;
-                        if (widebodyTypes.includes(acType)) widebodyFlights++;
-                    }
-                    
-                    if (flight.hasNightStop) {
-                        nightStops++;
-                        previousDutyEndLocation = flight.arrivalAirport;
-                    }
-                    if (flight.isReturnToBase) {
-                        returnToBaseFlights++;
-                        previousDutyEndLocation = CREW_BASE;
-                    }
-                    if (flight.isMultiDay) multiDayFlights++;
-                    if (flight.isOutOfBase) outOfBaseFlights++;
-                    
-                    if (flight.ftlData) {
-                        ftlCalculatedFlights++;
-                        if (flight.ftlData.isMultiDayDuty) {
-                            multiDayFtlCalculations++;
-                        }
-                    }
-                }
-            });
+    if (flight.type === 'D') {
+        dayOffs++;
+        if (previousDutyEndLocation === CREW_BASE) {
+            dayOffsAtBase++;
+        } else {
+            dayOffsAway++;
+        }
+    } else if (flight.flight && flight.flight.trim
+        if (flight.blockHours) {
+            const [hours, minutes] = flight.blockHours.split(':').map(Number);
+            totalBlockHours += hours * 60 + minutes;
+        }
+        
+        if (flight.dutyHours) {
+            const [hours, minutes] = flight.dutyHours.split(':').map(Number);
+            totalDutyHours += hours * 60 + minutes;
+        }
+        
+        if (flight.aircraft) {
+            const acType = flight.aircraft.substring(0, 3);
+            if (narrowbodyTypes.includes(acType)) narrowbodyFlights++;
+            if (widebodyTypes.includes(acType)) widebodyFlights++;
+        }
+        
+        if (flight.isMultiDay) multiDayFlights++;
+        if (flight.isOutOfBase) outOfBaseFlights++;
+        
+        if (flight.ftlData) {
+            ftlCalculatedFlights++;
+            if (flight.ftlData.isMultiDayDuty) {
+                multiDayFtlCalculations++;
+            }
+        }
+    }
+    
+    // Count night stops and RTB separately (outside flight number check)
+    // This ensures multi-day continuation rows are counted
+    if (flight.hasNightStop) {
+        nightStops++;
+        previousDutyEndLocation = flight.arrivalAirport;
+    }
+    if (flight.isReturnToBase) {
+        returnToBaseFlights++;
+        previousDutyEndLocation = CREW_BASE;
+    }
+});
             
             const formatTime = (minutes) => {
                 const hours = Math.floor(minutes / 60);
