@@ -1201,91 +1201,130 @@
         
         // Update all timers on the page
         function updateAllTimers() {
-            const timerCells = document.querySelectorAll('.time-to-limit-cell');
-            
-            timerCells.forEach(cell => {
-                const flightIndex = parseInt(cell.dataset.flightIndex);
-                if (isNaN(flightIndex) || !allFlights[flightIndex]) return;
-                
-                const flight = allFlights[flightIndex];
-                const timerData = calculateTimeToLimit(flight);
-                
-                cell.innerHTML = formatTimerDisplay(timerData);
-                cell.className = 'time-to-limit-cell ' + getTimerClass(timerData);
-            });
-        }
+    const timerCells = document.querySelectorAll('.time-to-limit-cell');
+    
+    timerCells.forEach(cell => {
+        const flightIndex = parseInt(cell.dataset.flightIndex);
+        if (isNaN(flightIndex) || !allFlights[flightIndex]) return;
         
-        // Calculate time to limit - FIXED VERSION (consistent display and logic)
+        const flight = allFlights[flightIndex];
+        const timerData = calculateTimeToLimit(flight);
+        const arrivalStation = flight.ftlData.arrivalStation || flight.departureAirport;
+        const latestArrival = flight.ftlData.latestArrivalTime;
+        
+        const displayHtml = `${formatTimerDisplay(timerData)}<br><small style="font-size:9px;color:#666;">Target: ${latestArrival} ${arrivalStation}</small>`;
+        
+        cell.innerHTML = displayHtml;
+        cell.className = 'time-to-limit-cell ' + getTimerClass(timerData);
+    });
+}
+        
+        // Calculate time to limit - COMPLETELY REWRITTEN (bulletproof version)
         function calculateTimeToLimit(flight) {
             if (!flight.ftlData || !flight.dutyStart || !flight.date) {
                 return { status: 'no-data', display: '---' };
             }
             
             try {
-                const now = new Date();
-                
-                // Parse duty start date and time
-                const dutyStartDate = parseDateString(flight.date);
-                const dutyStartTime = parseTimeString(flight.dutyStart);
-                
-                if (!dutyStartDate) {
+                // Parse the latest arrival time string (HH:MM format in arrival station local time)
+                const latestArrivalTime = flight.ftlData.latestArrivalTime;
+                if (!latestArrivalTime || latestArrivalTime === 'N/A') {
                     return { status: 'error', display: 'Error' };
                 }
                 
-                dutyStartDate.setHours(dutyStartTime.hours, dutyStartTime.minutes, 0, 0);
+                const [targetHour, targetMin] = latestArrivalTime.split(':').map(Number);
                 
-                // Get departure station offset
-                const departureOffset = getStationOffset(flight.departureAirport, dutyStartDate);
+                // Parse duty start date (DD-MMM-YYYY format)
+                const dateParts = flight.date.split('-');
+                const day = parseInt(dateParts[0]);
+                const monthStr = dateParts[1].toUpperCase();
+                const year = parseInt(dateParts[2]);
                 
-                // Convert duty start to UTC
-                const dutyStartUTC = new Date(dutyStartDate.getTime() - (departureOffset * 60 * 60 * 1000));
+                const monthMap = {
+                    'JAN': 0, 'FEB': 1, 'MAR': 2, 'APR': 3, 'MAY': 4, 'JUN': 5,
+                    'JUL': 6, 'AUG': 7, 'SEP': 8, 'OCT': 9, 'NOV': 10, 'DEC': 11
+                };
+                const month = monthMap[monthStr];
                 
-                // Calculate duty limit time in UTC
-                const ftlLimitHours = flight.ftlData.limitHours;
-                const dutyLimitUTC = new Date(dutyStartUTC.getTime() + (ftlLimitHours * 60 * 60 * 1000));
-                
-                // Get arrival station offset for display
+                // Get arrival station offset
                 const arrivalStation = flight.ftlData.arrivalStation || flight.departureAirport;
-                const arrivalOffset = getStationOffset(arrivalStation, now);
+                const arrivalOffset = getStationOffset(arrivalStation, new Date(year, month, day));
                 
-                // CRITICAL FIX: Calculate the ACTUAL limit time in arrival station local time
-                // This is what the crew actually cares about - when they need to arrive by
-                const dutyLimitArrivalLocal = new Date(dutyLimitUTC.getTime() + (arrivalOffset * 60 * 60 * 1000));
+                // Create target date in arrival station local time
+                // Start with duty start date
+                let targetDay = day;
+                let targetMonth = month;
+                let targetYear = year;
                 
-                // Current time in arrival station local time
-                const nowArrivalLocal = new Date(now.getTime() + (arrivalOffset * 60 * 60 * 1000));
+                // Parse duty start time
+                const dutyStartTime = parseTimeString(flight.dutyStart);
                 
-                // Calculate time difference in arrival station local time
-                const diffMsArrivalLocal = dutyLimitArrivalLocal - nowArrivalLocal;
+                // Check if we need to add a day
+                // If target hour is less than duty start hour, OR if FTL > 12 hours, it's likely next day
+                const ftlLimitHours = flight.ftlData.limitHours;
+                const needsNextDay = (targetHour < dutyStartTime.hours) || 
+                                    (targetHour === dutyStartTime.hours && targetMin <= dutyStartTime.minutes) ||
+                                    (ftlLimitHours >= 10 && targetHour < dutyStartTime.hours + 12);
                 
-                // Calculate time difference in UTC (for status logic - keep consistent)
-                const diffMsUTC = dutyLimitUTC - now;
+                if (needsNextDay) {
+                    // Add one day
+                    const tempDate = new Date(year, month, day + 1);
+                    targetDay = tempDate.getDate();
+                    targetMonth = tempDate.getMonth();
+                    targetYear = tempDate.getFullYear();
+                }
                 
-                console.log(`Timer calculation for ${flight.flight}:`, {
-                    dutyStartLocal: dutyStartDate.toISOString(),
-                    dutyStartUTC: dutyStartUTC.toISOString(),
-                    dutyLimitUTC: dutyLimitUTC.toISOString(),
-                    dutyLimitArrivalLocal: dutyLimitArrivalLocal.toISOString(),
-                    nowArrivalLocal: nowArrivalLocal.toISOString(),
-                    nowUTC: now.toISOString(),
-                    diffMsArrivalLocal,
-                    diffMsUTC,
-                    arrivalOffset
+                // Create target time in UTC using Date.UTC (immune to device timezone)
+                const targetUTCms = Date.UTC(targetYear, targetMonth, targetDay, targetHour, targetMin, 0) 
+                                   - (arrivalOffset * 60 * 60 * 1000);
+                
+                // Get current time in UTC (immune to device timezone)
+                const now = new Date();
+                const nowUTCms = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(),
+                                         now.getUTCHours(), now.getUTCMinutes(), now.getUTCSeconds());
+                
+                // Calculate time difference in milliseconds
+                const diffMs = targetUTCms - nowUTCms;
+                
+                console.log(`Timer for ${flight.flight}:`, {
+                    dutyStartDate: flight.date,
+                    dutyStartTime: `${dutyStartTime.hours}:${dutyStartTime.minutes}`,
+                    latestArrival: latestArrivalTime,
+                    arrivalStation: arrivalStation,
+                    arrivalOffset: arrivalOffset,
+                    ftlLimitHours: ftlLimitHours,
+                    needsNextDay: needsNextDay,
+                    targetDate: `${targetYear}-${(targetMonth+1).toString().padStart(2,'0')}-${targetDay.toString().padStart(2,'0')} ${targetHour}:${targetMin}`,
+                    targetUTCms: new Date(targetUTCms).toISOString(),
+                    nowUTCms: new Date(nowUTCms).toISOString(),
+                    diffMs,
+                    diffHours: (diffMs / (1000 * 60 * 60)).toFixed(2)
                 });
                 
-                // Check if duty hasn't started yet (using UTC for consistency)
-                if (diffMsUTC > ftlLimitHours * 60 * 60 * 1000 + 60 * 60 * 1000) {
+                // Check if duty hasn't started yet - compare current time to duty start time
+                const dutyStartDateObj = new Date(year, month, day);
+                dutyStartDateObj.setHours(dutyStartTime.hours, dutyStartTime.minutes, 0, 0);
+                
+                // Get departure station offset to convert duty start to UTC
+                const departureStation = flight.departureAirport;
+                const departureOffset = getStationOffset(departureStation, dutyStartDateObj);
+                
+                const dutyStartUTCms = Date.UTC(year, month, day, dutyStartTime.hours, dutyStartTime.minutes, 0) 
+                                      - (departureOffset * 60 * 60 * 1000);
+                
+                // If current time is before duty start, show "Not Started"
+                if (nowUTCms < dutyStartUTCms) {
                     return { status: 'not-started', display: 'Not Started' };
                 }
                 
-                // Check if duty is completed (using UTC)
-                if (diffMsUTC < -60 * 60 * 1000) {
+                // Check if duty is completed
+                if (diffMs < -60 * 60 * 1000) {
                     return { status: 'completed', display: 'Completed' };
                 }
                 
-                // Check if exceeded - NOW USING ARRIVAL LOCAL TIME FOR LOGIC TOO!
-                if (diffMsArrivalLocal < 0) {
-                    const exceededMs = Math.abs(diffMsArrivalLocal);
+                // Check if exceeded
+                if (diffMs < 0) {
+                    const exceededMs = Math.abs(diffMs);
                     const hours = Math.floor(exceededMs / (1000 * 60 * 60));
                     const minutes = Math.floor((exceededMs % (1000 * 60 * 60)) / (1000 * 60));
                     const seconds = Math.floor((exceededMs % (1000 * 60)) / 1000);
@@ -1293,33 +1332,30 @@
                     return {
                         status: 'exceeded',
                         display: `EXCEEDED by ${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`,
-                        totalSeconds: -Math.floor(diffMsArrivalLocal / 1000)
+                        totalSeconds: -Math.floor(diffMs / 1000)
                     };
                 }
                 
-                // Calculate remaining time for display (using arrival local time)
-                const totalSecondsArrivalLocal = Math.floor(diffMsArrivalLocal / 1000);
-                const hours = Math.floor(totalSecondsArrivalLocal / 3600);
-                const minutes = Math.floor((totalSecondsArrivalLocal % 3600) / 60);
-                const seconds = totalSecondsArrivalLocal % 60;
+                // Calculate remaining time
+                const totalSeconds = Math.floor(diffMs / 1000);
+                const hours = Math.floor(totalSeconds / 3600);
+                const minutes = Math.floor((totalSeconds % 3600) / 60);
+                const seconds = totalSeconds % 60;
                 
-                // Determine status based on UTC difference (for consistency with FTL rules)
+                // Determine status
                 let status = 'safe';
-                if (diffMsUTC <= 30 * 60 * 1000) {
+                if (diffMs <= 30 * 60 * 1000) {
                     status = 'critical';
-                } else if (diffMsUTC <= 60 * 60 * 1000) {
+                } else if (diffMs <= 60 * 60 * 1000) {
                     status = 'caution';
-                } else if (diffMsUTC <= 2 * 60 * 60 * 1000) {
+                } else if (diffMs <= 2 * 60 * 60 * 1000) {
                     status = 'warning';
                 }
                 
                 return {
                     status: status,
                     display: `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`,
-                    totalSeconds: totalSecondsArrivalLocal,
-                    diffMsUTC: diffMsUTC,
-                    diffMsArrivalLocal: diffMsArrivalLocal,
-                    arrivalOffset: arrivalOffset
+                    totalSeconds: totalSeconds
                 };
                 
             } catch (error) {
@@ -2009,15 +2045,17 @@
                 html += `<td>${flight.dutyHours || ''}</td>`;
                 html += `<td class="${aircraftClass}">${aircraftDisplay}</td>`;
                 html += `<td>${ftlLimit}</td>`;
-                html += `<td>${latestArrival}</td>`;
-                html += `<td>${sectors}</td>`;
-                
-                if (flight.ftlData) {
-                    const timerData = calculateTimeToLimit(flight);
-                    html += `<td class="${getTimerClass(timerData)} time-to-limit-cell" data-flight-index="${index}">${formatTimerDisplay(timerData)}</td>`;
-                } else {
-                    html += `<td class="time-to-limit time-inactive">---</td>`;
-                }
+html += `<td>${latestArrival}</td>`;
+html += `<td>${sectors}</td>`;
+
+if (flight.ftlData) {
+    const timerData = calculateTimeToLimit(flight);
+    const arrivalStation = flight.ftlData.arrivalStation || flight.departureAirport;
+    const targetTimeDisplay = `${formatTimerDisplay(timerData)}<br><small style="font-size:9px;color:#666;">Target: ${latestArrival} ${arrivalStation}</small>`;
+    html += `<td class="${getTimerClass(timerData)} time-to-limit-cell" data-flight-index="${index}">${targetTimeDisplay}</td>`;
+} else {
+    html += `<td class="time-to-limit time-inactive">---</td>`;
+}
                 html += '</tr>';
             });
             
