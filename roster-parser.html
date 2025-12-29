@@ -1907,15 +1907,16 @@
         }
         
         // Check for aircraft on next line
-        function checkForAircraft(flight, lineIndex, lines) {
-            if (lineIndex + 1 < lines.length) {
-                const nextLine = lines[lineIndex + 1].trim();
-                const aircraftMatch = nextLine.match(/^(\d{2,3}[A-Z]?)$/);
-                if (aircraftMatch) {
-                    flight.aircraft = aircraftMatch[1];
-                }
-            }
+function checkForAircraft(flight, lineIndex, lines) {
+    if (lineIndex + 1 < lines.length) {
+        const nextLine = lines[lineIndex + 1].trim();
+        // Updated regex to match: 2-3 digits, optionally followed by letters (737, 73H, 7M8, 333, 339, 350, 359, 738)
+        const aircraftMatch = nextLine.match(/^(\d{1,3}[A-Z0-9]*)$/);
+        if (aircraftMatch) {
+            flight.aircraft = aircraftMatch[1];
         }
+    }
+}
         
         // Post-process flights to mark NS/RTB and duty starts
         function postProcessFlights(flights, crewBase) {
