@@ -4,14 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Flight Roster Parser with FTL Calculation & Auto-Save</title>
-     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✈️</text></svg>">
- <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✈️</text></svg>">
- <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✈️</text></svg>">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✈️</text></svg>">
     <style>
         body {
             font-family: Arial, sans-serif;
             padding: 20px;
             background: #f5f5f5;
+            margin: 0;
         }
         .container {
             max-width: 1400px;
@@ -67,7 +67,6 @@
         .duty-start {
             border-left: 3px solid #28a745;
         }
-        /* NIGHT STOP - FULL ROW RED */
         .night-stop {
             background: #f8d7da !important;
             color: #721c24 !important;
@@ -77,7 +76,6 @@
             color: inherit !important;
             border-color: #f5c6cb !important;
         }
-        /* RETURN TO BASE - FULL ROW GREEN */
         .return-to-base {
             background: #d4edda !important;
             color: #155724 !important;
@@ -88,12 +86,10 @@
             color: inherit !important;
             border-color: #c3e6cb !important;
         }
-        /* Out of Base (OB) */
         .out-of-base {
             background: #e8f4f8;
             border: 1px solid #17a2b8;
         }
-        /* Aircraft colors */
         .narrowbody {
             background: #d1ecf1;
             font-weight: bold;
@@ -129,7 +125,6 @@
             color: #721c24;
             font-weight: bold;
         }
-        /* FTL Settings Panel */
         .ftl-settings {
             background: #e9ecef;
             padding: 15px;
@@ -182,7 +177,6 @@
         .ftl-warning {
             color: #ffc107;
         }
-        /* Time to Limit styling */
         .time-to-limit {
             font-family: Arial, sans-serif;
             font-weight: bold;
@@ -235,7 +229,6 @@
             background: #f8d7da;
             color: #721c24;
         }
-        /* Auto-save panel styles */
         .auto-save-panel {
             background: #e8f4f8;
             padding: 12px 15px;
@@ -268,7 +261,6 @@
         .save-status-warning {
             color: #ffc107 !important;
         }
-        /* Timer explanation tooltip */
         .tooltip {
             position: relative;
             display: inline-block;
@@ -296,11 +288,169 @@
             visibility: visible;
             opacity: 1;
         }
+        .incomplete-warning {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        .month-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        .month-modal-content {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            width: 80%;
+            max-width: 600px;
+            max-height: 80%;
+            overflow-y: auto;
+        }
+        .month-nav {
+            display: flex;
+            justify-content: space-between;
+            margin: 10px 0;
+            font-size: 14px;
+            color: #666;
+        }
+        .month-highlight {
+            background: #e8f4f8;
+            border-left: 4px solid #17a2b8;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .duty-boundary {
+            background: linear-gradient(90deg, transparent 95%, #6f42c1 95%) !important;
+            position: relative;
+        }
+        .duty-boundary::after {
+            content: "🌐";
+            position: absolute;
+            right: 5px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 12px;
+            opacity: 0.7;
+        }
+        .duty-cycle-warnings {
+            background: #fff;
+            border-radius: 6px;
+            padding: 15px;
+            margin: 10px 0;
+            border: 1px solid #ffc107;
+        }
+        .boundary-warning-section {
+            padding-bottom: 15px;
+            border-bottom: 1px dashed #ffc107;
+        }
+        .incomplete-warning-section {
+            padding-top: 15px;
+        }
+        .duty-incomplete {
+            background: linear-gradient(90deg, transparent 95%, #ffc107 95%) !important;
+            position: relative;
+        }
+        .duty-incomplete::after {
+            content: "🔄";
+            position: absolute;
+            right: 5px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 12px;
+            opacity: 0.7;
+        }
+        .boundary-warnings {
+            background: #fff;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 10px 0;
+            border: 2px solid #ffc107;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .boundary-section {
+            padding: 15px;
+            margin-bottom: 15px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            border-left: 4px solid;
+        }
+        
+        .boundary-section h5 {
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .boundary-section ul {
+            margin: 8px 0;
+            padding-left: 20px;
+        }
+        
+        .boundary-section li {
+            margin-bottom: 4px;
+            font-size: 13px;
+        }
+        
+        .boundary-warning-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: bold;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+        }
+        
+        .boundary-warning-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        
+        .prev-month-btn {
+            background: linear-gradient(135deg, #17a2b8, #138496);
+            color: white;
+        }
+        
+        .next-month-btn {
+            background: linear-gradient(135deg, #28a745, #1e7e34);
+            color: white;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Flight Roster Parser with FTL Calculation & Auto-Save</h1>
+        
+        <!-- Multi-month tip -->
+        <div class="month-highlight">
+            <strong>💡 Duty Cycle Based Validation:</strong>
+            <p style="margin:5px 0; font-size:12px;">
+                <strong>New:</strong> The system now uses <strong>duty cycle validation</strong> instead of flight-based validation.
+                Multi-day flights like MH123/MH133/MH2 won't trigger false warnings when they properly span months.
+            </p>
+            <p style="margin:5px 0; font-size:11px; color:#666;">
+                <strong>How it works:</strong><br>
+                1. Groups flights into logical duty cycles (Duty Start → Duty End)<br>
+                2. Detects when duty cycles cross month boundaries<br>
+                3. Only warns when rosters are incomplete (missing months)<br>
+                4. 🌐 icon = Multi-month duty | 🔄 icon = Incomplete duty
+            </p>
+        </div>
         
         <!-- Auto-Save Controls Panel -->
         <div class="auto-save-panel">
@@ -367,20 +517,50 @@
             </div>
         </div>
         
-        <textarea id="rosterInput" placeholder="Paste your roster text here..."></textarea>
+        <textarea id="rosterInput" placeholder="Paste your roster text here... You can paste multiple months (e.g., December followed by January)"></textarea>
         <div>
             <button onclick="parseRoster()">Parse Roster</button>
             <button onclick="clearAll()" style="background: #6c757d;">Clear</button>
             <button onclick="testFTL()" style="background: #28a745;">Test FTL</button>
+            <button onclick="addNextMonthRoster()" style="background: #6f42c1;">📅 Add Next Month</button>
         </div>
+        
+        <div id="incompleteWarning" class="incomplete-warning" style="display: none;"></div>
+        
         <div id="results"></div>
         <div id="stats"></div>
+    </div>
+
+    <!-- Next Month Modal -->
+    <div id="nextMonthModal" class="month-modal" style="display: none;">
+        <div class="month-modal-content">
+            <h3 style="margin-top:0;">📅 Add Next Month's Roster</h3>
+            <p style="background:#fff3cd; padding:10px; border-radius:4px; margin:10px 0;">
+                <strong>Instructions:</strong><br>
+                1. Go to your roster page and copy the <strong>entire next month's roster</strong><br>
+                2. Paste it in the box below<br>
+                3. Click "Merge Rosters" - it will automatically link flights across months
+            </p>
+            <textarea id="nextMonthInput" 
+                      placeholder="Paste the COMPLETE next month roster here (e.g., if December is incomplete, paste entire January roster)..."
+                      style="width:100%; height:300px; margin:10px 0; font-family: monospace; font-size:12px; border:2px solid #17a2b8;"></textarea>
+            <div style="display:flex; gap:10px; justify-content:flex-end; margin-top:15px;">
+                <button onclick="mergeNextMonthRoster()" 
+                        style="background:#28a745; color:white; border:none; padding:10px 20px; border-radius:4px; cursor:pointer; font-weight:bold;">
+                    ✓ Merge Rosters & Re-calculate
+                </button>
+                <button onclick="closeMonthModal()" 
+                        style="background:#6c757d; color:white; border:none; padding:10px 20px; border-radius:4px; cursor:pointer;">
+                    ✕ Cancel
+                </button>
+            </div>
+        </div>
     </div>
 
     <script>
         // ============ GLOBAL CONSTANTS AND VARIABLES ============
         const CREW_BASE = 'KUL';
-        const AUTO_SAVE_KEY = 'flightRosterData_v4';
+        const AUTO_SAVE_KEY = 'flightRosterData_v8';
         const STATION_CACHE_KEY = 'userStationsCache';
         const AUTO_SAVE_SETTING_KEY = 'autoSaveEnabled';
         
@@ -405,29 +585,759 @@
         let autoSaveEnabled = true;
         let saveDebounceTimer = null;
         
+        // ============ DUTY CYCLE VALIDATION SYSTEM ============
+        
+        class DutyCycleValidator {
+            constructor() {
+                this.dutyCycles = [];
+                this.currentMonths = new Set();
+                this.boundaryWarnings = [];
+                this.incompleteFlights = [];
+            }
+            
+            // Main validation function
+            validateRoster(flights, crewBase) {
+                console.log('Starting duty cycle validation...');
+                
+                // Clear previous data
+                this.dutyCycles = [];
+                this.currentMonths.clear();
+                this.boundaryWarnings = [];
+                this.incompleteFlights = [];
+                
+                // Extract months from flights
+                this.extractMonthsFromFlights(flights);
+                
+                // Group flights into duty cycles
+                this.groupFlightsIntoDutyCycles(flights, crewBase);
+                
+                // Check for boundary-crossing duty cycles
+                this.checkBoundaryCrossingDuties();
+                
+                // Check for truly incomplete flights (within loaded months)
+                this.checkIncompleteFlightsWithinMonths(flights);
+                
+                console.log('Duty cycle validation complete:', {
+                    dutyCycles: this.dutyCycles.length,
+                    months: Array.from(this.currentMonths),
+                    boundaryWarnings: this.boundaryWarnings.length,
+                    incompleteFlights: this.incompleteFlights.length
+                });
+                
+                return {
+                    dutyCycles: this.dutyCycles,
+                    months: Array.from(this.currentMonths),
+                    boundaryWarnings: this.boundaryWarnings,
+                    incompleteFlights: this.incompleteFlights,
+                    hasBoundaryIssues: this.boundaryWarnings.length > 0,
+                    hasIncompleteData: this.incompleteFlights.length > 0
+                };
+            }
+            
+            extractMonthsFromFlights(flights) {
+                flights.forEach(flight => {
+                    if (flight.date) {
+                        const monthYear = this.extractMonthYear(flight.date);
+                        if (monthYear) {
+                            this.currentMonths.add(monthYear);
+                        }
+                    }
+                });
+            }
+            
+            extractMonthYear(dateStr) {
+                // Extract month-year from date string like "31-DEC-2024"
+                const parts = dateStr.split('-');
+                if (parts.length === 3) {
+                    return `${parts[1]}-${parts[2]}`; // e.g., "DEC-2024"
+                }
+                return null;
+            }
+            
+            parseDateToMonthIndex(dateStr) {
+                // Convert date string to month index (0-11) and year
+                const parts = dateStr.split('-');
+                if (parts.length !== 3) return null;
+                
+                const monthNames = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 
+                                  'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+                const monthIndex = monthNames.indexOf(parts[1].toUpperCase());
+                const year = parseInt(parts[2]);
+                
+                if (monthIndex === -1 || isNaN(year)) return null;
+                
+                return { monthIndex, year };
+            }
+            
+            groupFlightsIntoDutyCycles(flights, crewBase) {
+                let currentDuty = null;
+                let dutyFlights = [];
+                
+                for (let i = 0; i < flights.length; i++) {
+                    const flight = flights[i];
+                    
+                    // Skip arrival-only rows for duty cycle grouping
+                    if (flight.isArrivalOnlyRow && !flight.flight) {
+                        // This is an arrival-only row, add to current duty if exists
+                        if (currentDuty && flight.linkedDepartureFlight) {
+                            dutyFlights.push(flight);
+                        }
+                        continue;
+                    }
+                    
+                    // Start new duty cycle when we find a duty start
+                    if (flight.dutyStart && flight.dutyStart.trim() !== '' && 
+                        !flight.isArrivalDayEntry && !flight.isArrivalOnlyRow) {
+                        
+                        // If we have a current duty, complete it first
+                        if (currentDuty && dutyFlights.length > 0) {
+                            this.completeDutyCycle(currentDuty, dutyFlights, flights, i-1);
+                        }
+                        
+                        // Start new duty
+                        currentDuty = {
+                            id: `duty_${Date.now()}_${i}`,
+                            startDate: flight.date,
+                            startTime: flight.dutyStart,
+                            startFlight: flight.flight,
+                            startFlightIndex: i,
+                            endDate: null,
+                            endTime: null,
+                            endFlight: null,
+                            endFlightIndex: null,
+                            flights: [],
+                            spansMonths: false,
+                            requiresMonths: new Set(),
+                            isComplete: false,
+                            departureBase: flight.departureAirport,
+                            arrivalBase: null,
+                            isMultiDay: false
+                        };
+                        
+                        dutyFlights = [flight];
+                        console.log(`Duty cycle started: ${flight.date} ${flight.flight} at ${flight.dutyStart}`);
+                    }
+                    // Add flight to current duty (if we're in a duty cycle)
+                    else if (currentDuty && flight.flight && flight.flight.trim() !== '' && 
+                             !flight.isArrivalDayEntry && !flight.isArrivalOnlyRow) {
+                        dutyFlights.push(flight);
+                    }
+                    
+                    // End duty cycle when we find duty end (but not on arrival-only rows)
+                    if (flight.dutyEnd && flight.dutyEnd.trim() !== '' && currentDuty && 
+                        !flight.isArrivalOnlyRow) {
+                        
+                        // Add this flight if not already added
+                        if (!dutyFlights.includes(flight) && flight.flight && flight.flight.trim() !== '') {
+                            dutyFlights.push(flight);
+                        }
+                        
+                        this.completeDutyCycle(currentDuty, dutyFlights, flights, i);
+                        currentDuty = null;
+                        dutyFlights = [];
+                    }
+                    
+                    // Also handle arrival day entries that mark the end of a multi-day flight
+                    if (flight.isArrivalDayEntry && flight.dutyEnd && currentDuty && 
+                        flight.linkedDepartureFlight) {
+                        
+                        // Find the linked departure flight in the duty
+                        const linkedFlightIndex = dutyFlights.findIndex(f => 
+                            f === flight.linkedDepartureFlight || 
+                            f.flight === flight.linkedDepartureFlight.flight
+                        );
+                        
+                        if (linkedFlightIndex !== -1) {
+                            // Update the linked flight with duty end info
+                            dutyFlights[linkedFlightIndex].dutyEnd = flight.dutyEnd;
+                            dutyFlights[linkedFlightIndex].dutyCycleComplete = true;
+                            
+                            // Add arrival day entry to duty
+                            dutyFlights.push(flight);
+                            
+                            this.completeDutyCycle(currentDuty, dutyFlights, flights, i);
+                            currentDuty = null;
+                            dutyFlights = [];
+                        }
+                    }
+                }
+                
+                // Handle any remaining duty cycle at the end
+                if (currentDuty && dutyFlights.length > 0) {
+                    this.completeDutyCycle(currentDuty, dutyFlights, flights, flights.length - 1);
+                }
+            }
+            
+            completeDutyCycle(duty, dutyFlights, allFlights, endIndex) {
+                if (dutyFlights.length === 0) return;
+                
+                // Get the last flight with duty end or arrival info
+                let endFlight = dutyFlights[dutyFlights.length - 1];
+                let endDate = endFlight.date;
+                let endTime = endFlight.dutyEnd || '';
+                
+                // If last flight doesn't have duty end but has arrival, use that
+                if (!endTime && endFlight.arrival && endFlight.arrival.includes(' ')) {
+                    const arrivalTime = endFlight.arrival.split(' ')[1];
+                    endTime = arrivalTime;
+                }
+                
+                // Look for any flight in the duty with duty end
+                for (let i = dutyFlights.length - 1; i >= 0; i--) {
+                    const flight = dutyFlights[i];
+                    if (flight.dutyEnd && flight.dutyEnd.trim() !== '') {
+                        endFlight = flight;
+                        endDate = flight.date;
+                        endTime = flight.dutyEnd;
+                        break;
+                    }
+                }
+                
+                // Update duty info
+                duty.endDate = endDate;
+                duty.endTime = endTime;
+                duty.endFlight = endFlight.flight;
+                duty.endFlightIndex = allFlights.indexOf(endFlight);
+                duty.flights = [...dutyFlights];
+                duty.arrivalBase = endFlight.arrivalAirport || endFlight.departureAirport;
+                
+                // Check if duty spans multiple days
+                const startDateInfo = this.parseDateToMonthIndex(duty.startDate);
+                const endDateInfo = this.parseDateToMonthIndex(duty.endDate);
+                
+                if (startDateInfo && endDateInfo) {
+                    // Check if different calendar dates
+                    duty.isMultiDay = (duty.startDate !== duty.endDate);
+                    
+                    // Check if spans different months
+                    duty.spansMonths = (
+                        startDateInfo.year !== endDateInfo.year ||
+                        startDateInfo.monthIndex !== endDateInfo.monthIndex
+                    );
+                    
+                    if (duty.spansMonths) {
+                        // Add both months to required months
+                        duty.requiresMonths.add(this.extractMonthYear(duty.startDate));
+                        duty.requiresMonths.add(this.extractMonthYear(duty.endDate));
+                    }
+                }
+                
+                // Check if duty is complete (has both start and end)
+                duty.isComplete = !!(duty.startDate && duty.endDate && duty.startTime && duty.endTime);
+                
+                this.dutyCycles.push(duty);
+                
+                console.log(`Duty cycle completed: ${duty.startDate} ${duty.startFlight} to ${duty.endDate} ${duty.endFlight}`, {
+                    spansMonths: duty.spansMonths,
+                    isMultiDay: duty.isMultiDay,
+                    isComplete: duty.isComplete
+                });
+            }
+            
+            checkBoundaryCrossingDuties() {
+                this.boundaryWarnings = [];
+                
+                for (const duty of this.dutyCycles) {
+                    if (!duty.isComplete) continue;
+                    
+                    const startMonthYear = this.extractMonthYear(duty.startDate);
+                    const endMonthYear = this.extractMonthYear(duty.endDate);
+                    
+                    if (!startMonthYear || !endMonthYear) continue;
+                    
+                    // Check if duty spans months
+                    if (duty.spansMonths) {
+                        // Check if we have all required months loaded
+                        const missingMonths = [];
+                        
+                        for (const requiredMonth of duty.requiresMonths) {
+                            if (!this.currentMonths.has(requiredMonth)) {
+                                missingMonths.push(requiredMonth);
+                            }
+                        }
+                        
+                        if (missingMonths.length > 0) {
+                            // Determine if we need next or previous month
+                            const startDateInfo = this.parseDateToMonthIndex(duty.startDate);
+                            const endDateInfo = this.parseDateToMonthIndex(duty.endDate);
+                            
+                            let warningType = 'unknown';
+                            let missingMonthType = '';
+                            
+                            if (startDateInfo && endDateInfo) {
+                                // Compare dates to determine direction
+                                const startDate = new Date(startDateInfo.year, startDateInfo.monthIndex, 1);
+                                const endDate = new Date(endDateInfo.year, endDateInfo.monthIndex, 1);
+                                
+                                if (endDate > startDate) {
+                                    warningType = 'forward';
+                                    missingMonthType = 'next';
+                                } else {
+                                    warningType = 'backward';
+                                    missingMonthType = 'previous';
+                                }
+                            }
+                            
+                            this.boundaryWarnings.push({
+                                duty: duty,
+                                missingMonths: missingMonths,
+                                warningType: warningType,
+                                missingMonthType: missingMonthType,
+                                message: `Duty ${duty.startFlight} on ${duty.startDate} continues to ${duty.endDate}`
+                            });
+                        }
+                    }
+                }
+            }
+            
+            checkIncompleteFlightsWithinMonths(flights) {
+                this.incompleteFlights = [];
+                
+                for (const flight of flights) {
+                    // Skip day offs, arrival entries, and flights without flight numbers
+                    if (flight.type === 'D' || flight.isArrivalDayEntry || 
+                        !flight.flight || flight.flight.trim() === '') {
+                        continue;
+                    }
+                    
+                    // Skip if already part of a complete duty cycle
+                    const isInCompleteDuty = this.dutyCycles.some(duty => 
+                        duty.isComplete && duty.flights.includes(flight)
+                    );
+                    
+                    if (isInCompleteDuty) continue;
+                    
+                    // Check if flight has departure but no arrival within same loaded month
+                    const hasDeparture = flight.departure && flight.departure.trim() !== '';
+                    const hasArrival = flight.arrival && flight.arrival.trim() !== '';
+                    const flightMonth = this.extractMonthYear(flight.date);
+                    
+                    if (hasDeparture && !hasArrival && flightMonth && this.currentMonths.has(flightMonth)) {
+                        // This flight is within loaded month but missing arrival
+                        this.incompleteFlights.push({
+                            flight: flight,
+                            reason: 'missing_arrival_within_month',
+                            month: flightMonth
+                        });
+                    }
+                }
+            }
+            
+            getFormattedWarnings() {
+                if (this.boundaryWarnings.length === 0 && this.incompleteFlights.length === 0) {
+                    return null;
+                }
+                
+                let html = '<div class="duty-cycle-warnings">';
+                
+                // Boundary crossing warnings
+                if (this.boundaryWarnings.length > 0) {
+                    html += '<div class="boundary-warning-section">';
+                    html += '<h4 style="margin-top:0; color:#856404;">';
+                    html += '📅 Duty Cycle Boundary Alert';
+                    html += '</h4>';
+                    html += `<p>${this.boundaryWarnings.length} duty cycle(s) extend beyond loaded months:</p>`;
+                    html += '<ul style="margin:10px 0; padding-left:20px;">';
+                    
+                    for (const warning of this.boundaryWarnings) {
+                        const duty = warning.duty;
+                        html += '<li style="margin-bottom:8px;">';
+                        html += `<strong>${duty.startFlight}</strong> on ${duty.startDate} ${duty.startTime}`;
+                        html += ` → ${duty.endDate} ${duty.endTime || '(no end time)'}`;
+                        html += `<br><small>Requires ${warning.missingMonthType} month roster`;
+                        if (warning.missingMonths.length > 0) {
+                            html += `: ${warning.missingMonths.join(', ')}`;
+                        }
+                        html += '</small>';
+                        html += '</li>';
+                    }
+                    
+                    html += '</ul>';
+                    html += '</div>';
+                }
+                
+                // Incomplete flight warnings (within loaded months)
+                if (this.incompleteFlights.length > 0) {
+                    html += '<div class="incomplete-warning-section" style="margin-top:15px; padding-top:15px; border-top:1px solid #ddd;">';
+                    html += '<h5 style="color:#dc3545; margin-top:0;">';
+                    html += '⚠️ Incomplete Flight Data';
+                    html += '</h5>';
+                    html += `<p>${this.incompleteFlights.length} flight(s) missing arrival data within loaded months:</p>`;
+                    html += '<ul style="margin:10px 0; padding-left:20px;">';
+                    
+                    for (const incomplete of this.incompleteFlights) {
+                        const flight = incomplete.flight;
+                        html += `<li><strong>${flight.date} ${flight.flight}:</strong> ${flight.departure} → ?</li>`;
+                    }
+                    
+                    html += '</ul>';
+                    html += '<p style="color:#666; font-size:12px;">';
+                    html += '<em>These flights are within loaded months but missing arrival times.</em>';
+                    html += '</p>';
+                    html += '</div>';
+                }
+                
+                html += '</div>';
+                
+                return html;
+            }
+        }
+        
+        // ============ MONTH BOUNDARY DETECTION SYSTEM ============
+        
+        class MonthBoundaryDetector {
+            constructor() {
+                this.dateTracker = new Map(); // Tracks all dates that exist in source
+                this.dayOffDates = new Set(); // Tracks dates that are day offs
+                this.datesWithData = new Set(); // Tracks dates with any flight data
+            }
+
+            // Track a date that exists in the source roster
+            trackDate(dateStr, isDayOff = false) {
+                this.dateTracker.set(dateStr, {
+                    existsInSource: true,
+                    isDayOff: isDayOff,
+                    hasParsedData: false,
+                    date: this.parseDateString(dateStr)
+                });
+            }
+
+            // Mark a date as having successfully parsed data
+            markDateAsParsed(dateStr) {
+                if (this.dateTracker.has(dateStr)) {
+                    const info = this.dateTracker.get(dateStr);
+                    info.hasParsedData = true;
+                } else {
+                    this.trackDate(dateStr, false);
+                    this.dateTracker.get(dateStr).hasParsedData = true;
+                }
+                this.datesWithData.add(dateStr);
+            }
+
+            // Mark a date as day off
+            markDateAsDayOff(dateStr) {
+                this.trackDate(dateStr, true);
+                this.dayOffDates.add(dateStr);
+            }
+
+            // Parse date string to Date object for comparison
+            parseDateString(dateStr) {
+                const parts = dateStr.split('-');
+                if (parts.length !== 3) return null;
+                
+                const day = parseInt(parts[0]);
+                const monthNames = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 
+                                  'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+                const month = monthNames.indexOf(parts[1].toUpperCase());
+                const year = parseInt(parts[2]);
+                
+                if (month === -1 || isNaN(year)) return null;
+                return new Date(year, month, day);
+            }
+
+            // Find first duty start in the month
+            findFirstDutyStart(flights) {
+                for (const flight of flights) {
+                    if (flight.dutyStart && flight.dutyStart.trim() !== '' && 
+                        !flight.isArrivalDayEntry && !flight.isArrivalOnlyRow) {
+                        return {
+                            date: flight.date,
+                            flight: flight.flight,
+                            time: flight.dutyStart,
+                            dateObj: this.parseDateString(flight.date)
+                        };
+                    }
+                }
+                return null;
+            }
+
+            // Find last duty end in the month
+            findLastDutyEnd(flights) {
+                for (let i = flights.length - 1; i >= 0; i--) {
+                    const flight = flights[i];
+                    if (flight.dutyEnd && flight.dutyEnd.trim() !== '' && 
+                        !flight.isArrivalOnlyRow) {
+                        return {
+                            date: flight.date,
+                            flight: flight.flight,
+                            time: flight.dutyEnd,
+                            dateObj: this.parseDateString(flight.date)
+                        };
+                    }
+                }
+                return null;
+            }
+
+            // Detect boundary issues
+            detectBoundaryIssues(flights) {
+                console.log('Starting month boundary detection...');
+                
+                const issues = {
+                    needsPreviousMonth: false,
+                    needsNextMonth: false,
+                    incompleteWithinMonth: [],
+                    suspiciousDates: {
+                        beforeFirstDutyStart: [],
+                        afterLastDutyEnd: []
+                    }
+                };
+
+                // Find first duty start and last duty end
+                const firstDutyStart = this.findFirstDutyStart(flights);
+                const lastDutyEnd = this.findLastDutyEnd(flights);
+
+                console.log('First duty start:', firstDutyStart);
+                console.log('Last duty end:', lastDutyEnd);
+                console.log('Date tracker size:', this.dateTracker.size);
+                console.log('Dates with data:', Array.from(this.datesWithData));
+                console.log('Day off dates:', Array.from(this.dayOffDates));
+
+                // Check for dates before first duty start
+                if (firstDutyStart && firstDutyStart.dateObj) {
+                    for (const [dateStr, info] of this.dateTracker.entries()) {
+                        const currentDate = info.date;
+                        if (currentDate && currentDate < firstDutyStart.dateObj) {
+                            // Date exists in source and is before first duty start
+                            if (!info.isDayOff && (info.hasParsedData || this.datesWithData.has(dateStr))) {
+                                issues.needsPreviousMonth = true;
+                                issues.suspiciousDates.beforeFirstDutyStart.push({
+                                    date: dateStr,
+                                    reason: 'Data exists before first duty start',
+                                    isDayOff: info.isDayOff,
+                                    hasParsedData: info.hasParsedData
+                                });
+                                console.log(`Suspicious date before first duty start: ${dateStr}`, info);
+                            }
+                        }
+                    }
+                }
+
+                // Check for dates after last duty end
+                if (lastDutyEnd && lastDutyEnd.dateObj) {
+                    for (const [dateStr, info] of this.dateTracker.entries()) {
+                        const currentDate = info.date;
+                        if (currentDate && currentDate > lastDutyEnd.dateObj) {
+                            // Date exists in source and is after last duty end
+                            if (!info.isDayOff && (info.hasParsedData || this.datesWithData.has(dateStr))) {
+                                issues.needsNextMonth = true;
+                                issues.suspiciousDates.afterLastDutyEnd.push({
+                                    date: dateStr,
+                                    reason: 'Data exists after last duty end',
+                                    isDayOff: info.isDayOff,
+                                    hasParsedData: info.hasParsedData
+                                });
+                                console.log(`Suspicious date after last duty end: ${dateStr}`, info);
+                            }
+                        }
+                    }
+                }
+
+                // Check for incomplete flights within the month
+                if (firstDutyStart && lastDutyEnd) {
+                    for (const flight of flights) {
+                        const flightDate = this.parseDateString(flight.date);
+                        if (flightDate && flightDate >= firstDutyStart.dateObj && 
+                            flightDate <= lastDutyEnd.dateObj) {
+                            
+                            // Skip day offs and arrival-only rows
+                            if (flight.type === 'D' || flight.isArrivalDayEntry || 
+                                flight.isArrivalOnlyRow || !flight.flight) {
+                                continue;
+                            }
+                            
+                            // Check if flight has departure but no arrival
+                            const hasDeparture = flight.departure && flight.departure.trim() !== '';
+                            const hasArrival = flight.arrival && flight.arrival.trim() !== '';
+                            
+                            if (hasDeparture && !hasArrival) {
+                                issues.incompleteWithinMonth.push({
+                                    flight: flight,
+                                    reason: 'Missing arrival within month'
+                                });
+                            }
+                        }
+                    }
+                }
+
+                console.log('Boundary detection results:', issues);
+                return issues;
+            }
+
+            // Get formatted warning message
+            getFormattedWarning(issues, currentMonth) {
+                if (!issues.needsPreviousMonth && !issues.needsNextMonth && 
+                    issues.incompleteWithinMonth.length === 0) {
+                    return null;
+                }
+
+                let html = '<div class="boundary-warnings">';
+                html += '<h4 style="margin-top:0; color:#856404;">📅 Roster Boundary Analysis</h4>';
+
+                // Previous month warning
+                if (issues.needsPreviousMonth) {
+                    html += '<div class="boundary-section" style="margin-bottom:15px; padding-bottom:15px; border-bottom:1px dashed #ffc107;">';
+                    html += '<h5 style="color:#17a2b8; margin-top:0;">';
+                    html += '🔄 Backward-Extending Duty Cycles';
+                    html += '</h5>';
+                    
+                    const monthNames = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 
+                                      'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+                    const currentDate = new Date();
+                    let prevMonth = '';
+                    let prevYear = '';
+                    
+                    // Extract current month and year from first date
+                    const firstDate = Array.from(this.dateTracker.keys())[0];
+                    if (firstDate) {
+                        const parts = firstDate.split('-');
+                        const monthIndex = monthNames.indexOf(parts[1]);
+                        const year = parseInt(parts[2]);
+                        
+                        // Calculate previous month
+                        let prevMonthIndex = monthIndex - 1;
+                        let prevYearNum = year;
+                        if (prevMonthIndex < 0) {
+                            prevMonthIndex = 11;
+                            prevYearNum = year - 1;
+                        }
+                        prevMonth = monthNames[prevMonthIndex];
+                        prevYear = prevYearNum;
+                    } else {
+                        prevMonth = 'DEC';
+                        prevYear = '2025'; // Default assumption for January
+                    }
+                    
+                    html += `<p><strong>Duty cycles appear to start in ${prevMonth}-${prevYear}.</strong></p>`;
+                    
+                    if (issues.suspiciousDates.beforeFirstDutyStart.length > 0) {
+                        html += '<p>The following dates have data but no duty start:</p>';
+                        html += '<ul style="margin:10px 0; padding-left:20px;">';
+                        issues.suspiciousDates.beforeFirstDutyStart.forEach(item => {
+                            html += `<li><strong>${item.date}</strong>`;
+                            if (item.hasParsedData) {
+                                html += ' (has parsed flight data)';
+                            } else {
+                                html += ' (has unparsed data)';
+                            }
+                            html += '</li>';
+                        });
+                        html += '</ul>';
+                    }
+                    
+                    html += '<p style="color:#666; font-size:12px;">';
+                    html += '<em>These entries appear to be completing duty cycles that started in the previous month.</em>';
+                    html += '</p>';
+                    html += '</div>';
+                }
+
+                // Next month warning
+                if (issues.needsNextMonth) {
+                    html += '<div class="boundary-section" style="margin-bottom:15px; padding-bottom:15px; border-bottom:1px dashed #ffc107;">';
+                    html += '<h5 style="color:#28a745; margin-top:0;">';
+                    html += '📅 Forward-Extending Duty Cycles';
+                    html += '</h5>';
+                    
+                    const monthNames = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 
+                                      'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+                    const firstDate = Array.from(this.dateTracker.keys())[0];
+                    let nextMonth = '';
+                    let nextYear = '';
+                    
+                    if (firstDate) {
+                        const parts = firstDate.split('-');
+                        const monthIndex = monthNames.indexOf(parts[1]);
+                        const year = parseInt(parts[2]);
+                        
+                        // Calculate next month
+                        let nextMonthIndex = monthIndex + 1;
+                        let nextYearNum = year;
+                        if (nextMonthIndex > 11) {
+                            nextMonthIndex = 0;
+                            nextYearNum = year + 1;
+                        }
+                        nextMonth = monthNames[nextMonthIndex];
+                        nextYear = nextYearNum;
+                    } else {
+                        nextMonth = 'FEB';
+                        nextYear = '2026'; // Default assumption for January
+                    }
+                    
+                    html += `<p><strong>Duty cycles extend into ${nextMonth}-${nextYear}.</strong></p>`;
+                    
+                    if (issues.suspiciousDates.afterLastDutyEnd.length > 0) {
+                        html += '<p>The following dates have incomplete duties:</p>';
+                        html += '<ul style="margin:10px 0; padding-left:20px;">';
+                        issues.suspiciousDates.afterLastDutyEnd.forEach(item => {
+                            html += `<li><strong>${item.date}</strong>`;
+                            if (item.hasParsedData) {
+                                html += ' (has parsed flight data)';
+                            } else {
+                                html += ' (has unparsed data)';
+                            }
+                            html += '</li>';
+                        });
+                        html += '</ul>';
+                    }
+                    
+                    html += '<p style="color:#666; font-size:12px;">';
+                    html += '<em>These duties continue into the next month and require the next roster for complete analysis.</em>';
+                    html += '</p>';
+                    html += '</div>';
+                }
+
+                // Incomplete within month warning
+                if (issues.incompleteWithinMonth.length > 0) {
+                    html += '<div class="boundary-section">';
+                    html += '<h5 style="color:#dc3545; margin-top:0;">';
+                    html += '⚠️ Data Quality Issues Within Month';
+                    html += '</h5>';
+                    html += `<p>${issues.incompleteWithinMonth.length} flight(s) missing arrival data within loaded month:</p>`;
+                    html += '<ul style="margin:10px 0; padding-left:20px;">';
+                    issues.incompleteWithinMonth.forEach(item => {
+                        const flight = item.flight;
+                        html += `<li><strong>${flight.date} ${flight.flight}:</strong> ${flight.departure} → ?</li>`;
+                    });
+                    html += '</ul>';
+                    html += '<p style="color:#666; font-size:12px;">';
+                    html += '<em>These flights are within the loaded month but have incomplete data.</em>';
+                    html += '</p>';
+                    html += '</div>';
+                }
+
+                html += '</div>';
+                return html;
+            }
+
+            // Clear all tracked data
+            clear() {
+                this.dateTracker.clear();
+                this.dayOffDates.clear();
+                this.datesWithData.clear();
+            }
+        }
+        
+        // Global instances
+        const dutyCycleValidator = new DutyCycleValidator();
+        const monthBoundaryDetector = new MonthBoundaryDetector();
+        
         // ============ AUTO-SAVE FUNCTIONS ============
         
-        // Initialize auto-save on page load
         function initializeAutoSave() {
             try {
-                // Load auto-save setting
                 const savedToggle = localStorage.getItem(AUTO_SAVE_SETTING_KEY);
                 autoSaveEnabled = savedToggle !== null ? JSON.parse(savedToggle) : true;
                 document.getElementById('autoSaveToggle').checked = autoSaveEnabled;
                 
-                // Set up auto-save toggle event
                 document.getElementById('autoSaveToggle').addEventListener('change', function() {
                     autoSaveEnabled = this.checked;
                     localStorage.setItem(AUTO_SAVE_SETTING_KEY, JSON.stringify(autoSaveEnabled));
                     updateSaveStatus('Auto-save ' + (autoSaveEnabled ? 'enabled' : 'disabled'), 'success');
                 });
                 
-                // Set up textarea auto-save
                 document.getElementById('rosterInput').addEventListener('input', function() {
                     triggerAutoSave('roster-input');
                 });
                 
-                // Load any saved data
                 setTimeout(() => {
                     loadSavedData();
                 }, 500);
@@ -438,7 +1348,6 @@
             }
         }
         
-        // Trigger auto-save with debounce
         function triggerAutoSave(source = 'manual') {
             if (!autoSaveEnabled && source !== 'manual') return;
             
@@ -451,14 +1360,13 @@
             }, source === 'roster-input' ? 1000 : 100);
         }
         
-        // Save all data to localStorage
         function saveData(source = 'manual') {
             if (!autoSaveEnabled && source !== 'manual') return;
             
             try {
                 const saveData = {
                     timestamp: new Date().toISOString(),
-                    version: '4.0',
+                    version: '8.0',
                     data: {
                         rosterText: document.getElementById('rosterInput').value,
                         crewType: document.getElementById('crewTypeSelect').value,
@@ -487,7 +1395,6 @@
             }
         }
         
-        // Load saved data from localStorage
         function loadSavedData() {
             try {
                 const saved = localStorage.getItem(AUTO_SAVE_KEY);
@@ -549,7 +1456,6 @@
             }
         }
         
-        // Clear all saved data
         function clearAllSavedData() {
             if (confirm('Are you sure you want to clear ALL saved data? This cannot be undone.')) {
                 localStorage.removeItem(AUTO_SAVE_KEY);
@@ -569,6 +1475,8 @@
                 
                 document.getElementById('results').innerHTML = '';
                 document.getElementById('stats').innerHTML = '';
+                document.getElementById('incompleteWarning').style.display = 'none';
+                document.getElementById('incompleteWarning').innerHTML = '';
                 
                 stopLiveTimer();
                 
@@ -576,12 +1484,11 @@
             }
         }
         
-        // Export data to JSON file
         function exportData() {
             try {
                 const exportObj = {
                     timestamp: new Date().toISOString(),
-                    version: '4.0',
+                    version: '8.0',
                     roster: document.getElementById('rosterInput').value,
                     ftlSettings: currentFtlSettings,
                     flights: allFlights,
@@ -607,12 +1514,10 @@
             }
         }
         
-        // Import data from JSON file
         function importData() {
             document.getElementById('fileImport').click();
         }
         
-        // Handle file import
         function handleFileImport(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -669,7 +1574,6 @@
             event.target.value = '';
         }
         
-        // Update save status display
         function updateSaveStatus(message, type = 'info') {
             const statusElement = document.getElementById('saveStatus');
             if (!statusElement) return;
@@ -690,16 +1594,14 @@
             }
         }
         
-        // Save before page unload (backup)
         window.addEventListener('beforeunload', function() {
             if (autoSaveEnabled && document.getElementById('rosterInput').value.trim()) {
                 saveData('page-unload');
             }
         });
         
-        // ============ FTL CONFIGURATION ============
+        // ============ INITIALIZATION ============
         
-        // Initialize user stations cache from sessionStorage
         function initializeUserStationsCache() {
             try {
                 const cached = sessionStorage.getItem(STATION_CACHE_KEY);
@@ -713,7 +1615,6 @@
             }
         }
         
-        // Save user stations cache to sessionStorage
         function saveUserStationsCache() {
             try {
                 sessionStorage.setItem(STATION_CACHE_KEY, JSON.stringify(userStationsCache));
@@ -722,7 +1623,6 @@
             }
         }
         
-        // Function to load configuration with better error handling
         async function loadFtlConfiguration() {
             try {
                 updateFtlStatus('Loading configuration files...', 'loading');
@@ -791,7 +1691,6 @@
             }
         }
         
-        // Create fallback configuration if files can't be loaded
         function createFallbackConfiguration() {
             ftlConfig.aircraftGroups = {
                 "737": "Narrowbody",
@@ -837,7 +1736,6 @@
             ftlDataLoaded = true;
         }
         
-        // Update FTL status display
         function updateFtlStatus(message, type = 'info') {
             const statusElement = document.getElementById('ftl-status-text');
             statusElement.textContent = message;
@@ -859,709 +1757,8 @@
             }
         }
         
-        // ============ TIMEZONE HANDLING FUNCTIONS ============
+        // ============ UPDATED PARSER FUNCTIONS ============
         
-        // Parse month abbreviation to number (0-11)
-        function parseMonth(monthStr) {
-            const months = {
-                'JAN': 0, 'FEB': 1, 'MAR': 2, 'APR': 3, 'MAY': 4, 'JUN': 5,
-                'JUL': 6, 'AUG': 7, 'SEP': 8, 'OCT': 9, 'NOV': 10, 'DEC': 11
-            };
-            return months[monthStr.toUpperCase()] !== undefined ? months[monthStr.toUpperCase()] : 0;
-        }
-        
-        // Parse date string "DD-MMM-YYYY" to Date object
-        function parseDateString(dateStr) {
-            if (!dateStr) return null;
-            
-            const parts = dateStr.split('-');
-            if (parts.length !== 3) return null;
-            
-            const day = parseInt(parts[0]);
-            const month = parseMonth(parts[1]);
-            const year = parseInt(parts[2]);
-            
-            return new Date(year, month, day);
-        }
-        
-        // Parse time string "HH:MM" to hours and minutes
-        function parseTimeString(timeStr) {
-            if (!timeStr) return { hours: 0, minutes: 0 };
-            
-            const parts = timeStr.split(':');
-            if (parts.length !== 2) return { hours: 0, minutes: 0 };
-            
-            return {
-                hours: parseInt(parts[0]),
-                minutes: parseInt(parts[1])
-            };
-        }
-        
-        // Check if a date is within DST period
-        function isDateInDstPeriod(date, dstPeriod) {
-            if (!dstPeriod || !dstPeriod.observed) return false;
-            
-            const month = date.getMonth() + 1;
-            const period = dstPeriod.period || '';
-            
-            if (period.includes('-')) {
-                const [startMonthStr, endMonthStr] = period.split('-');
-                const startMonth = parseMonth(startMonthStr) + 1;
-                const endMonth = parseMonth(endMonthStr) + 1;
-                
-                if (startMonth > endMonth) {
-                    return month >= startMonth || month <= endMonth;
-                } else {
-                    return month >= startMonth && month <= endMonth;
-                }
-            }
-            
-            return false;
-        }
-        
-        // ============ CHANGE 1: Fixed getStationOffset() function ============
-        function getStationOffset(stationCode, date) {
-            // First check user cache
-            if (userStationsCache[stationCode]) {
-                return parseFloat(userStationsCache[stationCode]);
-            }
-            
-            // Then check if FTL data is loaded and station exists
-            if (ftlDataLoaded && ftlConfig.stations && ftlConfig.stations[stationCode]) {
-                const station = ftlConfig.stations[stationCode];
-                
-                if (station.dst && isDateInDstPeriod(date, station.dst)) {
-                    return station.dst.gmtOffset;
-                }
-                
-                return station.gmtOffset;
-            }
-            
-            // If FTL data not loaded yet, return null to signal waiting
-            if (!ftlDataLoaded) {
-                console.warn(`Station ${stationCode} requested but FTL data not loaded yet`);
-                return null;
-            }
-            
-            // Station not found in database - prompt user
-            const offsetStr = prompt(`Station ${stationCode} not found in database.\nPlease enter GMT offset (e.g., +8, -5.5, 0):`, '+0');
-            
-            if (offsetStr !== null) {
-                let offset = 0;
-                try {
-                    offset = parseFloat(offsetStr.replace('+', ''));
-                    if (isNaN(offset)) offset = 0;
-                } catch (e) {
-                    offset = 0;
-                }
-                
-                userStationsCache[stationCode] = offset;
-                saveUserStationsCache();
-                triggerAutoSave('station-cache');
-                
-                return offset;
-            }
-            return 0;
-        }
-        
-        // ============ FTL CALCULATION FUNCTIONS ============
-        
-        // Get time band from local time (HH:MM format)
-        function getLocalStartTimeBand(localTimeStr) {
-            if (!localTimeStr || !localTimeStr.includes(':')) {
-                console.warn('Invalid time format:', localTimeStr);
-                return '0800-1259';
-            }
-            
-            const hour = parseInt(localTimeStr.split(':')[0]);
-            
-            if (hour >= 6 && hour < 8) return '0600-0759';
-            if (hour >= 8 && hour < 13) return '0800-1259';
-            if (hour >= 13 && hour < 18) return '1300-1759';
-            if (hour >= 18 && hour < 22) return '1800-2159';
-            return '2200-0559';
-        }
-        
-        // Get FTL limit in hours
-        function getFtlLimitHours(dutyStartTime, sectorCount, restHours = null) {
-            if (!dutyStartTime) {
-                console.warn('No duty start time provided');
-                return null;
-            }
-            
-            const { crewType, acclimatization } = currentFtlSettings;
-            const timeBand = getLocalStartTimeBand(dutyStartTime);
-            
-            console.log(`Getting FTL limit for:`, {
-                dutyStartTime,
-                sectorCount,
-                crewType,
-                acclimatization,
-                timeBand,
-                restHours
-            });
-            
-            let limitTable;
-            
-            if (acclimatization === 'acclimatized') {
-                if (!ftlConfig.limits?.acclimatized?.[crewType]?.[timeBand]) {
-                    console.warn('No acclimatized limit table found for:', crewType, timeBand);
-                    return null;
-                }
-                limitTable = ftlConfig.limits.acclimatized[crewType][timeBand];
-            } else {
-                let ruleKey = 'rest_period_leq18_or_geq30';
-                if (restHours !== null && restHours > 18 && restHours < 30) {
-                    ruleKey = 'rest_period_18_01_to_29_59';
-                }
-                
-                if (!ftlConfig.limits?.non_acclimatized?.[ruleKey]?.[crewType]) {
-                    console.warn('No non-acclimatized limit table found for:', ruleKey, crewType);
-                    return null;
-                }
-                
-                limitTable = ftlConfig.limits.non_acclimatized[ruleKey][crewType];
-                sectorCount = Math.min(sectorCount, 4);
-            }
-            
-            if (!limitTable || limitTable.length === 0) {
-                console.warn('Empty limit table');
-                return null;
-            }
-            
-            const sectorIndex = Math.min(sectorCount, limitTable.length) - 1;
-            const limitHours = limitTable[sectorIndex];
-            
-            console.log(`FTL Limit found: ${limitHours}h for ${sectorCount} sectors`);
-            
-            return limitHours;
-        }
-        
-        // Calculate latest arrival time
-        function calculateLatestArrival(dutyStartDateStr, dutyStartTimeStr, departureStation, arrivalStation, ftlLimitHours) {
-            console.log('Calculating latest arrival:', {
-                dutyStartDateStr,
-                dutyStartTimeStr,
-                departureStation,
-                arrivalStation,
-                ftlLimitHours
-            });
-            
-            if (!dutyStartDateStr || !dutyStartTimeStr || !departureStation || !arrivalStation || ftlLimitHours === null) {
-                console.warn('Invalid inputs for latest arrival calculation');
-                return 'N/A';
-            }
-            
-            try {
-                const dutyStartDate = parseDateString(dutyStartDateStr);
-                const dutyStartTime = parseTimeString(dutyStartTimeStr);
-                
-                if (!dutyStartDate) {
-                    console.warn('Invalid duty start date:', dutyStartDateStr);
-                    return 'N/A';
-                }
-                
-                dutyStartDate.setHours(dutyStartTime.hours, dutyStartTime.minutes, 0, 0);
-                
-                const departureOffset = getStationOffset(departureStation, dutyStartDate);
-                const arrivalOffset = getStationOffset(arrivalStation, dutyStartDate);
-                
-                console.log('Station offsets:', {
-                    departureStation,
-                    departureOffset,
-                    arrivalStation,
-                    arrivalOffset
-                });
-                
-                const dutyStartUTC = new Date(dutyStartDate.getTime() - (departureOffset * 60 * 60 * 1000));
-                
-                console.log('UTC conversion:', {
-                    dutyStartLocal: dutyStartDate.toISOString(),
-                    departureOffset,
-                    dutyStartUTC: dutyStartUTC.toISOString()
-                });
-                
-                const latestArrivalUTC = new Date(dutyStartUTC.getTime() + (ftlLimitHours * 60 * 60 * 1000));
-                
-                console.log('Added FTL limit:', {
-                    ftlLimitHours,
-                    latestArrivalUTC: latestArrivalUTC.toISOString()
-                });
-                
-                const latestArrivalLocal = new Date(latestArrivalUTC.getTime() + (arrivalOffset * 60 * 60 * 1000));
-                
-                console.log('Final conversion:', {
-                    arrivalOffset,
-                    latestArrivalLocal: latestArrivalLocal.toISOString()
-                });
-                
-                const hours = latestArrivalLocal.getHours().toString().padStart(2, '0');
-                const minutes = latestArrivalLocal.getMinutes().toString().padStart(2, '0');
-                
-                const result = `${hours}:${minutes}`;
-                console.log('Latest arrival result:', result);
-                
-                return result;
-                
-            } catch (error) {
-                console.error('Error calculating latest arrival:', error);
-                return 'N/A';
-            }
-        }
-        
-        // Calculate rest hours between duties
-        function calculateRestHours(previousDutyEndDate, previousDutyEndTime, currentDutyStartDate, currentDutyStartTime) {
-            if (!previousDutyEndDate || !previousDutyEndTime || !currentDutyStartDate || !currentDutyStartTime) {
-                return null;
-            }
-            
-            try {
-                const parseDate = (dateStr) => {
-                    const parts = dateStr.split('-');
-                    if (parts.length !== 3) return null;
-                    
-                    const day = parseInt(parts[0]);
-                    const monthStr = parts[1].toUpperCase();
-                    const year = parseInt(parts[2]);
-                    
-                    const monthMap = {
-                        'JAN': 0, 'FEB': 1, 'MAR': 2, 'APR': 3, 'MAY': 4, 'JUN': 5,
-                        'JUL': 6, 'AUG': 7, 'SEP': 8, 'OCT': 9, 'NOV': 10, 'DEC': 11
-                    };
-                    
-                    const month = monthMap[monthStr];
-                    if (month === undefined) return null;
-                    
-                    return new Date(year, month, day);
-                };
-                
-                const endDate = parseDate(previousDutyEndDate);
-                const startDate = parseDate(currentDutyStartDate);
-                
-                if (!endDate || !startDate) return null;
-                
-                const [endHour, endMin] = previousDutyEndTime.split(':').map(Number);
-                const [startHour, startMin] = currentDutyStartTime.split(':').map(Number);
-                
-                endDate.setHours(endHour, endMin, 0, 0);
-                startDate.setHours(startHour, startMin, 0, 0);
-                
-                const diffMs = startDate - endDate;
-                const diffHours = diffMs / (1000 * 60 * 60);
-                
-                return diffHours;
-            } catch (error) {
-                console.error('Error calculating rest hours:', error);
-                return null;
-            }
-        }
-        
-        // ============ TIME TO LIMIT FUNCTIONS (FIXED VERSION) ============
-        
-        // Start the live timer
-        function startLiveTimer() {
-            if (timerInterval) {
-                clearInterval(timerInterval);
-            }
-            
-            timerRunning = true;
-            updateTimerStatus();
-            
-            updateAllTimers();
-            
-            timerInterval = setInterval(updateAllTimers, 1000);
-            
-            console.log('Live timer started');
-        }
-        
-        // Stop the live timer
-        function stopLiveTimer() {
-            if (timerInterval) {
-                clearInterval(timerInterval);
-                timerInterval = null;
-            }
-            
-            timerRunning = false;
-            updateTimerStatus();
-            
-            console.log('Live timer stopped');
-        }
-        
-        // Toggle timer
-        function toggleTimer() {
-            if (timerRunning) {
-                stopLiveTimer();
-            } else {
-                startLiveTimer();
-            }
-            triggerAutoSave('timer-toggle');
-        }
-        
-        // Update timer status display
-        function updateTimerStatus() {
-            const statusElement = document.getElementById('timer-status-indicator');
-            if (statusElement) {
-                if (timerRunning) {
-                    statusElement.innerHTML = '<span class="timer-status timer-running">⏱️ Timer Running</span>';
-                } else {
-                    statusElement.innerHTML = '<span class="timer-status timer-stopped">⏸️ Timer Stopped</span>';
-                }
-            }
-        }
-        
-        // Update all timers on the page
-        function updateAllTimers() {
-    const timerCells = document.querySelectorAll('.time-to-limit-cell');
-    
-    timerCells.forEach(cell => {
-        const flightIndex = parseInt(cell.dataset.flightIndex);
-        if (isNaN(flightIndex) || !allFlights[flightIndex]) return;
-        
-        const flight = allFlights[flightIndex];
-        const timerData = calculateTimeToLimit(flight);
-        const arrivalStation = flight.ftlData.arrivalStation || flight.departureAirport;
-        const latestArrival = flight.ftlData.latestArrivalTime;
-        
-        const displayHtml = `${formatTimerDisplay(timerData)}<br><small style="font-size:9px;color:#666;">Target: ${latestArrival} ${arrivalStation}</small>`;
-        
-        cell.innerHTML = displayHtml;
-        cell.className = 'time-to-limit-cell ' + getTimerClass(timerData);
-    });
-}
-        
-        // Calculate time to limit - COMPLETELY REWRITTEN (bulletproof version)
-        function calculateTimeToLimit(flight) {
-            if (!flight.ftlData || !flight.dutyStart || !flight.date) {
-                return { status: 'no-data', display: '---' };
-            }
-            
-            try {
-                // Parse the latest arrival time string (HH:MM format in arrival station local time)
-                const latestArrivalTime = flight.ftlData.latestArrivalTime;
-                if (!latestArrivalTime || latestArrivalTime === 'N/A') {
-                    return { status: 'error', display: 'Error' };
-                }
-                
-                const [targetHour, targetMin] = latestArrivalTime.split(':').map(Number);
-                
-                // Parse duty start date (DD-MMM-YYYY format)
-                const dateParts = flight.date.split('-');
-                const day = parseInt(dateParts[0]);
-                const monthStr = dateParts[1].toUpperCase();
-                const year = parseInt(dateParts[2]);
-                
-                const monthMap = {
-                    'JAN': 0, 'FEB': 1, 'MAR': 2, 'APR': 3, 'MAY': 4, 'JUN': 5,
-                    'JUL': 6, 'AUG': 7, 'SEP': 8, 'OCT': 9, 'NOV': 10, 'DEC': 11
-                };
-                const month = monthMap[monthStr];
-                
-                // Get arrival station offset
-                const arrivalStation = flight.ftlData.arrivalStation || flight.departureAirport;
-                const arrivalOffset = getStationOffset(arrivalStation, new Date(year, month, day));
-                
-                // Create target date in arrival station local time
-                // Start with duty start date
-                let targetDay = day;
-                let targetMonth = month;
-                let targetYear = year;
-                
-                // Parse duty start time
-                const dutyStartTime = parseTimeString(flight.dutyStart);
-                
-                // Check if we need to add a day
-                // If target hour is less than duty start hour, OR if FTL > 12 hours, it's likely next day
-                const ftlLimitHours = flight.ftlData.limitHours;
-                const needsNextDay = (targetHour < dutyStartTime.hours) || 
-                                    (targetHour === dutyStartTime.hours && targetMin <= dutyStartTime.minutes) ||
-                                    (ftlLimitHours >= 10 && targetHour < dutyStartTime.hours + 12);
-                
-                if (needsNextDay) {
-                    // Add one day
-                    const tempDate = new Date(year, month, day + 1);
-                    targetDay = tempDate.getDate();
-                    targetMonth = tempDate.getMonth();
-                    targetYear = tempDate.getFullYear();
-                }
-                
-                // Create target time in UTC using Date.UTC (immune to device timezone)
-                const targetUTCms = Date.UTC(targetYear, targetMonth, targetDay, targetHour, targetMin, 0) 
-                                   - (arrivalOffset * 60 * 60 * 1000);
-                
-                // Get current time in UTC (immune to device timezone)
-                const now = new Date();
-                const nowUTCms = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(),
-                                         now.getUTCHours(), now.getUTCMinutes(), now.getUTCSeconds());
-                
-                // Calculate time difference in milliseconds
-                const diffMs = targetUTCms - nowUTCms;
-                
-                console.log(`Timer for ${flight.flight}:`, {
-                    dutyStartDate: flight.date,
-                    dutyStartTime: `${dutyStartTime.hours}:${dutyStartTime.minutes}`,
-                    latestArrival: latestArrivalTime,
-                    arrivalStation: arrivalStation,
-                    arrivalOffset: arrivalOffset,
-                    ftlLimitHours: ftlLimitHours,
-                    needsNextDay: needsNextDay,
-                    targetDate: `${targetYear}-${(targetMonth+1).toString().padStart(2,'0')}-${targetDay.toString().padStart(2,'0')} ${targetHour}:${targetMin}`,
-                    targetUTCms: new Date(targetUTCms).toISOString(),
-                    nowUTCms: new Date(nowUTCms).toISOString(),
-                    diffMs,
-                    diffHours: (diffMs / (1000 * 60 * 60)).toFixed(2)
-                });
-                
-                // Check if duty hasn't started yet - compare current time to duty start time
-                const dutyStartDateObj = new Date(year, month, day);
-                dutyStartDateObj.setHours(dutyStartTime.hours, dutyStartTime.minutes, 0, 0);
-                
-                // Get departure station offset to convert duty start to UTC
-                const departureStation = flight.departureAirport;
-                const departureOffset = getStationOffset(departureStation, dutyStartDateObj);
-                
-                const dutyStartUTCms = Date.UTC(year, month, day, dutyStartTime.hours, dutyStartTime.minutes, 0) 
-                                      - (departureOffset * 60 * 60 * 1000);
-                
-                // If current time is before duty start, show "Not Started"
-                if (nowUTCms < dutyStartUTCms) {
-                    return { status: 'not-started', display: 'Not Started' };
-                }
-                
-                // Check if duty is completed
-                if (diffMs < -60 * 60 * 1000) {
-                    return { status: 'completed', display: 'Completed' };
-                }
-                
-                // Check if exceeded
-                if (diffMs < 0) {
-                    const exceededMs = Math.abs(diffMs);
-                    const hours = Math.floor(exceededMs / (1000 * 60 * 60));
-                    const minutes = Math.floor((exceededMs % (1000 * 60 * 60)) / (1000 * 60));
-                    const seconds = Math.floor((exceededMs % (1000 * 60)) / 1000);
-                    
-                    return {
-                        status: 'exceeded',
-                        display: `EXCEEDED by ${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`,
-                        totalSeconds: -Math.floor(diffMs / 1000)
-                    };
-                }
-                
-                // Calculate remaining time
-                const totalSeconds = Math.floor(diffMs / 1000);
-                const hours = Math.floor(totalSeconds / 3600);
-                const minutes = Math.floor((totalSeconds % 3600) / 60);
-                const seconds = totalSeconds % 60;
-                
-                // Determine status
-                let status = 'safe';
-                if (diffMs <= 30 * 60 * 1000) {
-                    status = 'critical';
-                } else if (diffMs <= 60 * 60 * 1000) {
-                    status = 'caution';
-                } else if (diffMs <= 2 * 60 * 60 * 1000) {
-                    status = 'warning';
-                }
-                
-                return {
-                    status: status,
-                    display: `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`,
-                    totalSeconds: totalSeconds
-                };
-                
-            } catch (error) {
-                console.error('Error calculating time to limit:', error);
-                return { status: 'error', display: 'Error' };
-            }
-        }
-        
-        // Format timer display
-        function formatTimerDisplay(timerData) {
-            let emoji = '';
-            switch(timerData.status) {
-                case 'safe': emoji = '🟢'; break;
-                case 'warning': emoji = '🟡'; break;
-                case 'caution': emoji = '🟠'; break;
-                case 'critical': emoji = '🔴'; break;
-                case 'exceeded': emoji = '⛔'; break;
-                default: emoji = '';
-            }
-            
-            let displayText = timerData.display;
-            if (timerData.status === 'safe' || timerData.status === 'warning' || 
-                timerData.status === 'caution' || timerData.status === 'critical') {
-                displayText = emoji + ' ' + displayText;
-            } else if (timerData.status === 'exceeded') {
-                displayText = emoji + ' ' + displayText;
-            }
-            
-            return displayText;
-        }
-        
-        // Get CSS class for timer
-        function getTimerClass(timerData) {
-            switch(timerData.status) {
-                case 'safe': return 'time-to-limit time-safe';
-                case 'warning': return 'time-to-limit time-warning';
-                case 'caution': return 'time-to-limit time-caution';
-                case 'critical': return 'time-to-limit time-critical';
-                case 'exceeded': return 'time-to-limit time-exceeded';
-                case 'not-started':
-                case 'completed':
-                case 'no-data':
-                case 'error':
-                    return 'time-to-limit time-inactive';
-                default: return 'time-to-limit';
-            }
-        }
-        
-        // ============ CHANGE 2: Make calculateFTL() async ============
-        async function calculateFTL() {
-            currentFtlSettings.crewType = document.getElementById('crewTypeSelect').value;
-            currentFtlSettings.acclimatization = document.getElementById('acclimatizationSelect').value;
-            
-            console.log('Starting FTL calculation with settings:', currentFtlSettings);
-            
-            if (allFlights.length === 0) {
-                alert('Please parse a roster first!');
-                return;
-            }
-            
-            // ============ CHANGE 2: Updated FTL data loading check ============
-            if (!ftlDataLoaded) {
-                updateFtlStatus('FTL data not loaded. Loading now...', 'loading');
-                const loaded = await loadFtlConfiguration();
-                if (!loaded) {
-                    alert('Failed to load FTL configuration. Please check console for errors.');
-                    return;
-                }
-            }
-            
-            updateFtlStatus('Calculating FTL limits...', 'loading');
-            
-            try {
-                let dutyCycleFlights = [];
-                let dutyStartFlight = null;
-                let previousDutyEndFlight = null;
-                
-                allFlights.forEach(flight => {
-                    delete flight.ftlData;
-                });
-                
-                for (let i = 0; i < allFlights.length; i++) {
-                    const flight = allFlights[i];
-                    
-                    if (flight.type === 'D') {
-                        continue;
-                    }
-                    
-                    if (flight.dutyStart && flight.dutyStart !== '') {
-                        dutyStartFlight = flight;
-                        dutyCycleFlights = flight.flight ? [flight] : [];
-                    }
-                    else if (dutyStartFlight && flight.flight && flight.flight.trim() !== '') {
-                        dutyCycleFlights.push(flight);
-                    }
-                    
-                    if (flight.dutyEnd && dutyStartFlight && dutyCycleFlights.length > 0) {
-                        const sectorCount = dutyCycleFlights.length;
-                        const lastFlight = dutyCycleFlights[dutyCycleFlights.length - 1];
-                        
-                        let restHours = null;
-                        if (previousDutyEndFlight && previousDutyEndFlight.dutyEnd) {
-                            restHours = calculateRestHours(
-                                previousDutyEndFlight.date,
-                                previousDutyEndFlight.dutyEnd,
-                                dutyStartFlight.date,
-                                dutyStartFlight.dutyStart
-                            );
-                        }
-                        
-                        const dutyStartTime = dutyStartFlight.dutyStart.includes(' ') 
-                            ? dutyStartFlight.dutyStart.split(' ')[1]
-                            : dutyStartFlight.dutyStart;
-                        
-                        const ftlLimitHours = getFtlLimitHours(dutyStartTime, sectorCount, restHours);
-                        
-                        if (ftlLimitHours !== null) {
-                            const arrivalAirport = lastFlight.arrivalAirport || lastFlight.departureAirport;
-                            const latestArrival = calculateLatestArrival(
-                                dutyStartFlight.date,
-                                dutyStartFlight.dutyStart,
-                                dutyStartFlight.departureAirport,
-                                arrivalAirport,
-                                ftlLimitHours
-                            );
-                            
-                            dutyStartFlight.ftlData = {
-                                limitHours: ftlLimitHours,
-                                latestArrivalTime: latestArrival,
-                                sectorCount: sectorCount,
-                                dutyStartTime: dutyStartFlight.dutyStart,
-                                restHours: restHours,
-                                departureStation: dutyStartFlight.departureAirport,
-                                arrivalStation: arrivalAirport,
-                                isMultiDayDuty: (dutyStartFlight.date !== lastFlight.date)
-                            };
-                            
-                            console.log(`Added FTL data to ${dutyStartFlight.flight || 'duty start flight'}:`, dutyStartFlight.ftlData);
-                            
-                            lastFlight.hasFtlData = true;
-                            lastFlight.associatedFtlFlight = dutyStartFlight.flight;
-                        }
-                        
-                        previousDutyEndFlight = flight;
-                        dutyStartFlight = null;
-                        dutyCycleFlights = [];
-                    }
-                }
-                
-                displayResults(allFlights, currentCrewBase);
-                displayStatistics(allFlights);
-                
-                updateFtlStatus('FTL calculation complete', 'success');
-                
-                triggerAutoSave('ftl-calculation');
-                
-                startLiveTimer();
-                
-            } catch (error) {
-                console.error('Error in FTL calculation:', error);
-                updateFtlStatus('Error in FTL calculation', 'error');
-                alert('Error calculating FTL. Check console for details.');
-            }
-        }
-        
-        // Test function to verify FTL is working
-        function testFTL() {
-            console.log('=== FTL TEST START ===');
-            console.log('Current settings:', currentFtlSettings);
-            console.log('FTL config loaded:', ftlDataLoaded);
-            console.log('Flights loaded:', allFlights.length);
-            console.log('User stations cache:', userStationsCache);
-            
-            console.log('\n=== Testing MH139 Calculation ===');
-            console.log('Duty Start: 03-DEC-2025 21:00');
-            console.log('Departure Station: KUL');
-            console.log('Arrival Station: ADL');
-            console.log('FTL Limit (Tech, 1 sector, 2100 duty start): 13 hours');
-            
-            const testResult = calculateLatestArrival(
-                '03-DEC-2025',
-                '21:00',
-                'KUL',
-                'ADL',
-                13
-            );
-            
-            console.log('Latest Arrival Result:', testResult);
-            console.log('Expected: 12:30 (ADL local time)');
-            
-            console.log('=== FTL TEST END ===');
-        }
-        
-        // ============ EXISTING ROSTER PARSER CODE ============
-        
-        // Parse the roster data
         function parseRoster() {
             const input = document.getElementById('rosterInput').value.trim();
             if (!input) {
@@ -1575,6 +1772,13 @@
             let currentDay = '';
             let crewBase = CREW_BASE;
             
+            // Clear boundary detector
+            monthBoundaryDetector.clear();
+            
+            console.log('=== Starting Roster Parse ===');
+            console.log('Total lines to process:', lines.length);
+            
+            // Extract crew base
             for (const line of lines) {
                 if (line.includes('Base')) {
                     const baseMatch = line.match(/Base\s*:\s*([A-Z]{3})/);
@@ -1586,7 +1790,37 @@
             }
             
             currentCrewBase = crewBase;
+            console.log('Crew base:', crewBase);
             
+            // Track month from the first date we find
+            let monthDetected = '';
+            
+            // First pass: track all dates that exist in the source
+            for (let i = 0; i < lines.length; i++) {
+                const line = lines[i].trim();
+                if (!line) continue;
+                
+                if (shouldSkipLine(line)) continue;
+                
+                const dateMatch = line.match(/^(\d{2}-[A-Z]{3}-\d{4})\s+([A-Za-z]{2,3})/);
+                if (dateMatch) {
+                    const dateStr = dateMatch[1];
+                    const day = dateMatch[2];
+                    
+                    // Track this date exists in source
+                    monthBoundaryDetector.trackDate(dateStr, false);
+                    
+                    // Store month if not already stored
+                    if (!monthDetected) {
+                        const parts = dateStr.split('-');
+                        monthDetected = `${parts[1]}-${parts[2]}`;
+                    }
+                    
+                    console.log(`Tracked date: ${dateStr}`);
+                }
+            }
+            
+            // Second pass: parse flights and mark dates with data
             for (let i = 0; i < lines.length; i++) {
                 const line = lines[i].trim();
                 if (!line) continue;
@@ -1598,6 +1832,7 @@
                     currentDate = dateMatch[1];
                     currentDay = dateMatch[2];
                     
+                    // Parse the date line
                     parseDateLine(line, currentDate, currentDay, flights, i, lines);
                 } 
                 else if (line.match(/^\d{2}:\d{2}\s+MH/)) {
@@ -1608,19 +1843,48 @@
                 }
             }
             
+            console.log('Total flights parsed:', flights.length);
+            
             postProcessFlights(flights, crewBase);
             
             allFlights = flights;
             
-            displayResults(flights, crewBase);
-            displayStatistics(flights);
+            // Run both validation systems
+            const dutyCycleValidation = dutyCycleValidator.validateRoster(flights, crewBase);
+            const boundaryIssues = monthBoundaryDetector.detectBoundaryIssues(flights);
             
-            updateFtlStatus(`Parsed ${flights.length} flights. Ready for FTL calculation.`, 'success');
+            // Show combined warnings
+            showCombinedWarnings(flights, dutyCycleValidation, boundaryIssues, monthDetected);
+            
+            displayResults(flights, crewBase);
+            displayStatistics(flights, dutyCycleValidation, boundaryIssues);
+            
+            // Update FTL status
+            let statusMsg = `Parsed ${flights.length} flights`;
+            if (monthDetected) {
+                statusMsg += ` (${monthDetected})`;
+            }
+            
+            if (boundaryIssues.needsPreviousMonth || boundaryIssues.needsNextMonth || 
+                dutyCycleValidation.hasBoundaryIssues) {
+                statusMsg += ' - Duty cycles span month boundaries';
+                updateFtlStatus(statusMsg, 'warning');
+            } else if (boundaryIssues.incompleteWithinMonth.length > 0 || 
+                       dutyCycleValidation.hasIncompleteData) {
+                const incompleteCount = boundaryIssues.incompleteWithinMonth.length + 
+                                       dutyCycleValidation.incompleteFlights.length;
+                statusMsg += ` - ${incompleteCount} incomplete flight(s)`;
+                updateFtlStatus(statusMsg, 'warning');
+            } else {
+                statusMsg += ' - Ready for FTL calculation';
+                updateFtlStatus(statusMsg, 'success');
+            }
             
             triggerAutoSave('roster-parse');
+            
+            console.log('=== Roster Parse Complete ===');
         }
         
-        // Skip header/footer lines
         function shouldSkipLine(line) {
             return line.includes('Flight Crew Portal') ||
                    line.includes('Welcome') ||
@@ -1639,13 +1903,88 @@
                    line.match(/^\s*$/);
         }
         
-        // Parse a date line
         function parseDateLine(line, date, day, flights, lineIndex, lines) {
             const cells = line.split('\t').filter(cell => cell.trim() !== '');
             
+            // Mark this date as having data
+            monthBoundaryDetector.datesWithData.add(date);
+            
             if (cells.length >= 3 && (cells[2] === 'D' || cells[2] === 'DO' || cells[2] === 'DO1')) {
+                monthBoundaryDetector.markDateAsDayOff(date);
                 flights.push(createDayOff(date, day));
                 return;
+            }
+            
+            // Check for "Arrival" keyword
+            if (line.includes('Arrival')) {
+                const timeMatch = line.match(/(\d{2}:\d{2})/);
+                if (timeMatch) {
+                    const dutyEndTime = timeMatch[1];
+                    
+                    console.log(`Found Arrival entry on ${date} with duty end time: ${dutyEndTime}`);
+                    
+                    // Look backwards for the most recent incomplete flight
+                    let incompleteFlight = null;
+                    for (let j = flights.length - 1; j >= 0; j--) {
+                        const flight = flights[j];
+                        if (flight.type !== 'D' && 
+                            flight.flight && 
+                            flight.flight.trim() !== '' &&
+                            flight.arrival &&  // Has arrival time/airport
+                            !flight.dutyEnd && // But no duty end
+                            !flight.isArrivalDayEntry) {
+                            incompleteFlight = flight;
+                            console.log(`Linking Arrival to flight: ${flight.flight} on ${flight.date}`);
+                            break;
+                        }
+                    }
+                    
+                    if (incompleteFlight) {
+                        incompleteFlight.dutyEnd = dutyEndTime;
+                        incompleteFlight.dutyCycleComplete = true;
+                        incompleteFlight.isMultiDay = true;
+                        incompleteFlight.actualDutyEndDate = date;
+                        incompleteFlight.shouldHideDutyEndInTable = true;
+                        
+                        console.log(`✓ Updated ${incompleteFlight.flight}: duty end = ${dutyEndTime} (arrives on ${date})`);
+                        
+                        const arrivalDayEntry = {
+                            date: date,
+                            day: day,
+                            type: '',
+                            dutyStart: '',
+                            flight: '',
+                            departure: '',
+                            departureAirport: '',
+                            arrival: '',
+                            arrivalAirport: '',
+                            dutyEnd: dutyEndTime,
+                            blockHours: '',
+                            dutyHours: '',
+                            aircraft: '',
+                            isDutyStart: false,
+                            hasNightStop: false,
+                            isMultiDay: true,
+                            isReturnToBase: false,
+                            isOutOfBase: false,
+                            dutyCycleComplete: true,
+                            isArrivalDayEntry: true,
+                            linkedDepartureFlight: incompleteFlight,
+                            shouldHideDutyEndInTable: false,
+                            isArrivalOnlyRow: true
+                        };
+                        
+                        flights.push(arrivalDayEntry);
+                        monthBoundaryDetector.markDateAsParsed(date);
+                        console.log(`✓ Created arrival day entry for ${date}`);
+                        return;
+                    } else {
+                        console.warn(`⚠ No incomplete flight found to link Arrival on ${date}`);
+                        flights.push(createEmptyDateEntry(date, day));
+                        monthBoundaryDetector.markDateAsParsed(date);
+                        return;
+                    }
+                }
             }
             
             const arrivalPattern = line.match(/([A-Z]{3})\s+(\d{2}:\d{2})\s+(\d{2}:\d{2})/);
@@ -1654,20 +1993,35 @@
                 const arrivalTime = arrivalPattern[2];
                 const dutyEnd = arrivalPattern[3];
                 
+                console.log(`Found arrival pattern: ${arrivalAirport} ${arrivalTime} on ${date}`);
+                
                 let departureFlight = null;
                 for (let j = flights.length - 1; j >= 0; j--) {
                     const flight = flights[j];
-                    if (flight.type !== 'D' && !flight.arrival && !flight.dutyEnd && flight.flight) {
+                    if (flight.type !== 'D' && 
+                        !flight.arrival && 
+                        !flight.dutyEnd && 
+                        flight.flight && 
+                        flight.flight.trim() !== '' &&
+                        !flight.isArrivalDayEntry) {
                         departureFlight = flight;
+                        console.log(`Found matching departure flight: ${flight.flight} on ${flight.date}`);
                         break;
                     }
                 }
-                
+            
                 if (departureFlight) {
+                    departureFlight.arrivalAirport = arrivalAirport;
+                    departureFlight.dutyEnd = dutyEnd;
+                    departureFlight.dutyCycleComplete = true;
+                    departureFlight.isMultiDay = true;
+                    
+                    console.log(`✓ Linked multi-day flight: ${departureFlight.flight} (${departureFlight.date}) → ${arrivalAirport} ${arrivalTime} (${date})`);
+                    
                     const arrivalFlight = {
                         date: date,
                         day: day,
-                        type: departureFlight.type,
+                        type: '',
                         dutyStart: '',
                         flight: '',
                         departure: '',
@@ -1681,20 +2035,28 @@
                         isDutyStart: false,
                         hasNightStop: false,
                         isMultiDay: true,
-                        isReturnToBase: false,
+                        isReturnToBase: arrivalAirport === currentCrewBase,
                         isOutOfBase: false,
-                        dutyCycleComplete: true
+                        dutyCycleComplete: true,
+                        isArrivalDayEntry: true,
+                        linkedDepartureFlight: departureFlight,
+                        shouldHideDutyEndInTable: false,
+                        isArrivalOnlyRow: true
                     };
                     
                     flights.push(arrivalFlight);
+                    monthBoundaryDetector.markDateAsParsed(date);
                 } else {
+                    console.log(`⚠ No matching departure flight found for arrival at ${arrivalAirport}`);
                     flights.push(createEmptyDateEntry(date, day));
+                    monthBoundaryDetector.markDateAsParsed(date);
                 }
                 return;
             }
             
             if (cells.length <= 2) {
                 flights.push(createEmptyDateEntry(date, day));
+                monthBoundaryDetector.markDateAsParsed(date);
                 return;
             }
             
@@ -1710,6 +2072,7 @@
                     const flight = parseFlightDataExact(cells, flightIndex, date, day, dutyStart, true);
                     if (flight) {
                         flights.push(flight);
+                        monthBoundaryDetector.markDateAsParsed(date);
                         checkForAircraft(flight, lineIndex, lines);
                     }
                     return;
@@ -1717,9 +2080,9 @@
             }
             
             flights.push(createEmptyDateEntry(date, day));
+            monthBoundaryDetector.markDateAsParsed(date);
         }
         
-        // Parse continuation flight with duty start time
         function parseContinuationFlightWithTime(line, date, day, flights, lineIndex, lines) {
             const cells = line.split('\t').filter(cell => cell.trim() !== '');
             
@@ -1741,11 +2104,11 @@
             const flight = parseFlightDataExact(cells, flightIndex, date, day, dutyStart, false);
             if (flight) {
                 flights.push(flight);
+                monthBoundaryDetector.markDateAsParsed(date);
                 checkForAircraft(flight, lineIndex, lines);
             }
         }
         
-        // Parse continuation flight without time
         function parseContinuationFlight(line, date, day, flights, lineIndex, lines) {
             const cells = line.split('\t').filter(cell => cell.trim() !== '');
             
@@ -1762,11 +2125,11 @@
             const flight = parseFlightDataExact(cells, flightIndex, date, day, '', false);
             if (flight) {
                 flights.push(flight);
+                monthBoundaryDetector.markDateAsParsed(date);
                 checkForAircraft(flight, lineIndex, lines);
             }
         }
         
-        // Parse flight data EXACTLY as per your patterns
         function parseFlightDataExact(cells, flightIndex, date, day, dutyStart, isFirstOfDay) {
             const flight = {
                 date: date,
@@ -1787,7 +2150,10 @@
                 isMultiDay: false,
                 isReturnToBase: false,
                 isOutOfBase: false,
-                dutyCycleComplete: false
+                dutyCycleComplete: false,
+                isArrivalDayEntry: false,
+                shouldHideDutyEndInTable: false,
+                isArrivalOnlyRow: false
             };
             
             flight.flight = cells[flightIndex];
@@ -1856,8 +2222,10 @@
             return flight;
         }
         
-        // Create a day off entry
         function createDayOff(date, day) {
+            // Already tracked in parseDateLine, but ensure it's marked
+            monthBoundaryDetector.markDateAsDayOff(date);
+            
             return {
                 date: date,
                 day: day,
@@ -1877,12 +2245,17 @@
                 isMultiDay: false,
                 isReturnToBase: false,
                 isOutOfBase: false,
-                dutyCycleComplete: false
+                dutyCycleComplete: false,
+                isArrivalDayEntry: false,
+                shouldHideDutyEndInTable: false,
+                isArrivalOnlyRow: false
             };
         }
         
-        // Create empty date entry
         function createEmptyDateEntry(date, day) {
+            // This date has data but couldn't be parsed properly
+            monthBoundaryDetector.datesWithData.add(date);
+            
             return {
                 date: date,
                 day: day,
@@ -1902,29 +2275,34 @@
                 isMultiDay: false,
                 isReturnToBase: false,
                 isOutOfBase: false,
-                dutyCycleComplete: false
+                dutyCycleComplete: false,
+                isArrivalDayEntry: false,
+                shouldHideDutyEndInTable: false,
+                isArrivalOnlyRow: false
             };
         }
         
-        // Check for aircraft on next line
-function checkForAircraft(flight, lineIndex, lines) {
-    if (lineIndex + 1 < lines.length) {
-        const nextLine = lines[lineIndex + 1].trim();
-        // Updated regex to match: 2-3 digits, optionally followed by letters (737, 73H, 7M8, 333, 339, 350, 359, 738)
-        const aircraftMatch = nextLine.match(/^(\d{1,3}[A-Z0-9]*)$/);
-        if (aircraftMatch) {
-            flight.aircraft = aircraftMatch[1];
+        function checkForAircraft(flight, lineIndex, lines) {
+            if (lineIndex + 1 < lines.length) {
+                const nextLine = lines[lineIndex + 1].trim();
+                const aircraftMatch = nextLine.match(/^(\d{1,3}[A-Z0-9]*)$/);
+                if (aircraftMatch) {
+                    flight.aircraft = aircraftMatch[1];
+                }
+            }
         }
-    }
-}
         
-        // Post-process flights to mark NS/RTB and duty starts
         function postProcessFlights(flights, crewBase) {
             console.log('=== DEBUG: Crew Base:', crewBase);
             
             for (let i = 0; i < flights.length; i++) {
                 const flight = flights[i];
                 if (flight.type === 'D' || !flight.dutyEnd) continue;
+                
+                // Skip arrival day entries for night stop/RTB processing
+                if (flight.isArrivalDayEntry) {
+                    continue;
+                }
                 
                 if (flight.arrivalAirport === crewBase) {
                     flight.isReturnToBase = true;
@@ -1972,7 +2350,1019 @@ function checkForAircraft(flight, lineIndex, lines) {
             }
         }
         
-        // Display results
+        // ============ COMBINED WARNING FUNCTION ============
+        
+        function showCombinedWarnings(flights, dutyCycleValidation, boundaryIssues, monthDetected) {
+            const warningDiv = document.getElementById('incompleteWarning');
+            
+            // Get formatted warnings from both systems
+            const dutyCycleWarnings = dutyCycleValidator.getFormattedWarnings();
+            const boundaryWarnings = monthBoundaryDetector.getFormattedWarning(boundaryIssues, monthDetected);
+            
+            if (!dutyCycleWarnings && !boundaryWarnings) {
+                warningDiv.style.display = 'none';
+                warningDiv.innerHTML = '';
+                return;
+            }
+            
+            let warningHtml = `
+                <h4 style="margin-top:0; color:#856404;">
+                    📅 Roster Completeness Check
+                </h4>
+                <p>
+                    <strong>Loaded Month:</strong> ${monthDetected || 'Unknown'}
+                </p>
+            `;
+            
+            // Add boundary warnings if present
+            if (boundaryWarnings) {
+                warningHtml += boundaryWarnings;
+            }
+            
+            // Add duty cycle warnings if present
+            if (dutyCycleWarnings) {
+                warningHtml += dutyCycleWarnings;
+            }
+            
+            warningHtml += `<div style="display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap;">`;
+            
+            // Show appropriate buttons based on warnings
+            const needsPreviousMonth = boundaryIssues.needsPreviousMonth;
+            const needsNextMonth = boundaryIssues.needsNextMonth || dutyCycleValidation.hasBoundaryIssues;
+            const hasIncompleteData = boundaryIssues.incompleteWithinMonth.length > 0 || 
+                                      dutyCycleValidation.hasIncompleteData;
+            
+            // Previous month button
+            if (needsPreviousMonth) {
+                // Calculate previous month
+                const monthNames = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 
+                                  'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+                let prevMonth = 'DEC';
+                let prevYear = '2025';
+                
+                if (monthDetected) {
+                    const parts = monthDetected.split('-');
+                    const monthIndex = monthNames.indexOf(parts[0]);
+                    const year = parseInt(parts[1]);
+                    
+                    let prevMonthIndex = monthIndex - 1;
+                    let prevYearNum = year;
+                    if (prevMonthIndex < 0) {
+                        prevMonthIndex = 11;
+                        prevYearNum = year - 1;
+                    }
+                    prevMonth = monthNames[prevMonthIndex];
+                    prevYear = prevYearNum;
+                }
+                
+                warningHtml += `
+                    <button onclick="loadPreviousMonthRoster('${prevMonth}-${prevYear}')" 
+                            style="background: #17a2b8; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-weight: bold;">
+                        📅 Load ${prevMonth} ${prevYear}
+                    </button>
+                `;
+            }
+            
+            // Next month button
+            if (needsNextMonth) {
+                // Calculate next month
+                const monthNames = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 
+                                  'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+                let nextMonth = 'FEB';
+                let nextYear = '2026';
+                
+                if (monthDetected) {
+                    const parts = monthDetected.split('-');
+                    const monthIndex = monthNames.indexOf(parts[0]);
+                    const year = parseInt(parts[1]);
+                    
+                    let nextMonthIndex = monthIndex + 1;
+                    let nextYearNum = year;
+                    if (nextMonthIndex > 11) {
+                        nextMonthIndex = 0;
+                        nextYearNum = year + 1;
+                    }
+                    nextMonth = monthNames[nextMonthIndex];
+                    nextYear = nextYearNum;
+                }
+                
+                warningHtml += `
+                    <button onclick="addNextMonthRoster('${nextMonth}-${nextYear}')" 
+                            style="background: #28a745; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-weight: bold;">
+                        📅 Load ${nextMonth} ${nextYear}
+                    </button>
+                `;
+            }
+            
+            warningHtml += `
+                <button onclick="continueWithIncomplete()" 
+                        style="background: #6c757d; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer;">
+                    🚀 Continue Anyway
+                </button>
+            `;
+            
+            if (hasIncompleteData) {
+                warningHtml += `
+                    <button onclick="estimateMissingArrivals()" 
+                            style="background: #ffc107; color: #856404; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer;">
+                        🔮 Estimate Missing Arrivals
+                    </button>
+                `;
+            }
+            
+            warningHtml += `
+                </div>
+                <div style="margin-top: 15px; padding-top: 10px; border-top: 1px solid #ffc107; font-size: 11px; color: #666;">
+                    <p><strong>Detection Logic:</strong> Checks for data before first duty start (needs previous month) and after last duty end (needs next month).</p>
+                    <p><em>Day offs are ignored in boundary detection. Duty cycles that span months are detected by both systems.</em></p>
+                </div>
+            `;
+            
+            warningDiv.innerHTML = warningHtml;
+            warningDiv.style.display = 'block';
+        }
+        
+        // ============ NEW FUNCTIONS FOR MONTH BOUNDARY DETECTION ============
+        
+        // New function to load previous month
+        function loadPreviousMonthRoster(prevMonth) {
+            const modal = document.getElementById('nextMonthModal');
+            const modalTitle = modal.querySelector('h3');
+            const modalInstructions = modal.querySelector('p');
+            const textarea = document.getElementById('nextMonthInput');
+            
+            modalTitle.textContent = `📅 Add ${prevMonth} Roster`;
+            modalInstructions.innerHTML = `
+                <strong>Instructions:</strong><br>
+                1. Go to your roster page and copy the <strong>entire ${prevMonth} roster</strong><br>
+                2. Paste it in the box below<br>
+                3. Click "Merge Rosters" - it will automatically link flights across months<br>
+                <br>
+                <strong>Note:</strong> Paste the PREVIOUS month's roster (${prevMonth}) to complete duty cycles that started in that month.
+            `;
+            
+            textarea.placeholder = `Paste the COMPLETE ${prevMonth} roster here...`;
+            modal.style.display = 'flex';
+            textarea.focus();
+        }
+        
+        // Update addNextMonthRoster to accept month parameter
+        function addNextMonthRoster(nextMonth = null) {
+            const modal = document.getElementById('nextMonthModal');
+            const modalTitle = modal.querySelector('h3');
+            const modalInstructions = modal.querySelector('p');
+            const textarea = document.getElementById('nextMonthInput');
+            
+            if (nextMonth) {
+                modalTitle.textContent = `📅 Add ${nextMonth} Roster`;
+                modalInstructions.innerHTML = `
+                    <strong>Instructions:</strong><br>
+                    1. Go to your roster page and copy the <strong>entire ${nextMonth} roster</strong><br>
+                    2. Paste it in the box below<br>
+                    3. Click "Merge Rosters" - it will automatically link flights across months
+                `;
+                textarea.placeholder = `Paste the COMPLETE ${nextMonth} roster here...`;
+            } else {
+                modalTitle.textContent = '📅 Add Next Month\'s Roster';
+                modalInstructions.innerHTML = `
+                    <strong>Instructions:</strong><br>
+                    1. Go to your roster page and copy the <strong>entire next month's roster</strong><br>
+                    2. Paste it in the box below<br>
+                    3. Click "Merge Rosters" - it will automatically link flights across months
+                `;
+                textarea.placeholder = 'Paste the COMPLETE next month roster here...';
+            }
+            
+            modal.style.display = 'flex';
+            textarea.focus();
+        }
+        
+        // Update mergeNextMonthRoster to handle both directions
+        function mergeNextMonthRoster() {
+            const currentRoster = document.getElementById('rosterInput').value;
+            const additionalRoster = document.getElementById('nextMonthInput').value.trim();
+            
+            if (!additionalRoster) {
+                alert('Please paste the additional roster first.');
+                return;
+            }
+            
+            // Check if we should prepend (previous month) or append (next month)
+            const currentFirstDate = findFirstDateInRoster(currentRoster);
+            const additionalFirstDate = findFirstDateInRoster(additionalRoster);
+            
+            let mergedRoster = '';
+            
+            if (currentFirstDate && additionalFirstDate) {
+                const currentDate = monthBoundaryDetector.parseDateString(currentFirstDate);
+                const additionalDate = monthBoundaryDetector.parseDateString(additionalFirstDate);
+                
+                if (additionalDate < currentDate) {
+                    // Additional roster is from previous month - prepend it
+                    mergedRoster = additionalRoster.trim() + '\n\n' + currentRoster.trim();
+                    console.log('Prepending previous month roster');
+                } else {
+                    // Additional roster is from next month - append it
+                    mergedRoster = currentRoster.trim() + '\n\n' + additionalRoster.trim();
+                    console.log('Appending next month roster');
+                }
+            } else {
+                // Default: append (original behavior)
+                mergedRoster = currentRoster.trim() + '\n\n' + additionalRoster.trim();
+            }
+            
+            document.getElementById('rosterInput').value = mergedRoster;
+            
+            closeMonthModal();
+            document.getElementById('incompleteWarning').style.display = 'none';
+            
+            updateFtlStatus('Merging rosters and re-parsing...', 'loading');
+            
+            setTimeout(() => {
+                parseRoster();
+                updateSaveStatus('Rosters merged successfully', 'success');
+                
+                if (ftlDataLoaded && allFlights.length > 0) {
+                    setTimeout(() => {
+                        calculateFTL();
+                    }, 500);
+                }
+            }, 100);
+        }
+        
+        // Helper function to find first date in roster text
+        function findFirstDateInRoster(rosterText) {
+            const lines = rosterText.split('\n');
+            for (const line of lines) {
+                const dateMatch = line.match(/^(\d{2}-[A-Z]{3}-\d{4})/);
+                if (dateMatch) {
+                    return dateMatch[1];
+                }
+            }
+            return null;
+        }
+        
+        function closeMonthModal() {
+            const modal = document.getElementById('nextMonthModal');
+            modal.style.display = 'none';
+            document.getElementById('nextMonthInput').value = '';
+        }
+        
+        function continueWithIncomplete() {
+            document.getElementById('incompleteWarning').style.display = 'none';
+            updateSaveStatus('Proceeding with incomplete data', 'warning');
+        }
+        
+        function estimateMissingArrivals() {
+            const validation = dutyCycleValidator.validateRoster(allFlights, currentCrewBase);
+            const boundaryIssues = monthBoundaryDetector.detectBoundaryIssues(allFlights);
+            
+            const allIncomplete = [
+                ...validation.incompleteFlights.map(item => item.flight),
+                ...boundaryIssues.incompleteWithinMonth.map(item => item.flight)
+            ];
+            
+            allIncomplete.forEach(flight => {
+                const route = estimateRoute(flight.flight);
+                if (route) {
+                    flight.arrivalAirport = route.arrival;
+                    flight.arrival = `${route.arrival} ${route.estimatedTime}`;
+                    flight.dutyEnd = route.estimatedDutyEnd;
+                    flight.isReturnToBase = route.arrival === currentCrewBase;
+                    flight.isMultiDay = true;
+                    flight.estimated = true;
+                    flight.hasNightStop = !flight.isReturnToBase;
+                }
+            });
+            
+            document.getElementById('incompleteWarning').style.display = 'none';
+            
+            displayResults(allFlights, currentCrewBase);
+            displayStatistics(allFlights);
+            
+            updateSaveStatus(`Estimated ${allIncomplete.length} flight(s)`, 'warning');
+        }
+        
+        function estimateRoute(flightNumber) {
+            // Common route patterns for estimation
+            const routePatterns = {
+                'MH 191': { arrival: 'KUL', estimatedTime: '07:05', estimatedDutyEnd: '07:35' },
+                'MH 139': { arrival: 'ADL', estimatedTime: '08:40', estimatedDutyEnd: '09:10' },
+                'MH 144': { arrival: 'KUL', estimatedTime: '20:24', estimatedDutyEnd: '20:54' },
+                'MH 122': { arrival: 'KUL', estimatedTime: '17:45', estimatedDutyEnd: '18:15' },
+                'MH 132': { arrival: 'KUL', estimatedTime: '07:50', estimatedDutyEnd: '08:20' },
+                'MH 3': { arrival: 'KUL', estimatedTime: '07:15', estimatedDutyEnd: '07:45' }
+            };
+            
+            return routePatterns[flightNumber] || null;
+        }
+        
+        // ============ TIMEZONE HANDLING FUNCTIONS ============
+        
+        function parseMonth(monthStr) {
+            const months = {
+                'JAN': 0, 'FEB': 1, 'MAR': 2, 'APR': 3, 'MAY': 4, 'JUN': 5,
+                'JUL': 6, 'AUG': 7, 'SEP': 8, 'OCT': 9, 'NOV': 10, 'DEC': 11
+            };
+            return months[monthStr.toUpperCase()] !== undefined ? months[monthStr.toUpperCase()] : 0;
+        }
+        
+        function parseDateString(dateStr) {
+            if (!dateStr) return null;
+            
+            const parts = dateStr.split('-');
+            if (parts.length !== 3) return null;
+            
+            const day = parseInt(parts[0]);
+            const month = parseMonth(parts[1]);
+            const year = parseInt(parts[2]);
+            
+            return new Date(year, month, day);
+        }
+        
+        function parseTimeString(timeStr) {
+            if (!timeStr) return { hours: 0, minutes: 0 };
+            
+            const parts = timeStr.split(':');
+            if (parts.length !== 2) return { hours: 0, minutes: 0 };
+            
+            return {
+                hours: parseInt(parts[0]),
+                minutes: parseInt(parts[1])
+            };
+        }
+        
+        function isDateInDstPeriod(date, dstPeriod) {
+            if (!dstPeriod || !dstPeriod.observed) return false;
+            
+            const month = date.getMonth() + 1;
+            const period = dstPeriod.period || '';
+            
+            if (period.includes('-')) {
+                const [startMonthStr, endMonthStr] = period.split('-');
+                const startMonth = parseMonth(startMonthStr) + 1;
+                const endMonth = parseMonth(endMonthStr) + 1;
+                
+                if (startMonth > endMonth) {
+                    return month >= startMonth || month <= endMonth;
+                } else {
+                    return month >= startMonth && month <= endMonth;
+                }
+            }
+            
+            return false;
+        }
+        
+        function getStationOffset(stationCode, date) {
+            // First check user cache
+            if (userStationsCache[stationCode]) {
+                return parseFloat(userStationsCache[stationCode]);
+            }
+            
+            // Then check if FTL data is loaded and station exists
+            if (ftlDataLoaded && ftlConfig.stations && ftlConfig.stations[stationCode]) {
+                const station = ftlConfig.stations[stationCode];
+                
+                if (station.dst && isDateInDstPeriod(date, station.dst)) {
+                    return station.dst.gmtOffset;
+                }
+                
+                return station.gmtOffset;
+            }
+            
+            // If FTL data not loaded yet, return null to signal waiting
+            if (!ftlDataLoaded) {
+                console.warn(`Station ${stationCode} requested but FTL data not loaded yet`);
+                return null;
+            }
+            
+            // Station not found in database - prompt user
+            const offsetStr = prompt(`Station ${stationCode} not found in database.\nPlease enter GMT offset (e.g., +8, -5.5, 0):`, '+0');
+            
+            if (offsetStr !== null) {
+                let offset = 0;
+                try {
+                    offset = parseFloat(offsetStr.replace('+', ''));
+                    if (isNaN(offset)) offset = 0;
+                } catch (e) {
+                    offset = 0;
+                }
+                
+                userStationsCache[stationCode] = offset;
+                saveUserStationsCache();
+                triggerAutoSave('station-cache');
+                
+                return offset;
+            }
+            return 0;
+        }
+        
+        // ============ FTL CALCULATION FUNCTIONS ============
+        
+        function getLocalStartTimeBand(localTimeStr) {
+            if (!localTimeStr || !localTimeStr.includes(':')) {
+                console.warn('Invalid time format:', localTimeStr);
+                return '0800-1259';
+            }
+            
+            const hour = parseInt(localTimeStr.split(':')[0]);
+            
+            if (hour >= 6 && hour < 8) return '0600-0759';
+            if (hour >= 8 && hour < 13) return '0800-1259';
+            if (hour >= 13 && hour < 18) return '1300-1759';
+            if (hour >= 18 && hour < 22) return '1800-2159';
+            return '2200-0559';
+        }
+        
+        function getFtlLimitHours(dutyStartTime, sectorCount, restHours = null) {
+            if (!dutyStartTime) {
+                console.warn('No duty start time provided');
+                return null;
+            }
+            
+            const { crewType, acclimatization } = currentFtlSettings;
+            const timeBand = getLocalStartTimeBand(dutyStartTime);
+            
+            console.log(`Getting FTL limit for:`, {
+                dutyStartTime,
+                sectorCount,
+                crewType,
+                acclimatization,
+                timeBand,
+                restHours
+            });
+            
+            let limitTable;
+            
+            if (acclimatization === 'acclimatized') {
+                if (!ftlConfig.limits?.acclimatized?.[crewType]?.[timeBand]) {
+                    console.warn('No acclimatized limit table found for:', crewType, timeBand);
+                    return null;
+                }
+                limitTable = ftlConfig.limits.acclimatized[crewType][timeBand];
+            } else {
+                let ruleKey = 'rest_period_leq18_or_geq30';
+                if (restHours !== null && restHours > 18 && restHours < 30) {
+                    ruleKey = 'rest_period_18_01_to_29_59';
+                }
+                
+                if (!ftlConfig.limits?.non_acclimatized?.[ruleKey]?.[crewType]) {
+                    console.warn('No non-acclimatized limit table found for:', ruleKey, crewType);
+                    return null;
+                }
+                
+                limitTable = ftlConfig.limits.non_acclimatized[ruleKey][crewType];
+                sectorCount = Math.min(sectorCount, 4);
+            }
+            
+            if (!limitTable || limitTable.length === 0) {
+                console.warn('Empty limit table');
+                return null;
+            }
+            
+            const sectorIndex = Math.min(sectorCount, limitTable.length) - 1;
+            const limitHours = limitTable[sectorIndex];
+            
+            console.log(`FTL Limit found: ${limitHours}h for ${sectorCount} sectors`);
+            
+            return limitHours;
+        }
+        
+        function calculateLatestArrival(dutyStartDateStr, dutyStartTimeStr, departureStation, arrivalStation, ftlLimitHours) {
+            console.log('Calculating latest arrival (block-in):', {
+                dutyStartDateStr,
+                dutyStartTimeStr,
+                departureStation,
+                arrivalStation,
+                ftlLimitHours
+            });
+            
+            if (!dutyStartDateStr || !dutyStartTimeStr || !departureStation || !arrivalStation || ftlLimitHours === null) {
+                console.warn('Invalid inputs for latest arrival calculation');
+                return 'N/A';
+            }
+            
+            try {
+                const dutyStartDate = parseDateString(dutyStartDateStr);
+                const dutyStartTime = parseTimeString(dutyStartTimeStr);
+                
+                if (!dutyStartDate) {
+                    console.warn('Invalid duty start date:', dutyStartDateStr);
+                    return 'N/A';
+                }
+                
+                dutyStartDate.setHours(dutyStartTime.hours, dutyStartTime.minutes, 0, 0);
+                
+                const departureOffset = getStationOffset(departureStation, dutyStartDate);
+                const arrivalOffset = getStationOffset(arrivalStation, dutyStartDate);
+                
+                console.log('Station offsets:', {
+                    departureStation,
+                    departureOffset,
+                    arrivalStation,
+                    arrivalOffset
+                });
+                
+                const dutyStartUTC = new Date(dutyStartDate.getTime() - (departureOffset * 60 * 60 * 1000));
+                
+                const latestArrivalUTC = new Date(dutyStartUTC.getTime() + (ftlLimitHours * 60 * 60 * 1000));
+                
+                const latestArrivalLocal = new Date(latestArrivalUTC.getTime() + (arrivalOffset * 60 * 60 * 1000));
+                
+                const hours = latestArrivalLocal.getHours().toString().padStart(2, '0');
+                const minutes = latestArrivalLocal.getMinutes().toString().padStart(2, '0');
+                
+                // Check if date is different from duty start date
+                let dateDisplay = '';
+                const monthNames = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+                const arrivalDay = latestArrivalLocal.getDate();
+                const arrivalMonth = monthNames[latestArrivalLocal.getMonth()];
+                const arrivalYear = latestArrivalLocal.getFullYear();
+                
+                const dutyDay = dutyStartDate.getDate();
+                const dutyMonth = monthNames[dutyStartDate.getMonth()];
+                const dutyYear = dutyStartDate.getFullYear();
+                
+                if (arrivalDay !== dutyDay || arrivalMonth !== dutyMonth || arrivalYear !== dutyYear) {
+                    dateDisplay = ` (${arrivalDay.toString().padStart(2, '0')}-${arrivalMonth}-${arrivalYear})`;
+                }
+                
+                const result = `${hours}:${minutes}${dateDisplay}`;
+                console.log('Latest arrival (block-in) result:', result);
+                
+                return result;
+                
+            } catch (error) {
+                console.error('Error calculating latest arrival:', error);
+                return 'N/A';
+            }
+        }
+        
+        function calculateRestHours(previousArrivalDate, previousArrivalTime, currentDutyStartDate, currentDutyStartTime) {
+            if (!previousArrivalDate || !previousArrivalTime || !currentDutyStartDate || !currentDutyStartTime) {
+                return null;
+            }
+            
+            try {
+                const parseDate = (dateStr) => {
+                    const parts = dateStr.split('-');
+                    if (parts.length !== 3) return null;
+                    
+                    const day = parseInt(parts[0]);
+                    const monthStr = parts[1].toUpperCase();
+                    const year = parseInt(parts[2]);
+                    
+                    const monthMap = {
+                        'JAN': 0, 'FEB': 1, 'MAR': 2, 'APR': 3, 'MAY': 4, 'JUN': 5,
+                        'JUL': 6, 'AUG': 7, 'SEP': 8, 'OCT': 9, 'NOV': 10, 'DEC': 11
+                    };
+                    
+                    const month = monthMap[monthStr];
+                    if (month === undefined) return null;
+                    
+                    return new Date(year, month, day);
+                };
+                
+                const endDate = parseDate(previousArrivalDate);
+                const startDate = parseDate(currentDutyStartDate);
+                
+                if (!endDate || !startDate) return null;
+                
+                const [endHour, endMin] = previousArrivalTime.split(':').map(Number);
+                const [startHour, startMin] = currentDutyStartTime.split(':').map(Number);
+                
+                endDate.setHours(endHour, endMin, 0, 0);
+                startDate.setHours(startHour, startMin, 0, 0);
+                
+                const diffMs = startDate - endDate;
+                const diffHours = diffMs / (1000 * 60 * 60);
+                
+                return diffHours;
+            } catch (error) {
+                console.error('Error calculating rest hours:', error);
+                return null;
+            }
+        }
+        
+        // ============ TIME TO LIMIT FUNCTIONS ============
+        
+        function startLiveTimer() {
+            if (timerInterval) {
+                clearInterval(timerInterval);
+            }
+            
+            timerRunning = true;
+            updateTimerStatus();
+            
+            updateAllTimers();
+            
+            timerInterval = setInterval(updateAllTimers, 1000);
+            
+            console.log('Live timer started');
+        }
+        
+        function stopLiveTimer() {
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+            
+            timerRunning = false;
+            updateTimerStatus();
+            
+            console.log('Live timer stopped');
+        }
+        
+        function toggleTimer() {
+            if (timerRunning) {
+                stopLiveTimer();
+            } else {
+                startLiveTimer();
+            }
+            triggerAutoSave('timer-toggle');
+        }
+        
+        function updateTimerStatus() {
+            const statusElement = document.getElementById('timer-status-indicator');
+            if (statusElement) {
+                if (timerRunning) {
+                    statusElement.innerHTML = '<span class="timer-status timer-running">⏱️ Timer Running</span>';
+                } else {
+                    statusElement.innerHTML = '<span class="timer-status timer-stopped">⏸️ Timer Stopped</span>';
+                }
+            }
+        }
+        
+        function updateAllTimers() {
+            const timerCells = document.querySelectorAll('.time-to-limit-cell');
+            
+            timerCells.forEach(cell => {
+                const flightIndex = parseInt(cell.dataset.flightIndex);
+                if (isNaN(flightIndex) || !allFlights[flightIndex]) return;
+                
+                const flight = allFlights[flightIndex];
+                const timerData = calculateTimeToLimit(flight);
+                const arrivalStation = flight.ftlData?.arrivalStation || flight.arrivalAirport || flight.departureAirport;
+                const latestArrival = flight.ftlData?.latestArrivalTime || '';
+                
+                const displayHtml = `${formatTimerDisplay(timerData)}<br><small style="font-size:9px;color:#666;">Target: ${latestArrival} ${arrivalStation}</small>`;
+                
+                cell.innerHTML = displayHtml;
+                cell.className = 'time-to-limit-cell ' + getTimerClass(timerData);
+            });
+        }
+        
+        function calculateTimeToLimit(flight) {
+            if (!flight.ftlData || !flight.dutyStart || !flight.date) {
+                return { status: 'no-data', display: '---' };
+            }
+            
+            try {
+                const latestArrivalTime = flight.ftlData.latestArrivalTime;
+                if (!latestArrivalTime || latestArrivalTime === 'N/A') {
+                    return { status: 'error', display: 'Error' };
+                }
+                
+                // Extract time and optional date from latestArrivalTime
+                const timeMatch = latestArrivalTime.match(/(\d{2}:\d{2})/);
+                const dateMatch = latestArrivalTime.match(/\((\d{2}-[A-Z]{3}-\d{4})\)/);
+                
+                if (!timeMatch) {
+                    return { status: 'error', display: 'Error' };
+                }
+                
+                const [targetHour, targetMin] = timeMatch[1].split(':').map(Number);
+                
+                // Use the date from FTL data or from the match
+                let targetDateStr = flight.ftlData.finalArrivalDate;
+                if (dateMatch) {
+                    targetDateStr = dateMatch[1];
+                }
+                
+                const dateParts = targetDateStr.split('-');
+                const day = parseInt(dateParts[0]);
+                const monthStr = dateParts[1].toUpperCase();
+                const year = parseInt(dateParts[2]);
+                
+                const monthMap = {
+                    'JAN': 0, 'FEB': 1, 'MAR': 2, 'APR': 3, 'MAY': 4, 'JUN': 5,
+                    'JUL': 6, 'AUG': 7, 'SEP': 8, 'OCT': 9, 'NOV': 10, 'DEC': 11
+                };
+                const month = monthMap[monthStr];
+                
+                const arrivalStation = flight.ftlData.arrivalStation;
+                const arrivalOffset = getStationOffset(arrivalStation, new Date(year, month, day));
+                
+                const targetUTCms = Date.UTC(year, month, day, targetHour, targetMin, 0) 
+                                   - (arrivalOffset * 60 * 60 * 1000);
+                
+                const now = new Date();
+                const nowUTCms = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(),
+                                         now.getUTCHours(), now.getUTCMinutes(), now.getUTCSeconds());
+                
+                const diffMs = targetUTCms - nowUTCms;
+                
+                // Check if duty hasn't started yet
+                const dutyStartDate = parseDateString(flight.date);
+                const dutyStartTime = parseTimeString(flight.dutyStart);
+                
+                if (dutyStartDate) {
+                    dutyStartDate.setHours(dutyStartTime.hours, dutyStartTime.minutes, 0, 0);
+                    const departureStation = flight.departureAirport;
+                    const departureOffset = getStationOffset(departureStation, dutyStartDate);
+                    const dutyStartUTCms = dutyStartDate.getTime() - (departureOffset * 60 * 60 * 1000);
+                    
+                    if (nowUTCms < dutyStartUTCms) {
+                        return { status: 'not-started', display: 'Not Started' };
+                    }
+                }
+                
+                // Check if duty is completed (arrival time has passed)
+                if (diffMs < -60 * 60 * 1000) {
+                    return { status: 'completed', display: 'Completed' };
+                }
+                
+                // Check if exceeded
+                if (diffMs < 0) {
+                    const exceededMs = Math.abs(diffMs);
+                    const hours = Math.floor(exceededMs / (1000 * 60 * 60));
+                    const minutes = Math.floor((exceededMs % (1000 * 60 * 60)) / (1000 * 60));
+                    const seconds = Math.floor((exceededMs % (1000 * 60)) / 1000);
+                    
+                    return {
+                        status: 'exceeded',
+                        display: `EXCEEDED by ${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`,
+                        totalSeconds: -Math.floor(diffMs / 1000)
+                    };
+                }
+                
+                // Calculate remaining time
+                const totalSeconds = Math.floor(diffMs / 1000);
+                const hours = Math.floor(totalSeconds / 3600);
+                const minutes = Math.floor((totalSeconds % 3600) / 60);
+                const seconds = totalSeconds % 60;
+                
+                let status = 'safe';
+                if (diffMs <= 30 * 60 * 1000) {
+                    status = 'critical';
+                } else if (diffMs <= 60 * 60 * 1000) {
+                    status = 'caution';
+                } else if (diffMs <= 2 * 60 * 60 * 1000) {
+                    status = 'warning';
+                }
+                
+                return {
+                    status: status,
+                    display: `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`,
+                    totalSeconds: totalSeconds
+                };
+                
+            } catch (error) {
+                console.error('Error calculating time to limit:', error);
+                return { status: 'error', display: 'Error' };
+            }
+        }
+        
+        function formatTimerDisplay(timerData) {
+            let emoji = '';
+            switch(timerData.status) {
+                case 'safe': emoji = '🟢'; break;
+                case 'warning': emoji = '🟡'; break;
+                case 'caution': emoji = '🟠'; break;
+                case 'critical': emoji = '🔴'; break;
+                case 'exceeded': emoji = '⛔'; break;
+                default: emoji = '';
+            }
+            
+            let displayText = timerData.display;
+            if (timerData.status === 'safe' || timerData.status === 'warning' || 
+                timerData.status === 'caution' || timerData.status === 'critical') {
+                displayText = emoji + ' ' + displayText;
+            } else if (timerData.status === 'exceeded') {
+                displayText = emoji + ' ' + displayText;
+            }
+            
+            return displayText;
+        }
+        
+        function getTimerClass(timerData) {
+            switch(timerData.status) {
+                case 'safe': return 'time-to-limit time-safe';
+                case 'warning': return 'time-to-limit time-warning';
+                case 'caution': return 'time-to-limit time-caution';
+                case 'critical': return 'time-to-limit time-critical';
+                case 'exceeded': return 'time-to-limit time-exceeded';
+                case 'not-started':
+                case 'completed':
+                case 'no-data':
+                case 'error':
+                    return 'time-to-limit time-inactive';
+                default: return 'time-to-limit';
+            }
+        }
+        
+        // ============ FTL CALCULATION FUNCTION ============
+        
+        async function calculateFTL() {
+            currentFtlSettings.crewType = document.getElementById('crewTypeSelect').value;
+            currentFtlSettings.acclimatization = document.getElementById('acclimatizationSelect').value;
+            
+            console.log('Starting FTL calculation with settings:', currentFtlSettings);
+            
+            if (allFlights.length === 0) {
+                alert('Please parse a roster first!');
+                return;
+            }
+            
+            if (!ftlDataLoaded) {
+                updateFtlStatus('FTL data not loaded. Loading now...', 'loading');
+                const loaded = await loadFtlConfiguration();
+                if (!loaded) {
+                    alert('Failed to load FTL configuration. Please check console for errors.');
+                    return;
+                }
+            }
+            
+            updateFtlStatus('Calculating FTL limits...', 'loading');
+            
+            try {
+                // Clear all previous FTL data
+                allFlights.forEach(flight => {
+                    delete flight.ftlData;
+                });
+                
+                let dutyStartFlight = null;
+                let dutyCycleFlights = [];
+                let previousDutyLastFlight = null;
+                
+                for (let i = 0; i < allFlights.length; i++) {
+                    const flight = allFlights[i];
+                    
+                    // Skip day offs and arrival-only entries
+                    if (flight.type === 'D' || flight.isArrivalDayEntry) {
+                        continue;
+                    }
+                    
+                    // Skip training/standby (they don't count toward FTL)
+                    if (flight.type === 'S3WBA' || flight.type === 'AS2WB') {
+                        continue;
+                    }
+                    
+                    // DUTY START: Begin a new duty cycle
+                    if (flight.dutyStart && flight.dutyStart !== '') {
+                        dutyStartFlight = flight;
+                        dutyCycleFlights = [];
+                        
+                        // Add this flight to duty cycle if it has a flight number
+                        if (flight.flight && flight.flight.trim() !== '') {
+                            dutyCycleFlights.push(flight);
+                        }
+                        console.log(`Duty cycle started at index ${i}: ${flight.date} ${flight.dutyStart}`);
+                    }
+                    // Add flights to duty cycle
+                    else if (dutyStartFlight && flight.flight && flight.flight.trim() !== '') {
+                        dutyCycleFlights.push(flight);
+                    }
+                    
+                    // DUTY END: Complete the duty cycle
+                    // IMPORTANT: Only process if this is NOT an arrival day entry
+                    if (flight.dutyEnd && flight.dutyEnd !== '' && dutyStartFlight && !flight.isArrivalDayEntry) {
+                        console.log(`Duty cycle ended at index ${i}: ${flight.date} ${flight.dutyEnd}`);
+                        
+                        // Count sectors for FTL
+                        let ftlSectorCount = 0;
+                        dutyCycleFlights.forEach(f => {
+                            if (f.type === 'OP') {
+                                ftlSectorCount++;
+                            }
+                        });
+                        
+                        // Adjust for PS as first or last sector
+                        if (dutyCycleFlights.length > 0) {
+                            const firstFlight = dutyCycleFlights[0];
+                            const lastFlight = dutyCycleFlights[dutyCycleFlights.length - 1];
+                            
+                            if (firstFlight.type === 'PS') {
+                                ftlSectorCount = Math.max(0, ftlSectorCount - 1);
+                                console.log('Adjusted sectors (PS as first): -1');
+                            }
+                            if (lastFlight.type === 'PS') {
+                                ftlSectorCount = Math.max(0, ftlSectorCount - 1);
+                                console.log('Adjusted sectors (PS as last): -1');
+                            }
+                        }
+                        
+                        console.log(`Total sectors for FTL: ${ftlSectorCount}`);
+                        
+                        // Only calculate FTL if we have operating sectors
+                        if (ftlSectorCount > 0) {
+                            // Get final destination (arrival station of last flight in duty cycle)
+                            const finalFlight = dutyCycleFlights[dutyCycleFlights.length - 1];
+                            const finalDestination = finalFlight.arrivalAirport || finalFlight.departureAirport;
+                            const finalArrivalDate = finalFlight.date;
+                            
+                            // Calculate rest hours (arrival time to duty start)
+                            let restHours = null;
+                            if (previousDutyLastFlight && previousDutyLastFlight.arrival) {
+                                const prevArrivalTime = previousDutyLastFlight.arrival.includes(' ') 
+                                    ? previousDutyLastFlight.arrival.split(' ')[1]
+                                    : previousDutyLastFlight.arrival;
+                                    
+                                restHours = calculateRestHours(
+                                    previousDutyLastFlight.date,
+                                    prevArrivalTime,
+                                    dutyStartFlight.date,
+                                    dutyStartFlight.dutyStart
+                                );
+                            }
+                            
+                            // Get duty start time
+                            const dutyStartTime = dutyStartFlight.dutyStart.includes(' ') 
+                                ? dutyStartFlight.dutyStart.split(' ')[1]
+                                : dutyStartFlight.dutyStart;
+                            
+                            // Get FTL limit
+                            const ftlLimitHours = getFtlLimitHours(dutyStartTime, ftlSectorCount, restHours);
+                            
+                            if (ftlLimitHours !== null) {
+                                // Calculate latest arrival (block-in) time
+                                const latestArrival = calculateLatestArrival(
+                                    dutyStartFlight.date,
+                                    dutyStartFlight.dutyStart,
+                                    dutyStartFlight.departureAirport,
+                                    finalDestination,
+                                    ftlLimitHours
+                                );
+                                
+                                // Store FTL data on the duty start flight
+                                dutyStartFlight.ftlData = {
+                                    limitHours: ftlLimitHours,
+                                    latestArrivalTime: latestArrival,
+                                    sectorCount: ftlSectorCount,
+                                    dutyStartTime: dutyStartFlight.dutyStart,
+                                    dutyStartDate: dutyStartFlight.date,
+                                    restHours: restHours,
+                                    departureStation: dutyStartFlight.departureAirport,
+                                    arrivalStation: finalDestination,
+                                    finalArrivalDate: finalArrivalDate,
+                                    isMultiDayDuty: (dutyStartFlight.date !== finalArrivalDate),
+                                    dutyEndFlightIndex: i
+                                };
+                                
+                                console.log(`FTL Data for duty cycle:`, dutyStartFlight.ftlData);
+                            }
+                        }
+                        
+                        // Update previous duty last flight for next calculation
+                        previousDutyLastFlight = flight;
+                        dutyStartFlight = null;
+                        dutyCycleFlights = [];
+                    }
+                }
+                
+                displayResults(allFlights, currentCrewBase);
+                displayStatistics(allFlights);
+                
+                updateFtlStatus('FTL calculation complete', 'success');
+                triggerAutoSave('ftl-calculation');
+                startLiveTimer();
+                
+            } catch (error) {
+                console.error('Error in FTL calculation:', error);
+                updateFtlStatus('Error in FTL calculation', 'error');
+                alert('Error calculating FTL. Check console for details.');
+            }
+        }
+        
+        function testFTL() {
+            console.log('=== FTL TEST START ===');
+            console.log('Current settings:', currentFtlSettings);
+            console.log('FTL config loaded:', ftlDataLoaded);
+            console.log('Flights loaded:', allFlights.length);
+            console.log('User stations cache:', userStationsCache);
+            
+            console.log('\n=== Testing MH133 Calculation ===');
+            console.log('Duty Start: 13-JAN-2026 07:00');
+            console.log('Departure Station: KUL (GMT+8)');
+            console.log('Arrival Station: AKL (GMT+13, DST)');
+            console.log('FTL Limit (Tech, 1 sector, 0700 duty start): 13 hours');
+            
+            const testResult = calculateLatestArrival(
+                '13-JAN-2026',
+                '07:00',
+                'KUL',
+                'AKL',
+                13
+            );
+            
+            console.log('Latest Arrival Result:', testResult);
+            console.log('Expected: 01:00 AKL (14-JAN)');
+            
+            console.log('=== FTL TEST END ===');
+        }
+        
+        // ============ DISPLAY FUNCTIONS ============
+        
         function displayResults(flights, crewBase) {
             let html = '<h2>Parsed Roster</h2>';
             
@@ -1982,7 +3372,27 @@ function checkForAircraft(flight, lineIndex, lines) {
                 return;
             }
             
-            html += `<p><strong>Crew Base:</strong> ${crewBase}</p>`;
+            // Run duty cycle validation for display info
+            const validation = dutyCycleValidator.validateRoster(flights, crewBase);
+            
+            html += `<p><strong>Crew Base:</strong> ${crewBase} | `;
+            html += `<strong>Months:</strong> ${validation.months.join(', ') || 'Single month'} | `;
+            html += `<strong>Duty Cycles:</strong> ${validation.dutyCycles.length} (${validation.dutyCycles.filter(d => d.isComplete).length} complete)</p>`;
+            
+            if (validation.hasBoundaryIssues) {
+                const boundaryCount = validation.boundaryWarnings.length;
+                html += `<p style="color: #856404; background: #fff3cd; padding: 8px; border-radius: 4px;">`;
+                html += `⚠️ ${boundaryCount} duty cycle${boundaryCount > 1 ? 's' : ''} span month boundaries`;
+                if (validation.incompleteFlights.length > 0) {
+                    html += ` | ${validation.incompleteFlights.length} flight${validation.incompleteFlights.length > 1 ? 's' : ''} missing arrivals`;
+                }
+                html += '</p>';
+            } else if (validation.hasIncompleteData) {
+                html += `<p style="color: #dc3545; background: #f8d7da; padding: 8px; border-radius: 4px;">`;
+                html += `⚠️ ${validation.incompleteFlights.length} flight${validation.incompleteFlights.length > 1 ? 's' : ''} missing arrival data`;
+                html += '</p>';
+            }
+            
             html += '<table>';
             html += '<tr>';
             html += '<th>Date</th>';
@@ -1990,7 +3400,7 @@ function checkForAircraft(flight, lineIndex, lines) {
             html += '<th>Duty Start</th>';
             html += '<th>Flight</th>';
             html += '<th>Departure</th>';
-            html += '<th>Arrival</th>';
+            html += '<th>Arrival (Block-in)</th>';
             html += '<th>Duty End</th>';
             html += '<th>Type</th>';
             html += '<th>Block Hours</th>';
@@ -2001,6 +3411,18 @@ function checkForAircraft(flight, lineIndex, lines) {
             html += '<th>Sectors</th>';
             html += '<th>Time to Limit</th>';
             html += '</tr>';
+            
+            // Create a map of flight to duty cycle for styling
+            const flightToDutyCycle = new Map();
+            validation.dutyCycles.forEach((duty, index) => {
+                duty.flights.forEach(flight => {
+                    flightToDutyCycle.set(flight, {
+                        dutyIndex: index,
+                        isBoundary: duty.spansMonths,
+                        isComplete: duty.isComplete
+                    });
+                });
+            });
             
             flights.forEach((flight, index) => {
                 let rowClass = '';
@@ -2018,9 +3440,20 @@ function checkForAircraft(flight, lineIndex, lines) {
                     }
                 }
                 
+                // Add duty cycle boundary styling
+                const dutyInfo = flightToDutyCycle.get(flight);
+                if (dutyInfo) {
+                    if (dutyInfo.isBoundary) {
+                        rowClass += ' duty-boundary';
+                    }
+                    if (!dutyInfo.isComplete) {
+                        rowClass += ' duty-incomplete';
+                    }
+                }
+                
                 let aircraftClass = '';
                 let aircraftDisplay = flight.aircraft || '';
-                if (flight.aircraft) {
+                if (flight.aircraft && !flight.isArrivalOnlyRow) {
                     const acType = flight.aircraft.substring(0, 3);
                     const narrowbody = ['737', '73H', '7M8', '738'];
                     const widebody = ['332', '333', '350', '359', '339'];
@@ -2042,36 +3475,80 @@ function checkForAircraft(flight, lineIndex, lines) {
                 const latestArrival = flight.ftlData ? flight.ftlData.latestArrivalTime : '';
                 const sectors = flight.ftlData ? flight.ftlData.sectorCount : '';
                 
+                // Add tooltip for FTL data
+                let ftlTooltip = '';
+                if (flight.ftlData) {
+                    ftlTooltip = `Latest block-in at ${flight.ftlData.arrivalStation}`;
+                    if (flight.ftlData.isMultiDayDuty) {
+                        ftlTooltip += ` (Multi-day duty)`;
+                    }
+                }
+                
                 html += `<tr class="${rowClass.trim()}">`;
                 html += `<td>${flight.date || ''}</td>`;
                 html += `<td>${flight.day || ''}</td>`;
                 html += `<td>${flight.dutyStart || ''}</td>`;
-                html += `<td><strong>${flight.flight || ''}</strong>`;
-                if (flight.hasNightStop) html += ' <span style="color:#721c24;font-size:10px;background:white;padding:1px 3px;border-radius:2px;">NS</span>';
-                if (flight.isReturnToBase) html += ' <span style="color:#20c997;font-size:10px;background:white;padding:1px 3px;border-radius:2px;">RTB</span>';
-                if (flight.isOutOfBase) html += ' <span style="color:#17a2b8;font-size:10px;background:white;padding:1px 3px;border-radius:2px;">OB</span>';
-                if (flight.isMultiDay) html += ' <span style="color:#6c757d;font-size:8px;background:white;padding:1px 3px;border-radius:2px;">CONT</span>';
-                if (flight.ftlData?.isMultiDayDuty) html += ' <span style="color:#6f42c1;font-size:8px;background:white;padding:1px 3px;border-radius:2px;">MULTI-DAY</span>';
-                html += `</td>`;
+                
+                // Flight column with duty cycle indicators
+                if (flight.isArrivalOnlyRow && !flight.flight) {
+                    // For arrival-only rows
+                    html += `<td><span style="color:#6c757d; font-style:italic;">Arrival</span>`;
+                    if (flight.isReturnToBase) html += ' <span style="color:#20c997;font-size:10px;background:white;padding:1px 3px;border-radius:2px;">RTB</span>';
+                    html += `</td>`;
+                } else {
+                    // Regular row with flight number
+                    html += `<td><strong>${flight.flight || ''}</strong>`;
+                    
+                    // Add duty cycle indicators
+                    if (dutyInfo) {
+                        if (dutyInfo.isBoundary) {
+                            html += ' <span style="color:#6f42c1;font-size:8px;background:white;padding:1px 3px;border-radius:2px;">🌐</span>';
+                        }
+                        if (!dutyInfo.isComplete) {
+                            html += ' <span style="color:#ffc107;font-size:8px;background:white;padding:1px 3px;border-radius:2px;">🔄</span>';
+                        }
+                    }
+                    
+                    if (flight.hasNightStop) html += ' <span style="color:#721c24;font-size:10px;background:white;padding:1px 3px;border-radius:2px;">NS</span>';
+                    if (flight.isReturnToBase) html += ' <span style="color:#20c997;font-size:10px;background:white;padding:1px 3px;border-radius:2px;">RTB</span>';
+                    if (flight.isOutOfBase) html += ' <span style="color:#17a2b8;font-size:10px;background:white;padding:1px 3px;border-radius:2px;">OB</span>';
+                    if (flight.isMultiDay && !flight.isArrivalDayEntry) html += ' <span style="color:#6c757d;font-size:8px;background:white;padding:1px 3px;border-radius:2px;">CONT</span>';
+                    if (flight.ftlData?.isMultiDayDuty) html += ' <span style="color:#6f42c1;font-size:8px;background:white;padding:1px 3px;border-radius:2px;">MULTI-DAY</span>';
+                    if (flight.estimated) html += ' <span style="color:#ffc107;font-size:8px;background:white;padding:1px 3px;border-radius:2px;">EST</span>';
+                    if (flight.isArrivalDayEntry && flight.flight) html += ' <span style="color:#17a2b8;font-size:8px;background:white;padding:1px 3px;border-radius:2px;">ARR</span>';
+                    html += `</td>`;
+                }
+                
                 html += `<td>${flight.departure || ''}</td>`;
                 html += `<td>${flight.arrival || ''}</td>`;
-                html += `<td>${flight.dutyEnd || ''}</td>`;
+                html += `<td>${flight.shouldHideDutyEndInTable ? '' : (flight.dutyEnd || '')}</td>`;
                 html += `<td>${flight.type || ''}</td>`;
                 html += `<td>${flight.blockHours || ''}</td>`;
                 html += `<td>${flight.dutyHours || ''}</td>`;
                 html += `<td class="${aircraftClass}">${aircraftDisplay}</td>`;
                 html += `<td>${ftlLimit}</td>`;
-html += `<td>${latestArrival}</td>`;
-html += `<td>${sectors}</td>`;
+                html += `<td title="${ftlTooltip}">${latestArrival}</td>`;
+                html += `<td>${sectors}</td>`;
 
-if (flight.ftlData) {
-    const timerData = calculateTimeToLimit(flight);
-    const arrivalStation = flight.ftlData.arrivalStation || flight.departureAirport;
-    const targetTimeDisplay = `${formatTimerDisplay(timerData)}<br><small style="font-size:9px;color:#666;">Target: ${latestArrival} ${arrivalStation}</small>`;
-    html += `<td class="${getTimerClass(timerData)} time-to-limit-cell" data-flight-index="${index}">${targetTimeDisplay}</td>`;
-} else {
-    html += `<td class="time-to-limit time-inactive">---</td>`;
-}
+                // Timer cell logic
+                if (flight.ftlData) {
+                    const timerData = calculateTimeToLimit(flight);
+                    const arrivalStation = flight.ftlData.arrivalStation || flight.arrivalAirport || flight.departureAirport;
+                    const targetTimeDisplay = `${formatTimerDisplay(timerData)}<br><small style="font-size:9px;color:#666;">Target: ${latestArrival} ${arrivalStation}</small>`;
+                    html += `<td class="${getTimerClass(timerData)} time-to-limit-cell" data-flight-index="${index}">${targetTimeDisplay}</td>`;
+                } else if (flight.isArrivalDayEntry && flight.linkedDepartureFlight && flight.linkedDepartureFlight.ftlData) {
+                    if (flight.isArrivalOnlyRow && !flight.flight) {
+                        html += `<td class="time-to-limit time-inactive">---</td>`;
+                    } else {
+                        const linkedFlight = flight.linkedDepartureFlight;
+                        const timerData = calculateTimeToLimit(linkedFlight);
+                        const arrivalStation = linkedFlight.ftlData.arrivalStation || linkedFlight.arrivalAirport || linkedFlight.departureAirport;
+                        const targetTimeDisplay = `${formatTimerDisplay(timerData)}<br><small style="font-size:9px;color:#666;">Target: ${linkedFlight.ftlData.latestArrivalTime} ${arrivalStation}</small>`;
+                        html += `<td class="${getTimerClass(timerData)} time-to-limit-cell" data-flight-index="${flights.indexOf(linkedFlight)}">${targetTimeDisplay}</td>`;
+                    }
+                } else {
+                    html += `<td class="time-to-limit time-inactive">---</td>`;
+                }
                 html += '</tr>';
             });
             
@@ -2091,20 +3568,28 @@ if (flight.ftlData) {
             html += '<span style="background: #d4edda; border-left: 3px solid #20c997;">Return to Base (RTB)</span> ';
             html += '<span style="background: #e8f4f8; border: 1px solid #17a2b8;">Out of Base (OB)</span> ';
             html += '<span style="background: #d1ecf1;">Narrowbody (N)</span> ';
-            html += '<span style="background: #d4edda;">Widebody (W)</span>';
-            html += '<span style="color:#6c757d;font-size:8px;background:white;padding:1px 3px;border-radius:2px;">CONT = Continuation</span>';
-            html += '<span style="color:#6f42c1;font-size:8px;background:white;padding:1px 3px;border-radius:2px;">MULTI-DAY = FTL spans multiple days</span>';
-            html += '<br><small>NS = Night Stop | RTB = Return to Base | OB = Out of Base | CONT = Multi-day flight continuation</small>';
+            html += '<span style="background: #d4edda;">Widebody (W)</span> ';
+            html += '<span style="color:#6f42c1;font-size:8px;background:white;padding:1px 3px;border-radius:2px;">🌐 = Multi-month duty</span> ';
+            html += '<span style="color:#ffc107;font-size:8px;background:white;padding:1px 3px;border-radius:2px;">🔄 = Incomplete duty</span>';
+            html += '<br><small>NS = Night Stop | RTB = Return to Base | OB = Out of Base | CONT = Multi-day flight continuation | ARR = Arrival day entry</small>';
+            html += '<br><small>🌐 = Duty spans multiple months | 🔄 = Incomplete duty cycle (needs additional roster)</small>';
             html += '<br><small><strong>Time to Limit:</strong> 🟢 Safe (>2h) | 🟡 Warning (1-2h) | 🟠 Caution (30min-1h) | 🔴 Critical (<30min) | ⛔ EXCEEDED</small>';
-            html += '<br><small><strong class="tooltip">Timer Logic: Counts down to arrival station local time limit<span class="tooltiptext">Timer displays countdown to when you must arrive at destination (local time).<br>FTL limits are calculated from duty start (departure local time).<br>The "EXCEEDED" status triggers when arrival station local time passes the limit.</span></strong></small>';
+            html += '<br><small><strong>Note:</strong> Flight-specific data (flight number, timer, aircraft) appears only once per flight cycle to avoid duplication</small>';
             html += '</div>';
             
             document.getElementById('results').innerHTML = html;
             updateTimerStatus();
         }
         
-        // ============ CHANGE 3: Fixed night stop counting in displayStatistics() ============
-        function displayStatistics(flights) {
+        function displayStatistics(flights, dutyCycleValidation = null, boundaryIssues = null) {
+            // If validation not provided, run it
+            if (!dutyCycleValidation) {
+                dutyCycleValidation = dutyCycleValidator.validateRoster(flights, currentCrewBase);
+            }
+            if (!boundaryIssues) {
+                boundaryIssues = monthBoundaryDetector.detectBoundaryIssues(flights);
+            }
+            
             let totalBlockHours = 0;
             let totalDutyHours = 0;
             let dayOffs = 0;
@@ -2118,16 +3603,20 @@ if (flight.ftlData) {
             let dayOffsAway = 0;
             let ftlCalculatedFlights = 0;
             let multiDayFtlCalculations = 0;
+            let estimatedFlights = 0;
+            let incompleteFlights = 0;
+            let arrivalDayEntries = 0;
+            let arrivalOnlyRows = 0;
             
             const narrowbodyTypes = ['737', '73H', '7M8', '738'];
             const widebodyTypes = ['332', '333', '350', '359', '339'];
             
-            let previousDutyEndLocation = CREW_BASE;
+            let previousDutyEndLocation = currentCrewBase;
             
             flights.forEach(flight => {
                 if (flight.type === 'D') {
                     dayOffs++;
-                    if (previousDutyEndLocation === CREW_BASE) {
+                    if (previousDutyEndLocation === currentCrewBase) {
                         dayOffsAtBase++;
                     } else {
                         dayOffsAway++;
@@ -2144,7 +3633,7 @@ if (flight.ftlData) {
                         totalDutyHours += hours * 60 + minutes;
                     }
                     
-                    if (flight.aircraft) {
+                    if (flight.aircraft && !flight.isArrivalOnlyRow) {
                         const acType = flight.aircraft.substring(0, 3);
                         if (narrowbodyTypes.includes(acType)) narrowbodyFlights++;
                         if (widebodyTypes.includes(acType)) widebodyFlights++;
@@ -2152,6 +3641,13 @@ if (flight.ftlData) {
                     
                     if (flight.isMultiDay) multiDayFlights++;
                     if (flight.isOutOfBase) outOfBaseFlights++;
+                    if (flight.estimated) estimatedFlights++;
+                    if (flight.isArrivalDayEntry) arrivalDayEntries++;
+                    if (flight.isArrivalOnlyRow) arrivalOnlyRows++;
+                    
+                    if (flight.departure && !flight.arrival) {
+                        incompleteFlights++;
+                    }
                     
                     if (flight.ftlData) {
                         ftlCalculatedFlights++;
@@ -2161,15 +3657,15 @@ if (flight.ftlData) {
                     }
                 }
                 
-                // Count night stops and RTB regardless of flight number
-                // This ensures multi-day continuation rows are counted
-                if (flight.hasNightStop) {
+                if (flight.hasNightStop && !flight.isArrivalDayEntry) {
+                    // Only count night stops on departure days, not arrival days
                     nightStops++;
                     previousDutyEndLocation = flight.arrivalAirport;
                 }
-                if (flight.isReturnToBase) {
+                if (flight.isReturnToBase && !flight.isArrivalDayEntry) {
+                    // Only count return to base on departure days
                     returnToBaseFlights++;
-                    previousDutyEndLocation = CREW_BASE;
+                    previousDutyEndLocation = currentCrewBase;
                 }
             });
             
@@ -2179,6 +3675,24 @@ if (flight.ftlData) {
                 return `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}`;
             };
             
+            // Duty cycle statistics
+            const completeDutyCycles = dutyCycleValidation.dutyCycles.filter(d => d.isComplete).length;
+            const boundaryDutyCycles = dutyCycleValidation.dutyCycles.filter(d => d.spansMonths).length;
+            const incompleteDutyCycles = dutyCycleValidation.dutyCycles.filter(d => !d.isComplete).length;
+            
+            // Boundary detection statistics
+            const boundaryDetectionInfo = `
+                <div style="margin-top: 10px; padding: 10px; background-color: #fff3cd; border-radius: 4px; border-left: 4px solid #ffc107;">
+                    <strong>📅 Month Boundary Detection:</strong>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin-top: 8px;">
+                        ${boundaryIssues.needsPreviousMonth ? '<div><strong>Previous Month:</strong> Required</div>' : ''}
+                        ${boundaryIssues.needsNextMonth ? '<div><strong>Next Month:</strong> Required</div>' : ''}
+                        <div><strong>Dates Tracked:</strong> ${monthBoundaryDetector.dateTracker.size}</div>
+                        <div><strong>Dates with Data:</strong> ${monthBoundaryDetector.datesWithData.size}</div>
+                    </div>
+                </div>
+            `;
+            
             const ftlSettingsInfo = ftlCalculatedFlights > 0 ? 
                 `<div style="margin-top: 10px; padding: 10px; background-color: #e9ecef; border-radius: 4px;">
                     <strong>FTL Settings:</strong> ${currentFtlSettings.crewType === 'cabin' ? 'Cabin Crew' : 'Tech Crew'}, 
@@ -2186,21 +3700,51 @@ if (flight.ftlData) {
                     | ${ftlCalculatedFlights} flights with FTL data (${multiDayFtlCalculations} multi-day)
                 </div>` : '';
             
+            const dutyCycleInfo = dutyCycleValidation.dutyCycles.length > 0 ?
+                `<div style="margin-top: 10px; padding: 10px; background-color: #e8f4f8; border-radius: 4px; border-left: 4px solid #17a2b8;">
+                    <strong>Duty Cycle Analysis:</strong>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin-top: 8px;">
+                        <div><strong>Total Duty Cycles:</strong> ${dutyCycleValidation.dutyCycles.length}</div>
+                        <div><strong>Complete:</strong> ${completeDutyCycles}</div>
+                        <div><strong>Multi-month:</strong> ${boundaryDutyCycles}</div>
+                        <div><strong>Incomplete:</strong> ${incompleteDutyCycles}</div>
+                        <div><strong>Months Loaded:</strong> ${dutyCycleValidation.months.length}</div>
+                        <div><strong>Month Boundaries:</strong> ${dutyCycleValidation.boundaryWarnings.length}</div>
+                    </div>
+                </div>` : '';
+            
+            const incompleteInfo = dutyCycleValidation.hasBoundaryIssues || dutyCycleValidation.hasIncompleteData ?
+                `<div style="margin-top: 10px; padding: 10px; background-color: #fff3cd; border-radius: 4px; border-left: 4px solid #ffc107;">
+                    <strong>⚠️ Data Completeness:</strong> 
+                    ${dutyCycleValidation.boundaryWarnings.length > 0 ? `${dutyCycleValidation.boundaryWarnings.length} multi-month duty cycle${dutyCycleValidation.boundaryWarnings.length > 1 ? 's' : ''}` : ''}
+                    ${dutyCycleValidation.boundaryWarnings.length > 0 && dutyCycleValidation.incompleteFlights.length > 0 ? ' | ' : ''}
+                    ${dutyCycleValidation.incompleteFlights.length > 0 ? `${dutyCycleValidation.incompleteFlights.length} flight${dutyCycleValidation.incompleteFlights.length > 1 ? 's' : ''} missing arrival data` : ''}
+                </div>` : '';
+            
             const html = `
                 <div class="stats">
                     <h3>Monthly Statistics</h3>
                     ${ftlSettingsInfo}
-                    <div class="stat-item"><strong>Total Block Hours:</strong> ${formatTime(totalBlockHours)}</div>
-                    <div class="stat-item"><strong>Total Duty Hours:</strong> ${formatTime(totalDutyHours)}</div>
-                    <div class="stat-item"><strong>Day Offs:</strong> ${dayOffs} (At Base: ${dayOffsAtBase}, Away: ${dayOffsAway})</div>
-                    <div class="stat-item"><strong>Night Stops:</strong> ${nightStops}</div>
-                    <div class="stat-item"><strong>Return to Base Flights:</strong> ${returnToBaseFlights}</div>
-                    <div class="stat-item"><strong>Out of Base Starts:</strong> ${outOfBaseFlights}</div>
-                    <div class="stat-item"><strong>Multi-day Flights:</strong> ${multiDayFlights}</div>
-                    <div class="stat-item"><strong>Narrowbody Flights:</strong> ${narrowbodyFlights}</div>
-                    <div class="stat-item"><strong>Widebody Flights:</strong> ${widebodyFlights}</div>
-                    ${ftlCalculatedFlights > 0 ? `<div class="stat-item"><strong>Flights with FTL Data:</strong> ${ftlCalculatedFlights}</div>` : ''}
-                    <div class="stat-item"><small><em>Note: Multi-day flights are counted once for block/duty hours and aircraft</em></small></div>
+                    ${boundaryDetectionInfo}
+                    ${dutyCycleInfo}
+                    ${incompleteInfo}
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 10px; margin-top: 15px;">
+                        <div class="stat-item"><strong>Months Covered:</strong> ${dutyCycleValidation.months.join(', ') || 'Single month'}</div>
+                        <div class="stat-item"><strong>Total Block Hours:</strong> ${formatTime(totalBlockHours)}</div>
+                        <div class="stat-item"><strong>Total Duty Hours:</strong> ${formatTime(totalDutyHours)}</div>
+                        <div class="stat-item"><strong>Day Offs:</strong> ${dayOffs} (At Base: ${dayOffsAtBase}, Away: ${dayOffsAway})</div>
+                        <div class="stat-item"><strong>Night Stops:</strong> ${nightStops}</div>
+                        <div class="stat-item"><strong>Return to Base Flights:</strong> ${returnToBaseFlights}</div>
+                        <div class="stat-item"><strong>Out of Base Starts:</strong> ${outOfBaseFlights}</div>
+                        <div class="stat-item"><strong>Multi-day Flights:</strong> ${multiDayFlights}</div>
+                        <div class="stat-item"><strong>Arrival Day Entries:</strong> ${arrivalDayEntries} (${arrivalOnlyRows} arrival-only rows)</div>
+                        <div class="stat-item"><strong>Narrowbody Flights:</strong> ${narrowbodyFlights}</div>
+                        <div class="stat-item"><strong>Widebody Flights:</strong> ${widebodyFlights}</div>
+                        ${ftlCalculatedFlights > 0 ? `<div class="stat-item"><strong>Flights with FTL Data:</strong> ${ftlCalculatedFlights}</div>` : ''}
+                    </div>
+                    <div class="stat-item" style="margin-top: 15px; padding-top: 10px; border-top: 1px solid #dee2e6;">
+                        <small><em>Note: The system now uses duty-cycle based validation to accurately detect multi-month flights and missing data.</em></small>
+                    </div>
                 </div>
             `;
             
@@ -2211,6 +3755,8 @@ if (flight.ftlData) {
             document.getElementById('rosterInput').value = '';
             document.getElementById('results').innerHTML = '';
             document.getElementById('stats').innerHTML = '';
+            document.getElementById('incompleteWarning').style.display = 'none';
+            document.getElementById('incompleteWarning').innerHTML = '';
             allFlights = [];
             stopLiveTimer();
             updateFtlStatus('Ready to calculate FTL', 'info');
@@ -2219,7 +3765,7 @@ if (flight.ftlData) {
         // ============ INITIALIZATION ============
         
         document.addEventListener('DOMContentLoaded', async function() {
-            console.log('Initializing Flight Roster Parser...');
+            console.log('Initializing Flight Roster Parser with Month Boundary Detection...');
             
             initializeAutoSave();
             
@@ -2237,7 +3783,8 @@ if (flight.ftlData) {
             
             await loadFtlConfiguration();
             
-            console.log('Flight Roster Parser fully initialized');
+            console.log('Flight Roster Parser fully initialized with month boundary detection');
+            console.log('Month Boundary Detection System loaded successfully');
         });
     </script>
 </body>
