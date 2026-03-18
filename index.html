@@ -698,8 +698,45 @@
                 <div class="error-message" id="cabinSectorsError"></div>
             </div>
             
-            </div><!-- end cabinAcclimatizationFields -->
-            <button id="calculateCabinBtn">Calculate Cabin Crew Limits</button>
+          </div>
+
+</div><!-- end cabinAcclimatizationFields -->
+
+<div class="input-group">
+  <label for="cabinDutyStart">Start Time</label>
+  <div class="time-gmt-container">
+    <div class="time-input">
+      <input type="datetime-local" id="cabinDutyStart" required>
+    </div>
+    <div class="gmt-input">
+      <select id="cabinStartGMT" class="gmt-select"></select>
+    </div>
+  </div>
+  <div class="input-description">Reporting time at Base/ ex-Station.</div>
+  <div class="error-message" id="cabinDutyStartError"></div>
+</div>
+
+<div class="input-group">
+  <label for="cabinDutyEnd">End Time</label>
+  <div class="time-gmt-container">
+    <div class="time-input">
+      <input type="datetime-local" id="cabinDutyEnd" required>
+    </div>
+    <div class="gmt-input">
+      <select id="cabinEndGMT" class="gmt-select"></select>
+    </div>
+  </div>
+  <div class="input-description">Final sector STA/ATA. FDP does not count +30 minutes post flight duty time.</div>
+  <div class="error-message" id="cabinDutyEndError"></div>
+</div>
+
+<div class="input-group">
+  <label for="cabinSectors">Number of Sectors</label>
+  <input type="text" id="cabinSectors" pattern="[0-9]*" inputmode="numeric" value="1" required>
+  <div class="error-message" id="cabinSectorsError"></div>
+</div>
+
+<button id="calculateCabinBtn">Calculate Cabin Crew Limits</button>
             
             <div class="results" id="cabinResults">
                 <div id="cabinResultContent">
@@ -769,45 +806,86 @@
                 <div class="error-message" id="techLastDutyEndError"></div>
             </div>
             
-            <div class="input-group">
-                <label for="techDutyStart">Start Time</label>
-                <div class="time-gmt-container">
-                    <div class="time-input">
-                        <input type="datetime-local" id="techDutyStart" required>
-                    </div>
-                    <div class="gmt-input">
-                        <select id="techStartGMT" class="gmt-select">
-                            <!-- GMT options would be populated by JavaScript -->
-                        </select>
-                    </div>
-                </div>
-                <div class="input-description">Reporting time at Base/ ex-Station.</div>
-                <div class="error-message" id="techDutyStartError"></div>
-            </div>
-            
-            <div class="input-group">
-                <label for="techDutyEnd">End Time</label>
-                <div class="time-gmt-container">
-                    <div class="time-input">
-                        <input type="datetime-local" id="techDutyEnd" required>
-                    </div>
-                    <div class="gmt-input">
-                        <select id="techEndGMT" class="gmt-select">
-                            <!-- GMT options would be populated by JavaScript -->
-                        </select>
-                    </div>
-                </div>
-                <div class="input-description">Final sector STA/ATA. FDP does not count +30 minutes post flight duty time.</div>
-                <div class="error-message" id="techDutyEndError"></div>
-            </div>
-            
-            <div class="input-group">
-                <label for="techSectors">Number of Sectors</label>
-                <input type="text" id="techSectors" pattern="[0-9]*" inputmode="numeric" value="1" required>
-                <div class="error-message" id="techSectorsError"></div>
-            </div>
+          </div>
+
+</div><!-- end cabinAcclimatizationFields -->
+
+<div class="input-group">
+  <label for="cabinDutyStart">Start Time</label>
+  <div class="time-gmt-container">
+    <div class="time-input">
+      <input type="datetime-local" id="cabinDutyStart" required>
+    </div>
+    <div class="gmt-input">
+      <select id="cabinStartGMT" class="gmt-select"></select>
+    </div>
+  </div>
+  <div class="input-description">Reporting time at Base/ ex-Station.</div>
+  <div class="error-message" id="cabinDutyStartError"></div>
+</div>
+
+<div class="input-group">
+  <label for="cabinDutyEnd">End Time</label>
+  <div class="time-gmt-container">
+    <div class="time-input">
+      <input type="datetime-local" id="cabinDutyEnd" required>
+    </div>
+    <div class="gmt-input">
+      <select id="cabinEndGMT" class="gmt-select"></select>
+    </div>
+  </div>
+  <div class="input-description">Final sector STA/ATA. FDP does not count +30 minutes post flight duty time.</div>
+  <div class="error-message" id="cabinDutyEndError"></div>
+</div>
+
+<div class="input-group">
+  <label for="cabinSectors">Number of Sectors</label>
+  <input type="text" id="cabinSectors" pattern="[0-9]*" inputmode="numeric" value="1" required>
+  <div class="error-message" id="cabinSectorsError"></div>
+</div>
+
+<button id="calculateCabinBtn">Calculate Cabin Crew Limits</button>
             
             </div><!-- end techAcclimatizationFields -->
+            </div>
+
+</div><!-- end cabinAcclimatizationFields -->
+
+<div class="input-group">
+  <label for="cabinDutyStart">Start Time</label>
+  <div class="time-gmt-container">
+    <div class="time-input">
+      <input type="datetime-local" id="cabinDutyStart" required>
+    </div>
+    <div class="gmt-input">
+      <select id="cabinStartGMT" class="gmt-select"></select>
+    </div>
+  </div>
+  <div class="input-description">Reporting time at Base/ ex-Station.</div>
+  <div class="error-message" id="cabinDutyStartError"></div>
+</div>
+
+<div class="input-group">
+  <label for="cabinDutyEnd">End Time</label>
+  <div class="time-gmt-container">
+    <div class="time-input">
+      <input type="datetime-local" id="cabinDutyEnd" required>
+    </div>
+    <div class="gmt-input">
+      <select id="cabinEndGMT" class="gmt-select"></select>
+    </div>
+  </div>
+  <div class="input-description">Final sector STA/ATA. FDP does not count +30 minutes post flight duty time.</div>
+  <div class="error-message" id="cabinDutyEndError"></div>
+</div>
+
+<div class="input-group">
+  <label for="cabinSectors">Number of Sectors</label>
+  <input type="text" id="cabinSectors" pattern="[0-9]*" inputmode="numeric" value="1" required>
+  <div class="error-message" id="cabinSectorsError"></div>
+</div>
+
+<button id="calculateCabinBtn">Calculate Cabin Crew Limits</button>
             <button id="calculateTechBtn">Calculate Tech Crew Limits</button>
             
             <div class="results" id="techResults">
