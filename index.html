@@ -1357,14 +1357,22 @@
 
                 // Date validation
                 if (this.elements.DutyStart.value && this.elements.DutyEnd.value) {
-  const startUTC = this.convertToUTC(this.elements.DutyStart.value, parseFloat(this.elements.StartGMT.value));
-  const endUTC = this.convertToUTC(this.elements.DutyEnd.value, parseFloat(this.elements.EndGMT.value));
-  
-  if (startUTC >= endUTC) {
-    Utils.showError(`${this.type}DutyEndError`, 'Duty end must be after duty start (check your GMT offsets and dates)');
-    isValid = false;
-  }
-}
+                    const startUTC = this.convertToUTC(this.elements.DutyStart.value, parseFloat(this.elements.StartGMT.value));
+                    let endUTC = this.convertToUTC(this.elements.DutyEnd.value, parseFloat(this.elements.EndGMT.value));
+
+                    // If end is before start, assume next day landing (westbound same-date scenario)
+                    if (endUTC <= startUTC) {
+                        endUTC += 24 * 60 * 60 * 1000;
+                    }
+
+                    // Catch genuinely impossible duty periods over 24 hours
+                    if (endUTC - startUTC > 24 * 60 * 60 * 1000) {
+                        Utils.showError(`${this.type}DutyEndError`, 'Duty period cannot exceed 24 hours — please check your dates');
+                        isValid = false;
+                    } else {
+                        Utils.clearError(`${this.type}DutyEndError`);
+                    }
+                }
 
                 // Sector validation - now handles text input
                 const sectors = parseInt(this.elements.Sectors.value);
@@ -1700,7 +1708,13 @@
 
             calculateDutyPeriodWithTimezone(startTimeStr, endTimeStr, startGMT, endGMT) {
                 const startUTC = this.convertToUTC(startTimeStr, startGMT);
-                const endUTC = this.convertToUTC(endTimeStr, endGMT);
+                let endUTC = this.convertToUTC(endTimeStr, endGMT);
+
+                // If end is before start, assume next day landing (westbound same-date scenario)
+                if (endUTC <= startUTC) {
+                    endUTC += 24 * 60 * 60 * 1000;
+                }
+
                 return endUTC - startUTC;
             }
 
