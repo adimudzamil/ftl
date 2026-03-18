@@ -576,7 +576,7 @@
         
         <!-- Auto-save toggle -->
         <div class="auto-save-toggle">
-            <input type="checkbox" id="autoSaveToggle" checked>
+            <input type="checkbox" id="autoSaveToggle">
             <label for="autoSaveToggle">Auto-save form data</label>
         </div>
         <div class="save-status" id="saveStatus">Form data saved</div>
@@ -609,57 +609,52 @@
                 </select>
                 <div class="input-description">Select your aircraft type</div>
             </div>
-            
-            <div class="input-group">
-  <label>Acclimatization</label>
-  <div style="display:flex; gap:10px; margin-top:5px;">
-    <label style="display:flex; align-items:center; gap:6px; font-weight:normal; cursor:pointer;">
-      <input type="radio" name="cabinRestLocation" id="cabinAtBase" value="base" checked>
-      No Acclimatization Check
-    </label>
-    <label style="display:flex; align-items:center; gap:6px; font-weight:normal; cursor:pointer;">
-      <input type="radio" name="cabinRestLocation" id="cabinAtOutstation" value="outstation">
-      Check Acclimatization
-    </label>
-  </div>
-  <div class="input-description">Select "Check Acclimatization" only if your last rest was at an outstation more than ±2 GMT hours from base</div>
-</div>
 
-<div id="cabinAcclimatizationFields" style="display:none;">
             <div class="input-group">
-                <label for="cabinBaseGMT">Current GMT</label>
-                <select id="cabinBaseGMT" class="gmt-select">
-                    <!-- GMT options would be populated by JavaScript -->
-                </select>
-                <div class="gmt-info">Select your current GMT, the place where you are departing from today.</div>
-                <div class="error-message" id="cabinBaseGMTError"></div>
-            </div>
-            
-            <div class="input-group">
-                <label for="cabinLastDepartureGMT">Last Departure Station GMT</label>
-                <select id="cabinLastDepartureGMT" class="gmt-select">
-                    <!-- GMT options would be populated by JavaScript -->
-                </select>
-                <div class="gmt-info">Select last departure station timezone</div>
-                <div class="error-message" id="cabinLastDepartureGMTError"></div>
-            </div>
-            
-            <div class="input-group">
-                <label for="cabinLastDutyEnd">Last Duty End Date and Time</label>
-                <div class="time-gmt-container">
-                    <div class="time-input">
-                        <input type="datetime-local" id="cabinLastDutyEnd" required>
-                    </div>
-                    <div class="gmt-input">
-                        <select id="cabinLastDutyEndGMT" class="gmt-select">
-                            <!-- GMT options would be populated by JavaScript -->
-                        </select>
-                    </div>
+                <label>Acclimatization</label>
+                <div style="display:flex; gap:10px; margin-top:5px;">
+                    <label style="display:flex; align-items:center; gap:6px; font-weight:normal; cursor:pointer;">
+                        <input type="radio" name="cabinRestLocation" id="cabinAtBase" value="base" checked>
+                        No Acclimatization Check
+                    </label>
+                    <label style="display:flex; align-items:center; gap:6px; font-weight:normal; cursor:pointer;">
+                        <input type="radio" name="cabinRestLocation" id="cabinAtOutstation" value="outstation">
+                        Check Acclimatization
+                    </label>
                 </div>
-                <div class="input-description">Check last duty end time in your roster (STA + 30 minutes) or (ATA + 30 minutes)</div>
-                <div class="error-message" id="cabinLastDutyEndError"></div>
+                <div class="input-description">Select "Check Acclimatization" only if your last rest was at an outstation more than ±2 GMT hours from base</div>
             </div>
-            
+
+            <div id="cabinAcclimatizationFields" style="display:none;">
+                <div class="input-group">
+                    <label for="cabinBaseGMT">Current GMT</label>
+                    <select id="cabinBaseGMT" class="gmt-select"></select>
+                    <div class="gmt-info">Select your current GMT, the place where you are departing from today.</div>
+                    <div class="error-message" id="cabinBaseGMTError"></div>
+                </div>
+
+                <div class="input-group">
+                    <label for="cabinLastDepartureGMT">Last Departure Station GMT</label>
+                    <select id="cabinLastDepartureGMT" class="gmt-select"></select>
+                    <div class="gmt-info">Select last departure station timezone</div>
+                    <div class="error-message" id="cabinLastDepartureGMTError"></div>
+                </div>
+
+                <div class="input-group">
+                    <label for="cabinLastDutyEnd">Last Duty End Date and Time</label>
+                    <div class="time-gmt-container">
+                        <div class="time-input">
+                            <input type="datetime-local" id="cabinLastDutyEnd" required>
+                        </div>
+                        <div class="gmt-input">
+                            <select id="cabinLastDutyEndGMT" class="gmt-select"></select>
+                        </div>
+                    </div>
+                    <div class="input-description">Check last duty end time in your roster (STA + 30 minutes) or (ATA + 30 minutes)</div>
+                    <div class="error-message" id="cabinLastDutyEndError"></div>
+                </div>
+            </div><!-- end cabinAcclimatizationFields -->
+
             <div class="input-group">
                 <label for="cabinDutyStart">Start Time</label>
                 <div class="time-gmt-container">
@@ -667,15 +662,13 @@
                         <input type="datetime-local" id="cabinDutyStart" required>
                     </div>
                     <div class="gmt-input">
-                        <select id="cabinStartGMT" class="gmt-select">
-                            <!-- GMT options would be populated by JavaScript -->
-                        </select>
+                        <select id="cabinStartGMT" class="gmt-select"></select>
                     </div>
                 </div>
                 <div class="input-description">Reporting time at Base/ ex-Station.</div>
                 <div class="error-message" id="cabinDutyStartError"></div>
             </div>
-            
+
             <div class="input-group">
                 <label for="cabinDutyEnd">End Time</label>
                 <div class="time-gmt-container">
@@ -683,68 +676,26 @@
                         <input type="datetime-local" id="cabinDutyEnd" required>
                     </div>
                     <div class="gmt-input">
-                        <select id="cabinEndGMT" class="gmt-select">
-                            <!-- GMT options would be populated by JavaScript -->
-                        </select>
+                        <select id="cabinEndGMT" class="gmt-select"></select>
                     </div>
                 </div>
                 <div class="input-description">Final sector STA/ATA. FDP does not count +30 minutes post flight duty time.</div>
                 <div class="error-message" id="cabinDutyEndError"></div>
             </div>
-            
+
             <div class="input-group">
                 <label for="cabinSectors">Number of Sectors</label>
                 <input type="text" id="cabinSectors" pattern="[0-9]*" inputmode="numeric" value="1" required>
                 <div class="error-message" id="cabinSectorsError"></div>
             </div>
-            
-          </div>
 
-</div><!-- end cabinAcclimatizationFields -->
+            <button id="calculateCabinBtn">Calculate Cabin Crew Limits</button>
 
-<div class="input-group">
-  <label for="cabinDutyStart">Start Time</label>
-  <div class="time-gmt-container">
-    <div class="time-input">
-      <input type="datetime-local" id="cabinDutyStart" required>
-    </div>
-    <div class="gmt-input">
-      <select id="cabinStartGMT" class="gmt-select"></select>
-    </div>
-  </div>
-  <div class="input-description">Reporting time at Base/ ex-Station.</div>
-  <div class="error-message" id="cabinDutyStartError"></div>
-</div>
-
-<div class="input-group">
-  <label for="cabinDutyEnd">End Time</label>
-  <div class="time-gmt-container">
-    <div class="time-input">
-      <input type="datetime-local" id="cabinDutyEnd" required>
-    </div>
-    <div class="gmt-input">
-      <select id="cabinEndGMT" class="gmt-select"></select>
-    </div>
-  </div>
-  <div class="input-description">Final sector STA/ATA. FDP does not count +30 minutes post flight duty time.</div>
-  <div class="error-message" id="cabinDutyEndError"></div>
-</div>
-
-<div class="input-group">
-  <label for="cabinSectors">Number of Sectors</label>
-  <input type="text" id="cabinSectors" pattern="[0-9]*" inputmode="numeric" value="1" required>
-  <div class="error-message" id="cabinSectorsError"></div>
-</div>
-
-<button id="calculateCabinBtn">Calculate Cabin Crew Limits</button>
-            
             <div class="results" id="cabinResults">
-                <div id="cabinResultContent">
-                    <!-- Results will appear here -->
-                </div>
+                <div id="cabinResultContent"></div>
             </div>
         </div>
-        
+
         <!-- Tech Crew Calculator -->
         <div id="tech-calculator" class="calculator-form">
             <div class="input-group">
@@ -755,146 +706,93 @@
                 </select>
                 <div class="input-description">Select your aircraft type</div>
             </div>
-            
-            <div class="input-group">
-  <label>Acclimatization</label>
-  <div style="display:flex; gap:10px; margin-top:5px;">
-    <label style="display:flex; align-items:center; gap:6px; font-weight:normal; cursor:pointer;">
-      <input type="radio" name="techRestLocation" id="techAtBase" value="base" checked>
-      No Acclimatization Check
-    </label>
-    <label style="display:flex; align-items:center; gap:6px; font-weight:normal; cursor:pointer;">
-      <input type="radio" name="techRestLocation" id="techAtOutstation" value="outstation">
-      Check Acclimatization
-    </label>
-  </div>
-  <div class="input-description">Select "Check Acclimatization" only if your last rest was at an outstation more than ±2 GMT hours from base</div>
-</div>
 
-<div id="techAcclimatizationFields" style="display:none;">
             <div class="input-group">
-                <label for="techBaseGMT">Current GMT</label>
-                <select id="techBaseGMT" class="gmt-select">
-                    <!-- GMT options would be populated by JavaScript -->
-                </select>
-                <div class="gmt-info">Select your current GMT, the place where you are departing from today.</div>
-                <div class="error-message" id="techBaseGMTError"></div>
+                <label>Acclimatization</label>
+                <div style="display:flex; gap:10px; margin-top:5px;">
+                    <label style="display:flex; align-items:center; gap:6px; font-weight:normal; cursor:pointer;">
+                        <input type="radio" name="techRestLocation" id="techAtBase" value="base" checked>
+                        No Acclimatization Check
+                    </label>
+                    <label style="display:flex; align-items:center; gap:6px; font-weight:normal; cursor:pointer;">
+                        <input type="radio" name="techRestLocation" id="techAtOutstation" value="outstation">
+                        Check Acclimatization
+                    </label>
+                </div>
+                <div class="input-description">Select "Check Acclimatization" only if your last rest was at an outstation more than ±2 GMT hours from base</div>
             </div>
-            
+
+            <div id="techAcclimatizationFields" style="display:none;">
+                <div class="input-group">
+                    <label for="techBaseGMT">Current GMT</label>
+                    <select id="techBaseGMT" class="gmt-select"></select>
+                    <div class="gmt-info">Select your current GMT, the place where you are departing from today.</div>
+                    <div class="error-message" id="techBaseGMTError"></div>
+                </div>
+
+                <div class="input-group">
+                    <label for="techLastDepartureGMT">Last Departure Station GMT</label>
+                    <select id="techLastDepartureGMT" class="gmt-select"></select>
+                    <div class="gmt-info">Select last departure station timezone</div>
+                    <div class="error-message" id="techLastDepartureGMTError"></div>
+                </div>
+
+                <div class="input-group">
+                    <label for="techLastDutyEnd">Last Duty End Date and Time</label>
+                    <div class="time-gmt-container">
+                        <div class="time-input">
+                            <input type="datetime-local" id="techLastDutyEnd" required>
+                        </div>
+                        <div class="gmt-input">
+                            <select id="techLastDutyEndGMT" class="gmt-select"></select>
+                        </div>
+                    </div>
+                    <div class="input-description">Check last duty end time in your roster (STA + 30 minutes) or (ATA + 30 minutes)</div>
+                    <div class="error-message" id="techLastDutyEndError"></div>
+                </div>
+            </div><!-- end techAcclimatizationFields -->
+
             <div class="input-group">
-                <label for="techLastDepartureGMT">Last Departure Station GMT</label>
-                <select id="techLastDepartureGMT" class="gmt-select">
-                    <!-- GMT options would be populated by JavaScript -->
-                </select>
-                <div class="gmt-info">Select last departure station timezone</div>
-                <div class="error-message" id="techLastDepartureGMTError"></div>
-            </div>
-            
-            <div class="input-group">
-                <label for="techLastDutyEnd">Last Duty End Date and Time</label>
+                <label for="techDutyStart">Start Time</label>
                 <div class="time-gmt-container">
                     <div class="time-input">
-                        <input type="datetime-local" id="techLastDutyEnd" required>
+                        <input type="datetime-local" id="techDutyStart" required>
                     </div>
                     <div class="gmt-input">
-                        <select id="techLastDutyEndGMT" class="gmt-select">
-                            <!-- GMT options would be populated by JavaScript -->
-                        </select>
+                        <select id="techStartGMT" class="gmt-select"></select>
                     </div>
                 </div>
-                <div class="input-description">Check last duty end time in your roster (STA + 30 minutes) or (ATA + 30 minutes)</div>
-                <div class="error-message" id="techLastDutyEndError"></div>
-            </div>
-            
-          </div>
-
-</div><!-- end cabinAcclimatizationFields -->
-
-<div class="input-group">
-  <label for="cabinDutyStart">Start Time</label>
-  <div class="time-gmt-container">
-    <div class="time-input">
-      <input type="datetime-local" id="cabinDutyStart" required>
-    </div>
-    <div class="gmt-input">
-      <select id="cabinStartGMT" class="gmt-select"></select>
-    </div>
-  </div>
-  <div class="input-description">Reporting time at Base/ ex-Station.</div>
-  <div class="error-message" id="cabinDutyStartError"></div>
-</div>
-
-<div class="input-group">
-  <label for="cabinDutyEnd">End Time</label>
-  <div class="time-gmt-container">
-    <div class="time-input">
-      <input type="datetime-local" id="cabinDutyEnd" required>
-    </div>
-    <div class="gmt-input">
-      <select id="cabinEndGMT" class="gmt-select"></select>
-    </div>
-  </div>
-  <div class="input-description">Final sector STA/ATA. FDP does not count +30 minutes post flight duty time.</div>
-  <div class="error-message" id="cabinDutyEndError"></div>
-</div>
-
-<div class="input-group">
-  <label for="cabinSectors">Number of Sectors</label>
-  <input type="text" id="cabinSectors" pattern="[0-9]*" inputmode="numeric" value="1" required>
-  <div class="error-message" id="cabinSectorsError"></div>
-</div>
-
-<button id="calculateCabinBtn">Calculate Cabin Crew Limits</button>
-            
-            </div><!-- end techAcclimatizationFields -->
+                <div class="input-description">Reporting time at Base/ ex-Station.</div>
+                <div class="error-message" id="techDutyStartError"></div>
             </div>
 
-</div><!-- end cabinAcclimatizationFields -->
-
-<div class="input-group">
-  <label for="cabinDutyStart">Start Time</label>
-  <div class="time-gmt-container">
-    <div class="time-input">
-      <input type="datetime-local" id="cabinDutyStart" required>
-    </div>
-    <div class="gmt-input">
-      <select id="cabinStartGMT" class="gmt-select"></select>
-    </div>
-  </div>
-  <div class="input-description">Reporting time at Base/ ex-Station.</div>
-  <div class="error-message" id="cabinDutyStartError"></div>
-</div>
-
-<div class="input-group">
-  <label for="cabinDutyEnd">End Time</label>
-  <div class="time-gmt-container">
-    <div class="time-input">
-      <input type="datetime-local" id="cabinDutyEnd" required>
-    </div>
-    <div class="gmt-input">
-      <select id="cabinEndGMT" class="gmt-select"></select>
-    </div>
-  </div>
-  <div class="input-description">Final sector STA/ATA. FDP does not count +30 minutes post flight duty time.</div>
-  <div class="error-message" id="cabinDutyEndError"></div>
-</div>
-
-<div class="input-group">
-  <label for="cabinSectors">Number of Sectors</label>
-  <input type="text" id="cabinSectors" pattern="[0-9]*" inputmode="numeric" value="1" required>
-  <div class="error-message" id="cabinSectorsError"></div>
-</div>
-
-<button id="calculateCabinBtn">Calculate Cabin Crew Limits</button>
-            <button id="calculateTechBtn">Calculate Tech Crew Limits</button>
-            
-            <div class="results" id="techResults">
-                <div id="techResultContent">
-                    <!-- Results will appear here -->
+            <div class="input-group">
+                <label for="techDutyEnd">End Time</label>
+                <div class="time-gmt-container">
+                    <div class="time-input">
+                        <input type="datetime-local" id="techDutyEnd" required>
+                    </div>
+                    <div class="gmt-input">
+                        <select id="techEndGMT" class="gmt-select"></select>
+                    </div>
                 </div>
+                <div class="input-description">Final sector STA/ATA. FDP does not count +30 minutes post flight duty time.</div>
+                <div class="error-message" id="techDutyEndError"></div>
+            </div>
+
+            <div class="input-group">
+                <label for="techSectors">Number of Sectors</label>
+                <input type="text" id="techSectors" pattern="[0-9]*" inputmode="numeric" value="1" required>
+                <div class="error-message" id="techSectorsError"></div>
+            </div>
+
+            <button id="calculateTechBtn">Calculate Tech Crew Limits</button>
+
+            <div class="results" id="techResults">
+                <div id="techResultContent"></div>
             </div>
         </div>
-        
+
         <!-- Standby Calculator -->
         <div id="standby-calculator" class="calculator-form">
             <div class="input-group">
@@ -1433,7 +1331,10 @@
                 const errors = [];
 
                 // Required field validation
-                if (!this.elements.LastDutyEnd.value) {
+                const atBaseRadio = document.getElementById(`${this.type}AtBase`);
+                const isAtBase = atBaseRadio && atBaseRadio.checked;
+
+                if (!isAtBase && !this.elements.LastDutyEnd.value) {
                     Utils.showError(`${this.type}LastDutyEndError`, 'Last duty end time is required');
                     isValid = false;
                 } else {
