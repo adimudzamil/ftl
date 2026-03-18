@@ -611,22 +611,6 @@
             </div>
             
             <div class="input-group">
-  <label>Acclimatization</label>
-  <div style="display:flex; gap:10px; margin-top:5px;">
-    <label style="display:flex; align-items:center; gap:6px; font-weight:normal; cursor:pointer;">
-      <input type="radio" name="cabinRestLocation" id="cabinAtBase" value="base" checked>
-      No Acclimatization Check
-    </label>
-    <label style="display:flex; align-items:center; gap:6px; font-weight:normal; cursor:pointer;">
-      <input type="radio" name="cabinRestLocation" id="cabinAtOutstation" value="outstation">
-      Check Acclimatization
-    </label>
-  </div>
-  <div class="input-description">Select "Check Acclimatization" only if your last rest was at an outstation more than ±2 GMT hours from base</div>
-</div>
-
-<div id="cabinAcclimatizationFields" style="display:none;">
-            <div class="input-group">
                 <label for="cabinBaseGMT">Current GMT</label>
                 <select id="cabinBaseGMT" class="gmt-select">
                     <!-- GMT options would be populated by JavaScript -->
@@ -698,7 +682,6 @@
                 <div class="error-message" id="cabinSectorsError"></div>
             </div>
             
-            </div><!-- end cabinAcclimatizationFields -->
             <button id="calculateCabinBtn">Calculate Cabin Crew Limits</button>
             
             <div class="results" id="cabinResults">
@@ -719,22 +702,6 @@
                 <div class="input-description">Select your aircraft type</div>
             </div>
             
-            <div class="input-group">
-  <label>Acclimatization</label>
-  <div style="display:flex; gap:10px; margin-top:5px;">
-    <label style="display:flex; align-items:center; gap:6px; font-weight:normal; cursor:pointer;">
-      <input type="radio" name="techRestLocation" id="techAtBase" value="base" checked>
-      No Acclimatization Check
-    </label>
-    <label style="display:flex; align-items:center; gap:6px; font-weight:normal; cursor:pointer;">
-      <input type="radio" name="techRestLocation" id="techAtOutstation" value="outstation">
-      Check Acclimatization
-    </label>
-  </div>
-  <div class="input-description">Select "Check Acclimatization" only if your last rest was at an outstation more than ±2 GMT hours from base</div>
-</div>
-
-<div id="techAcclimatizationFields" style="display:none;">
             <div class="input-group">
                 <label for="techBaseGMT">Current GMT</label>
                 <select id="techBaseGMT" class="gmt-select">
@@ -807,7 +774,6 @@
                 <div class="error-message" id="techSectorsError"></div>
             </div>
             
-            </div><!-- end techAcclimatizationFields -->
             <button id="calculateTechBtn">Calculate Tech Crew Limits</button>
             
             <div class="results" id="techResults">
@@ -1378,14 +1344,14 @@
 
                 // Date validation
                 if (this.elements.DutyStart.value && this.elements.DutyEnd.value) {
-  const startUTC = this.convertToUTC(this.elements.DutyStart.value, parseFloat(this.elements.StartGMT.value));
-  const endUTC = this.convertToUTC(this.elements.DutyEnd.value, parseFloat(this.elements.EndGMT.value));
-  
-  if (startUTC >= endUTC) {
-    Utils.showError(`${this.type}DutyEndError`, 'Duty end must be after duty start (check your GMT offsets and dates)');
-    isValid = false;
-  }
-}
+                    const start = new Date(this.elements.DutyStart.value);
+                    const end = new Date(this.elements.DutyEnd.value);
+                    
+                    if (start >= end) {
+                        Utils.showError(`${this.type}DutyEndError`, 'Duty end must be after duty start');
+                        isValid = false;
+                    }
+                }
 
                 // Sector validation - now handles text input
                 const sectors = parseInt(this.elements.Sectors.value);
@@ -1731,23 +1697,8 @@
             }
 
             checkAcclimatization() {
-    // If user selected No Acclimatization Check, return acclimatized immediately
-    const atBaseRadio = document.getElementById(`${this.type}AtBase`);
-    if (atBaseRadio && atBaseRadio.checked) {
-      return {
-        isAcclimatized: true,
-        timezoneExemption: false,
-        atBase: true,
-        message: 'Acclimatized (no acclimatization check selected)',
-        restPeriod: 'N/A',
-        restHours: 0,
-        validNightPeriods: 0,
-        nightPeriods: []
-      };
-    }
-    
-    const lastDutyEndUTC = this.convertToUTC(this.elements.LastDutyEnd.value, parseFloat(this.elements.LastDutyEndGMT.value));
-const dutyStartUTC = this.convertToUTC(this.elements.DutyStart.value, parseFloat(this.elements.StartGMT.value));
+                const lastDutyEndUTC = this.convertToUTC(this.elements.LastDutyEnd.value, parseFloat(this.elements.LastDutyEndGMT.value));
+                const dutyStartUTC = this.convertToUTC(this.elements.DutyStart.value, parseFloat(this.elements.StartGMT.value));
                 const restMs = dutyStartUTC - lastDutyEndUTC;
                 const restHours = restMs / (1000 * 60 * 60);
                 
@@ -2503,21 +2454,6 @@ const dutyStartUTC = this.convertToUTC(this.elements.DutyStart.value, parseFloat
             const techCalculator = new TechFTLCalculator('tech');
             const standbyCalculator = new StandbyFTLCalculator();
             
-            // Acclimatization toggle - Cabin
-document.querySelectorAll('input[name="cabinRestLocation"]').forEach(radio => {
-  radio.addEventListener('change', function() {
-    const fields = document.getElementById('cabinAcclimatizationFields');
-    fields.style.display = this.value === 'outstation' ? 'block' : 'none';
-  });
-});
-
-// Acclimatization toggle - Tech
-document.querySelectorAll('input[name="techRestLocation"]').forEach(radio => {
-  radio.addEventListener('change', function() {
-    const fields = document.getElementById('techAcclimatizationFields');
-    fields.style.display = this.value === 'outstation' ? 'block' : 'none';
-  });
-});
             // Calculator selector functionality
             document.querySelectorAll('.calc-btn').forEach(button => {
                 button.addEventListener('click', function() {
