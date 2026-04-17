@@ -689,53 +689,6 @@
                 <div class="error-message" id="cabinSectorsError"></div>
             </div>
 
-            <!-- IN-FLIGHT RELIEF SECTION — Cabin -->
-            <div class="input-group" style="border:1px solid #c8d8f0; border-radius:6px; padding:12px; background:#f0f4ff; margin-bottom:15px;">
-                <div class="checkbox-group">
-                    <input type="checkbox" id="cabinReliefEnabled">
-                    <label for="cabinReliefEnabled" style="font-weight:600; color:#1a3a8f;">🛌 In-Flight Relief Provided? (7.5.10 / 7.5.18)</label>
-                </div>
-                <div class="input-description">Check this if augmented crew with in-flight rest is being used to extend FDP.</div>
-
-                <div id="cabinReliefFields" style="display:none; margin-top:10px;">
-                    <!-- Single sector toggle for 7.5.18.2 -->
-                    <div class="input-group">
-                        <label>Operation Type</label>
-                        <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:5px;">
-                            <label style="display:flex; align-items:center; gap:6px; font-weight:normal; cursor:pointer;">
-                                <input type="radio" name="cabinSectorOp" value="single" checked> Single sector
-                            </label>
-                            <label style="display:flex; align-items:center; gap:6px; font-weight:normal; cursor:pointer;">
-                                <input type="radio" name="cabinSectorOp" value="multi"> Multi-sector
-                            </label>
-                        </div>
-                        <div class="input-description">For cabin crew: single sector + planned FDP &gt;14h may qualify for 7.5.18.2 (higher cap).</div>
-                    </div>
-
-                    <!-- Rest type -->
-                    <div class="input-group">
-                        <label>Rest Taken In</label>
-                        <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:5px;">
-                            <label style="display:flex; align-items:center; gap:6px; font-weight:normal; cursor:pointer;">
-                                <input type="radio" name="cabinRestType" value="bunk" checked> 🛏️ Crew Bunk
-                            </label>
-                            <label style="display:flex; align-items:center; gap:6px; font-weight:normal; cursor:pointer;">
-                                <input type="radio" name="cabinRestType" value="seat"> 💺 Reclining Seat (screened)
-                            </label>
-                        </div>
-                        <div class="input-description">Bunk = extension ½ of rest (max 19h). Seat = extension ⅓ of rest (max 16h). Under 7.5.18.2 bunk cap raised to 18h / 20h15m with PIC discretion.</div>
-                    </div>
-
-                    <!-- Total rest input -->
-                    <div class="input-group">
-                        <label for="cabinTotalRest">Total In-Flight Rest (HH:MM)</label>
-                        <input type="text" id="cabinTotalRest" placeholder="e.g. 04:00" pattern="[0-9]{1,2}:[0-5][0-9]" style="max-width:150px;">
-                        <div class="input-description">Enter total rest accumulated (non-consecutive rest counts). Must be ≥ 3:00 for any extension.</div>
-                        <div class="error-message" id="cabinTotalRestError"></div>
-                    </div>
-                </div>
-            </div>
-
             <button id="calculateCabinBtn">Calculate Cabin Crew Limits</button>
 
             <div class="results" id="cabinResults">
@@ -831,62 +784,6 @@
                 <label for="techSectors">Number of Sectors</label>
                 <input type="text" id="techSectors" pattern="[0-9]*" inputmode="numeric" value="1" required>
                 <div class="error-message" id="techSectorsError"></div>
-            </div>
-
-            <!-- IN-FLIGHT RELIEF SECTION — Tech -->
-            <div class="input-group" style="border:1px solid #c8d8f0; border-radius:6px; padding:12px; background:#f0f4ff; margin-bottom:15px;">
-                <div class="checkbox-group">
-                    <input type="checkbox" id="techReliefEnabled">
-                    <label for="techReliefEnabled" style="font-weight:600; color:#1a3a8f;">🛌 In-Flight Relief Provided? (7.5.10 / 7.5.18)</label>
-                </div>
-                <div class="input-description">Check this if augmented crew with in-flight rest is being used to extend FDP.</div>
-
-                <div id="techReliefFields" style="display:none; margin-top:10px;">
-                    <!-- 4-crew toggle -->
-                    <div class="input-group">
-                        <div class="checkbox-group">
-                            <input type="checkbox" id="techFourCrew">
-                            <label for="techFourCrew" style="font-weight:600;">👥 4-Crew Operation (7.5.18.1)</label>
-                        </div>
-                        <div class="input-description">Check if exactly 4 flight crew are rostered. This applies flat caps (17h scheduled / 19h15m permissible) instead of rest formula — single sector only.</div>
-                    </div>
-
-                    <!-- 4-crew sub-conditions (shown only when 4-crew checked) -->
-                    <div id="techFourCrewFields" style="display:none; margin-left:10px; border-left:3px solid #1a3a8f; padding-left:10px;">
-                        <div class="checkbox-group" style="margin-top:8px;">
-                            <input type="checkbox" id="techBunkAvailable">
-                            <label for="techBunkAvailable">✅ Crew bunk is available and operational</label>
-                        </div>
-                        <div class="checkbox-group">
-                            <input type="checkbox" id="techSingleSector4crew" checked>
-                            <label for="techSingleSector4crew">✅ Single sector operation</label>
-                        </div>
-                        <div class="input-description" style="color:#dc3545;">Both conditions are mandatory for 7.5.18.1. If either is not met, relief extension cannot be applied under this variation.</div>
-                    </div>
-
-                    <!-- Standard augmented fields (shown when 4-crew NOT checked) -->
-                    <div id="techStandardReliefFields">
-                        <div class="input-group" style="margin-top:8px;">
-                            <label>Rest Taken In</label>
-                            <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:5px;">
-                                <label style="display:flex; align-items:center; gap:6px; font-weight:normal; cursor:pointer;">
-                                    <input type="radio" name="techRestType" value="bunk" checked> 🛏️ Crew Bunk
-                                </label>
-                                <label style="display:flex; align-items:center; gap:6px; font-weight:normal; cursor:pointer;">
-                                    <input type="radio" name="techRestType" value="seat"> 💺 Reclining Seat (screened)
-                                </label>
-                            </div>
-                            <div class="input-description">Bunk = extension ½ of rest (max 18h). Seat = extension ⅓ of rest (max 15h).</div>
-                        </div>
-
-                        <div class="input-group">
-                            <label for="techTotalRest">Total In-Flight Rest (HH:MM)</label>
-                            <input type="text" id="techTotalRest" placeholder="e.g. 04:00" pattern="[0-9]{1,2}:[0-5][0-9]" style="max-width:150px;">
-                            <div class="input-description">Enter total rest accumulated (non-consecutive counts). Must be ≥ 3:00 for any extension.</div>
-                            <div class="error-message" id="techTotalRestError"></div>
-                        </div>
-                    </div>
-                </div>
             </div>
 
             <button id="calculateTechBtn">Calculate Tech Crew Limits</button>
@@ -1554,8 +1451,7 @@
                         tableReference,
                         dutyDecimal,
                         limitDecimal,
-                        lastAllowedETA,
-                        relief: this.getReliefResult(limitDecimal)
+                        lastAllowedETA
                     });
 
                     // Save calculation
@@ -1797,27 +1693,9 @@
                     '✓ Within limit' : 
                     '✗ Exceeds limit!';
                 resultHTML += `</div>`;
-
-                // In-flight relief result block
-                if (data.relief) {
-                    resultHTML += buildReliefHTML(data.relief, 'Cabin Crew');
-                }
                 
                 this.elements.resultContent.innerHTML = resultHTML;
                 this.elements.results.style.display = 'block';
-            }
-
-            getReliefResult(baseFdpDecimal) {
-                const enabled = document.getElementById(`${this.type}ReliefEnabled`);
-                if (!enabled || !enabled.checked) return null;
-                const restTypeEl = document.querySelector(`input[name="${this.type}RestType"]:checked`);
-                const restType = restTypeEl ? restTypeEl.value : 'bunk';
-                const totalRestStr = document.getElementById(`${this.type}TotalRest`);
-                const totalRestHours = totalRestStr ? parseHHMM(totalRestStr.value) : null;
-                if (totalRestHours === null) return null;
-                const singleSectorEl = document.querySelector(`input[name="${this.type}SectorOp"]:checked`);
-                const singleSector = singleSectorEl ? singleSectorEl.value === 'single' : true;
-                return calculateInflightRelief(this.type, restType, totalRestHours, baseFdpDecimal, false, false, singleSector, baseFdpDecimal);
             }
 
             // Common calculation methods
@@ -2090,8 +1968,7 @@ const dutyStartUTC = this.convertToUTC(this.elements.DutyStart.value, parseFloat
                         dutyDecimal,
                         techLimitDecimal,
                         lastAllowedETA,
-                        finalTechLimit,
-                        relief: this.getTechReliefResult(techLimitDecimal, sectors)
+                        finalTechLimit
                     });
 
                     // Save calculation
@@ -2106,25 +1983,6 @@ const dutyStartUTC = this.convertToUTC(this.elements.DutyStart.value, parseFloat
                     this.elements.calculateBtn.disabled = false;
                     this.elements.form.classList.remove('loading');
                 }
-            }
-
-            getTechReliefResult(baseFdpDecimal, sectors) {
-                const enabled = document.getElementById('techReliefEnabled');
-                if (!enabled || !enabled.checked) return null;
-                const fourCrew = document.getElementById('techFourCrew').checked;
-                const bunkAvailable = document.getElementById('techBunkAvailable') ? document.getElementById('techBunkAvailable').checked : false;
-                const singleSector4 = document.getElementById('techSingleSector4crew') ? document.getElementById('techSingleSector4crew').checked : false;
-                // For 4-crew path, use single sector checkbox; otherwise use actual sector count
-                const singleSector = fourCrew ? singleSector4 : (sectors === 1);
-                if (fourCrew) {
-                    return calculateInflightRelief('tech', 'bunk', 0, baseFdpDecimal, true, bunkAvailable, singleSector, baseFdpDecimal);
-                }
-                // Standard path — read rest type and duration
-                const restTypeEl = document.querySelector('input[name="techRestType"]:checked');
-                const restType = restTypeEl ? restTypeEl.value : 'bunk';
-                const totalRestHours = parseHHMM(document.getElementById('techTotalRest').value);
-                if (totalRestHours === null) return null;
-                return calculateInflightRelief('tech', restType, totalRestHours, baseFdpDecimal, false, false, singleSector, baseFdpDecimal);
             }
 
             applySpecialConditions(techLimit, tableReference, sectors, dutyHours, dutyMinutes, acclimatization, startTimeLocal) {
@@ -2349,11 +2207,6 @@ const dutyStartUTC = this.convertToUTC(this.elements.DutyStart.value, parseFloat
                     '✓ Within limit' : 
                     '✗ Exceeds limit!';
                 resultHTML += `</div>`;
-
-                // In-flight relief result block
-                if (data.relief) {
-                    resultHTML += buildReliefHTML(data.relief, 'Tech Crew');
-                }
                 
                 this.elements.resultContent.innerHTML = resultHTML;
                 this.elements.results.style.display = 'block';
@@ -2609,144 +2462,8 @@ const dutyStartUTC = this.convertToUTC(this.elements.DutyStart.value, parseFloat
             }
         }
 
-        // ============================================================
-        // IN-FLIGHT RELIEF ENGINE (inline copy — mirrors ftl-module.js)
-        // ============================================================
-        function calculateInflightRelief(crewType, restType, totalRestHours, baseFdpHours, fourCrew, bunkAvailable, singleSector, plannedFdpHours) {
-            if (crewType === 'tech' && fourCrew && singleSector) {
-                if (!bunkAvailable) {
-                    return {
-                        rule: '7.5.18.1', applicable: false, noExtension: true,
-                        reason: 'Crew bunk must be available and operational (7.5.18.1 condition vi).',
-                        scheduledMaxFDP: null, permissibleMaxFDP: null, picDiscretion: null, extensionHours: 0,
-                        notes: ['⚠️ 4-crew variation cannot be applied — bunk not available/operational.', 'Revert to standard FDP limits.']
-                    };
-                }
-                return {
-                    rule: '7.5.18.1', applicable: true, noExtension: false,
-                    scheduledMaxFDP: 17.0, permissibleMaxFDP: 19.25, picDiscretion: 2.25,
-                    extensionHours: Math.max(0, 17.0 - baseFdpHours),
-                    notes: [
-                        '✅ 4-crew variation (7.5.18.1) applied.',
-                        '📋 Conditions: exactly 4 flight crew, single sector, bunk available & operational, no dispatch crew.',
-                        '🕐 Scheduled FDP maximum: 17h 00m',
-                        '🕐 Permissible FDP maximum (with PIC discretion): 19h 15m',
-                        '⚠️ PIC discretion (up to 2h 15m) is the captain\'s sole authority. Not routine.',
-                        '📅 Minimum 2 days off at home base on return.',
-                        '📖 Ref: MAB FOM 7.5.18.1'
-                    ]
-                };
-            }
-            if (totalRestHours < 3.0) {
-                return {
-                    rule: '7.5.10', applicable: false, noExtension: true,
-                    reason: `Total in-flight rest is ${_fmtHM(totalRestHours)} — minimum 3h required.`,
-                    scheduledMaxFDP: null, permissibleMaxFDP: null, picDiscretion: null, extensionHours: 0,
-                    notes: ['❌ No FDP extension. Rest must total ≥ 3h (non-consecutive rest counts).', '📖 Ref: MAB FOM 7.5.10 para 4']
-                };
-            }
-            let extensionHours, hardCapHours, rule, is7518overlay = false;
-            if (restType === 'bunk') {
-                extensionHours = totalRestHours / 2;
-                hardCapHours = crewType === 'cabin' ? 19.0 : 18.0;
-                if (crewType === 'cabin' && singleSector && plannedFdpHours > 14.0) {
-                    hardCapHours = 18.0; is7518overlay = true; rule = '7.5.10 + 7.5.18.2';
-                } else { rule = '7.5.10'; }
-            } else {
-                extensionHours = totalRestHours / 3;
-                hardCapHours = crewType === 'cabin' ? 16.0 : 15.0;
-                rule = '7.5.10';
-            }
-            const rawExtended = baseFdpHours + extensionHours;
-            const scheduledMaxFDP = Math.min(rawExtended, hardCapHours);
-            let permissibleMaxFDP = null, picDiscretion = null;
-            if (is7518overlay) { permissibleMaxFDP = 20.25; picDiscretion = permissibleMaxFDP - scheduledMaxFDP; }
-            const notes = [
-                `✅ In-flight relief extension applied (Rule: ${rule}).`,
-                `🛌 Rest type: ${restType === 'bunk' ? 'Crew Bunk' : 'Seat (screened)'}`,
-                `⏱️ Total in-flight rest: ${_fmtHM(totalRestHours)}`,
-                `📐 Extension formula: ${restType === 'bunk' ? '½ of rest' : '⅓ of rest'} = ${_fmtHM(extensionHours)}`,
-                `📊 Base FDP: ${_fmtHM(baseFdpHours)} + Extension: ${_fmtHM(extensionHours)} = ${_fmtHM(rawExtended)}`,
-                rawExtended > hardCapHours
-                    ? `🔴 Capped at maximum: ${_fmtHM(hardCapHours)} (raw ${_fmtHM(rawExtended)} exceeds cap)`
-                    : `🟢 Within cap (max ${_fmtHM(hardCapHours)})`,
-                `🕐 Extended FDP limit: ${_fmtHM(scheduledMaxFDP)}`,
-            ];
-            if (is7518overlay) {
-                notes.push(`📋 7.5.18.2: Cabin crew, single sector, planned FDP >14h.`);
-                notes.push(`🕐 With PIC discretion: up to ${_fmtHM(permissibleMaxFDP)} absolute maximum.`);
-                notes.push(`⚠️ PIC discretion is captain's sole authority. Min in-flight rest 3h must be granted.`);
-                notes.push(`📅 Minimum 1 day off at home base on return.`);
-                notes.push(`📖 Ref: MAB FOM 7.5.10 (Table 7.5.10(2)) + 7.5.18.2`);
-            } else {
-                notes.push(`📖 Ref: MAB FOM 7.5.10 (Table ${crewType === 'cabin' ? '7.5.10(2)' : '7.5.10(1)'})`);
-            }
-            return { rule, applicable: true, noExtension: false, extensionHours, scheduledMaxFDP, permissibleMaxFDP, picDiscretion, is7518overlay, notes };
-        }
-
-        function _fmtHM(decH) {
-            const h = Math.floor(decH), m = Math.round((decH - h) * 60);
-            return m > 0 ? `${h}h ${m}m` : `${h}h`;
-        }
-
-        function parseHHMM(str) {
-            if (!str || !str.includes(':')) return null;
-            const [h, m] = str.split(':').map(Number);
-            if (isNaN(h) || isNaN(m)) return null;
-            return h + m / 60;
-        }
-
-        function buildReliefHTML(relief, crewLabel) {
-            if (!relief) return '';
-            let html = `<div style="margin-top:12px; padding:12px; border-radius:6px; background:#e8f0fe; border-left:4px solid #1a3a8f;">`;
-            html += `<strong>🛌 In-Flight Relief Result (${crewLabel})</strong><br><br>`;
-            if (relief.noExtension) {
-                html += `<div class="result-item warning" style="margin-bottom:8px;">`;
-                html += `<strong>No Extension:</strong> ${relief.reason || ''}`;
-                html += `</div>`;
-            } else {
-                // Outcome block 1 — scheduled
-                html += `<div class="result-item ok" style="margin-bottom:8px;">`;
-                html += `<strong>📊 Outcome 1 — Scheduled Maximum FDP</strong><br>`;
-                html += `<div class="time-display">${_fmtHM(relief.scheduledMaxFDP)}</div>`;
-                html += `<small>This is the maximum permitted FDP with in-flight relief applied.</small>`;
-                html += `</div>`;
-                // Outcome block 2 — PIC discretion
-                if (relief.permissibleMaxFDP) {
-                    html += `<div class="result-item warning" style="margin-bottom:8px;">`;
-                    html += `<strong>📊 Outcome 2 — With PIC Discretion</strong><br>`;
-                    html += `<div class="time-display">${_fmtHM(relief.permissibleMaxFDP)}</div>`;
-                    html += `<small>Absolute maximum. PIC discretion adds up to ${_fmtHM(relief.picDiscretion)}. <strong>This is the captain's authority only — not a planning tool.</strong></small>`;
-                    html += `</div>`;
-                } else {
-                    html += `<div class="result-item" style="margin-bottom:8px; background:#f8f9fa; border-left:4px solid #6c757d;">`;
-                    html += `<strong>📊 Outcome 2 — PIC Discretion</strong><br>`;
-                    html += `<small>Not applicable for this scenario (PIC discretion under 7.5.18.2 is limited to cabin crew single-sector long-haul with bunk).</small>`;
-                    html += `</div>`;
-                }
-            }
-            // Notes
-            html += `<div style="margin-top:8px; font-size:0.82rem; color:#444; line-height:1.6;">`;
-            relief.notes.forEach(n => { html += `${n}<br>`; });
-            html += `</div></div>`;
-            return html;
-        }
-
-        // ============================================================
-
         // Initialize application
         document.addEventListener('DOMContentLoaded', function() {
-            // ── In-flight relief toggle visibility ──
-            document.getElementById('cabinReliefEnabled').addEventListener('change', function() {
-                document.getElementById('cabinReliefFields').style.display = this.checked ? 'block' : 'none';
-            });
-            document.getElementById('techReliefEnabled').addEventListener('change', function() {
-                document.getElementById('techReliefFields').style.display = this.checked ? 'block' : 'none';
-            });
-            document.getElementById('techFourCrew').addEventListener('change', function() {
-                document.getElementById('techFourCrewFields').style.display = this.checked ? 'block' : 'none';
-                document.getElementById('techStandardReliefFields').style.display = this.checked ? 'none' : 'block';
-            });
             // Populate GMT selects
             const gmtSelects = document.querySelectorAll('.gmt-select');
             gmtSelects.forEach(select => {

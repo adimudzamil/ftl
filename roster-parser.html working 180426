@@ -3306,9 +3306,7 @@
                                     arrivalStation: finalDestination,
                                     finalArrivalDate: finalArrivalDate,
                                     isMultiDayDuty: (dutyStartFlight.date !== finalArrivalDate),
-                                    dutyEndFlightIndex: i,
-                                    // Relief note: flag long-haul single-sector widebody duties
-                                    reliefPossible: (ftlSectorCount === 1 && ftlLimitHours >= 13)
+                                    dutyEndFlightIndex: i
                                 };
                                 
                                 console.log(`FTL Data for duty cycle:`, dutyStartFlight.ftlData);
@@ -3529,7 +3527,7 @@
                 html += `<td>${flight.dutyHours || ''}</td>`;
                 html += `<td class="${aircraftClass}">${aircraftDisplay}</td>`;
                 html += `<td>${ftlLimit}</td>`;
-                html += `<td title="${ftlTooltip}">${latestArrival}${flight.ftlData && flight.ftlData.reliefPossible ? ' <span title="In-flight relief extension may apply — verify in FTL Calculator" style="color:#1a3a8f;font-size:10px;cursor:help;">🛌</span>' : ''}</td>`;
+                html += `<td title="${ftlTooltip}">${latestArrival}</td>`;
                 html += `<td>${sectors}</td>`;
 
                 // Timer cell logic
@@ -3576,7 +3574,6 @@
             html += '<br><small>NS = Night Stop | RTB = Return to Base | OB = Out of Base | CONT = Multi-day flight continuation | ARR = Arrival day entry</small>';
             html += '<br><small>🌐 = Duty spans multiple months | 🔄 = Incomplete duty cycle (needs additional roster)</small>';
             html += '<br><small><strong>Time to Limit:</strong> 🟢 Safe (>2h) | 🟡 Warning (1-2h) | 🟠 Caution (30min-1h) | 🔴 Critical (<30min) | ⛔ EXCEEDED</small>';
-            html += '<br><small>🛌 = Long-haul single sector — in-flight relief extension may apply. Verify in FTL Calculator (7.5.10 / 7.5.18).</small>';
             html += '<br><small><strong>Note:</strong> Flight-specific data (flight number, timer, aircraft) appears only once per flight cycle to avoid duplication</small>';
             html += '</div>';
             
